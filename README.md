@@ -9,6 +9,7 @@ Template template = engine.getTemplate("demo.html");
 template.merge(Context, Writer/OutputStream/Channel);
 ```
 2.配置文件
+---------
 smarty.properties是对系统运行环境的配置，放到classes的根目录即可，默认值如下：
 ```shell
 debug=true - 调试模式，模板文件更新将自动重新加载
@@ -46,5 +47,5 @@ package.modifier=template.smarty4j.statement.modifier - 变量调节器扩展包
 * 赋值支持/{}直接定义数组和映射对象，如a=[1,2,3]或b={a:"test",b:false}
 * 部分支持{$var = ...}的直接赋值语法，如{$a=10}
 * 支持{block}函数，模板继承功能
-* include支持返回值，使用return属性，例如：{include ... return="a,b"}表示include引入的子模板的a,b两个属性需要传递到父模板中，同时，子模板内也需要写{return a,b}来实际返回这两个变量，这是非标准smarty的功能，出于变量缓存的问题，不打算支持smarty中的scope属性，大家用这个功能来代替scope属性好了，smarty4j也不需要设置nocache属性，变量是不是要用cache由编译器来决定
+* 为了减少缓存计算的复杂性，不支持标签的scope属性，部分场景可以使用call的非标准扩展属性return来实现，include支持返回值，使用return属性，例如：{call ... return="a,b"}表示函数的a,b两个属性需要返回，smarty4j也不需要设置nocache属性，变量是不是要用cache由编译器来决定
 
