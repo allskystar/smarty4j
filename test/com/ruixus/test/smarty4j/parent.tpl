@@ -1,0 +1,1 @@
+<title>{block name="title"} | Default Title | {/block}</title>
