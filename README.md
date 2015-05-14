@@ -25,12 +25,12 @@ package.modifier=template.smarty4j.statement.modifier - 变量调节器扩展包
 * 针对OutputStream优化性能，重写了OutputStreamWriter的行为，取消了它内部使用的缓冲区，因为模板引擎在字节流与字符流中切换较频繁，且变量生存周期短(通常<1ms)，而缓冲区的创建操作需要消耗大量的资源(8096字节)
 * 修复cycle,counter在include包含的模板中使用的死循环问题
 * 优化变量缓存功能
-** 未使用的变量的赋值行为被取消(包括行函数的assign属性赋值行为)
-** foreach/section未使用的循环变量的赋值行为被取消
-** Function的execute方法提供返回值可用于assign的缓存赋值
-** include支持inline属性(取代原smarty4j 1.0中的macro函数)，不使用inline属性会触发变量缓存的强制回写
-** 请尽量避免使用eval函数，它会强制禁用缓存
-** 请减少在模板中使用函数中的assign属性或{capture}函数的使用，如果需要尽量在业务层完成，因为1.1版本已经是基于byte进行处理，如果使用这两个功能，这个片段的处理会转为基于String进行，影响效率
+	* 未使用的变量的赋值行为被取消(包括行函数的assign属性赋值行为)
+	* foreach/section未使用的循环变量的赋值行为被取消
+	* Function的execute方法提供返回值可用于assign的缓存赋值
+	* include支持inline属性(取代原smarty4j 1.0中的macro函数)，不使用inline属性会触发变量缓存的强制回写
+	* 请尽量避免使用eval函数，它会强制禁用缓存
+	* 请减少在模板中使用函数中的assign属性或{capture}函数的使用，如果需要尽量在业务层完成，因为1.1版本已经是基于byte进行处理，如果使用这两个功能，这个片段的处理会转为基于String进行，影响效率
 * 增加IContext接口，屏蔽掉get/set操作，如果一定需要使用可以强制转义成Context，请注意对变量缓存的影响，参见preventCache与preventAllCache方法
 * 使用数据包装类型，减少循环setForeach对Map的操作次数
 * 支持直接在函数属性值中使用变量调节器
