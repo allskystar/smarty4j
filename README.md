@@ -41,11 +41,10 @@ package.modifier=template.smarty4j.statement.modifier - 变量调节器扩展包
 * 修复section函数的bug
 * 函数的赋值中可以直接应用公式与变量修饰器语法
 * 修复操作符的一处定义错误(完全不影响使用)
-* 支持直接赋值
 * math函数能够自适应选择使用int型还是double型运算，``中包含的表达式使用double型运算，普通的表达式如果常量中有浮点数也使用double型运算，否则使用int型运算
 * foreach支持smarty 3.x的语法，增加for函数的支持
 * 赋值支持/{}直接定义数组和映射对象，如a=[1,2,3]或b={a:"test",b:false}
 * 部分支持{$var = ...}的直接赋值语法，如{$a=10}
 * 支持{block}函数，模板继承功能
-* 为了减少缓存计算的复杂性，不支持标签的scope属性，部分场景可以使用call的非标准扩展属性return来实现，include支持返回值，使用return属性，例如：{call ... return="a,b"}表示函数的a,b两个属性需要返回，smarty4j也不需要设置nocache属性，变量是不是要用cache由编译器来决定
+* 为了减少缓存计算的复杂性，不支持标签的scope属性，部分场景可以使用call的非标准扩展属性return来实现，例如：{call ... return="a,b"}表示函数的a,b两个属性需要返回，smarty4j也不需要设置nocache属性，变量是不是要用cache由编译器来决定
 
