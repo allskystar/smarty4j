@@ -1,5 +1,6 @@
 Smarty4j
 ========
+域名终于买好了，包统一迁移到了com.ruixus.*下，域名买了很多年以后不会再变了
 
 1.Smarty4j的使用
 ---------
@@ -18,8 +19,8 @@ encoding=UTF-8 - 模板文件编码集
 tpl.path=/ - 模板根路径
 left.delimiter={ - 左边界定界符
 right.delimiter=} - 右边界定界符
-package.function=template.smarty4j.statement.function - 函数扩展包的名称，以:分隔
-package.modifier=template.smarty4j.statement.modifier - 变量调节器扩展包的名称，以:分隔
+package.function=com.ruixus.smarty4j.statement.function - 函数扩展包的名称，以:分隔
+package.modifier=com.ruixus.smarty4j.statement.modifier - 变量调节器扩展包的名称，以:分隔
 ```
 3.Update(Version 1.1)
 ----------
