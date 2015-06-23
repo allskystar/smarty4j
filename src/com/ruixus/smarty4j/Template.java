@@ -40,6 +40,7 @@ public class Template {
 	private static final String[] INTERFACES = { Parser.class.getName().replace('.', '/') };
 
 	SimpleStack bytes = new SimpleStack();
+	SimpleStack strs = new SimpleStack();
 
 	private Engine engine;
 	private String name;
@@ -235,10 +236,21 @@ public class Template {
 	 * 
 	 * @param index
 	 *          字节数组编号
-	 * @return 字节数组
+	 * @return 文本字节数组
 	 */
 	public byte[] getTextBytes(int index) {
 		return (byte[]) bytes.get(index);
+	}
+	
+	/**
+	 * 获取文本对应的字符串
+	 * 
+	 * @param index
+	 *          字节数组编号
+	 * @return 文本内容
+	 */
+	public String getTextString(int index) {
+		return (String) strs.get(index);
 	}
 
 	/**

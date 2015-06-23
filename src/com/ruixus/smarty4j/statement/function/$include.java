@@ -115,7 +115,6 @@ public class $include extends LineFunction {
 		// 移除必须存在的参数
 		fields.remove("file");
 		fields.remove("assign");
-		fields.remove("return");
 		PARAMETERS[2] = new MapExpression(fields);
 	}
 

@@ -128,16 +128,22 @@ public class Analyzer {
 	}
 
 	/**
-	 * Returns the byte index, provided OutputStream rendering and generated from the text.
+	 * Returns the text's index, provided OutputStream rendering and generated from the text.
 	 * 
 	 * @param text
 	 *          text segment in the template
-	 * @return the byte index
+	 * @return the text's index
 	 */
-	public int getBytesIndex(String text) {
+	public int getTextIndex(String text) {
 		int ret = tpl.bytes.size();
 		if (!texts.containsKey(text)) {
-			tpl.bytes.push(text.getBytes(engine.getCharset()));
+			byte[] bytes = text.getBytes(engine.getCharset());
+			tpl.bytes.push(bytes);
+			if (bytes.length > 65535) {
+				tpl.strs.push(text);
+			} else {
+				tpl.strs.push(null);
+			}
 			texts.put(text, ret);
 		} else {
 			ret = texts.get(text);
