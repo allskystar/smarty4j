@@ -70,6 +70,7 @@ public class Smarty4j {
 
 			try {
 				if (fileArgs.length == 0) {
+					engine.setTemplatePath(System.getProperty("user.dir"));
 					in = new InputStreamReader(System.in, charset);
 				} else {
 					File file = new File(fileArgs[0]);
