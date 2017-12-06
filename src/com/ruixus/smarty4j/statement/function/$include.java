@@ -3,12 +3,14 @@ package com.ruixus.smarty4j.statement.function;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import com.ruixus.smarty4j.Analyzer;
 import com.ruixus.smarty4j.Context;
+import com.ruixus.smarty4j.Engine;
 import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.ParseException;
 import com.ruixus.smarty4j.SafeContext;
@@ -24,13 +26,14 @@ import com.ruixus.smarty4j.statement.Definition.Type;
 import com.ruixus.smarty4j.statement.LineFunction;
 
 /**
- * The tag is used for including other templates in the current template. Any variables available in
- * the current template are also available within the included template.
+ * The tag is used for including other templates in the current template. Any
+ * variables available in the current template are also available within the
+ * included template.
  *
  * <table border="1">
- * <colgroup> <col align="center" class="param"> <col align="center" class="type"> <col
- * align="center" class="required"> <col align="center" class="default"> <col class="desc">
- * </colgroup> <thead>
+ * <colgroup> <col align="center" class="param">
+ * <col align="center" class="type"> <col align="center" class="required">
+ * <col align="center" class="default"> <col class="desc"> </colgroup> <thead>
  * <tr>
  * <th align="center">Attribute Name</th>
  * <th align="center">Type</th>
@@ -51,7 +54,8 @@ import com.ruixus.smarty4j.statement.LineFunction;
  * <td align="center">string</td>
  * <td align="center">No</td>
  * <td align="center"><span class="emphasis"><em>n/a</em></span></td>
- * <td>The name of the variable that the output of include will be assigned to</td>
+ * <td>The name of the variable that the output of include will be assigned
+ * to</td>
  * </tr>
  * <tr>
  * <td align="center">[var ...]</td>
@@ -64,7 +68,8 @@ import com.ruixus.smarty4j.statement.LineFunction;
  * </table>
  * 
  * <table border="1">
- * <colgroup> <col align="center" class="param"> <col class="desc"> </colgroup> <thead>
+ * <colgroup> <col align="center" class="param"> <col class="desc"> </colgroup>
+ * <thead>
  * <tr>
  * <th align="center">Option Name</th>
  * <th>Description</th>
@@ -72,7 +77,8 @@ import com.ruixus.smarty4j.statement.LineFunction;
  * </thead> <tbody>
  * <tr>
  * <td align="center">inline</td>
- * <td>If set merge the compile code of the subtemplate into the compiled calling template</td>
+ * <td>If set merge the compile code of the subtemplate into the compiled
+ * calling template</td>
  * </tr>
  * </tbody>
  * </table>
@@ -84,20 +90,20 @@ import com.ruixus.smarty4j.statement.LineFunction;
 public class $include extends LineFunction {
 
 	/** 参数定义 */
-	private static final Definition[] definitions = {
-	    Definition.forFunction("file", Type.STROBJ),
-	    Definition.forFunction("assign", Type.STRING, NullExpression.VALUE),
-	    Definition.forFunction("", Type.MAP, NullExpression.VALUE) };
+	private static final Definition[] definitions = { Definition.forFunction("file", Type.STROBJ),
+			Definition.forFunction("assign", Type.STRING, NullExpression.VALUE),
+			Definition.forFunction("", Type.MAP, NullExpression.VALUE) };
 
 	public static Object execute(SafeContext ctx, TemplateWriter writer, String file, String assign,
-	    Map<String, Object> data) throws Exception {
+			Map<String, Object> data) throws Exception {
 		if (assign != null) {
 			writer = TemplateWriter.getTemporaryWriter();
 		}
 
 		// 加载子模板, 设置子模板的父容器
 		Template tpl = ctx.getTemplate();
-		tpl = tpl.getEngine().getTemplate(tpl.getRelativePath(file));
+		Engine engine = tpl.getEngine();
+		tpl = engine.getTemplate(tpl.getRelativePath(file));
 		Context cc = new Context((Context) ctx);
 		cc.putAll(data);
 		tpl.merge(cc, writer);
@@ -109,8 +115,7 @@ public class $include extends LineFunction {
 	}
 
 	@Override
-	public void createParameters(Definition[] parameters, Map<String, Expression> fields)
-	    throws ParseException {
+	public void createParameters(Definition[] parameters, Map<String, Expression> fields) throws ParseException {
 		super.createParameters(parameters, fields);
 		// 移除必须存在的参数
 		fields.remove("file");
@@ -122,13 +127,19 @@ public class $include extends LineFunction {
 	public void analyzeContent(Analyzer analyzer, TemplateReader reader) throws ParseException {
 		if (contain("inline")) {
 			Template tpl = analyzer.getTemplate();
-			String name = tpl.getRelativePath(PARAMETERS[0].toString());
-			String path = tpl.getEngine().getTemplatePath() + name;
-			File file = new File(path);
-			tpl.associate(file);
+			String name;
+			InputStream is;
 			try {
-				reader.insertReader(name, new TemplateReader(new InputStreamReader(
-				    new FileInputStream(file), tpl.getEngine().getCharset())));
+				name = tpl.getRelativePath(PARAMETERS[0].toString());
+				File file = new File(tpl.getEngine().getTemplatePath() + name);
+				if (file.exists()) {
+					is = new FileInputStream(file);
+					tpl.associate(file);
+				} else {
+					is = Engine.class.getClassLoader().getResourceAsStream(name);
+				}
+
+				reader.insertReader(name, new TemplateReader(new InputStreamReader(is, tpl.getEngine().getCharset())));
 			} catch (IOException e) {
 				reader.addMessage(e.getMessage());
 			}

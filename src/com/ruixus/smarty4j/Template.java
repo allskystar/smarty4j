@@ -24,9 +24,10 @@ import com.ruixus.smarty4j.util.SimpleStack;
 import com.ruixus.smarty4j.util.SimpleStringReader;
 
 /**
- * The template class save the information of template file, and built-in template parser that
- * implements the interface. It by calling the merge method, the ability to merge the source data
- * and template files to generate output.
+ * The template class save the information of template file, and built-in
+ * template parser that implements the interface. It by calling the merge
+ * method, the ability to merge the source data and template files to generate
+ * output.
  * 
  * @version 1.1.0, 2015/05/16
  * @author Ouyang Xianwei
@@ -55,19 +56,18 @@ public class Template {
 	 * Constructs a template according to the file.
 	 * 
 	 * @param engine
-	 *          the template engine
+	 *            the template engine
 	 * @param file
-	 *          the file
+	 *            the file
 	 * @throws IOException
-	 *           if template file cannot be read
+	 *             if template file cannot be read
 	 * @throws TemplateException
-	 *           if syntax error in template
+	 *             if syntax error in template
 	 */
 	public Template(Engine engine, File file) throws IOException, TemplateException {
-		this(engine, file.getAbsolutePath(), new InputStreamReader(new FileInputStream(file),
-		    engine.getCharset()), true);
+		this(engine, file.getAbsolutePath().substring(engine.getTemplatePath().length()),
+				new InputStreamReader(new FileInputStream(file), engine.getCharset()), true);
 		this.file = file;
-		name = file.getAbsolutePath().substring(engine.getTemplatePath().length());
 		modified = file.lastModified();
 	}
 
@@ -75,11 +75,11 @@ public class Template {
 	 * Constructs a template according to a string.
 	 * 
 	 * @param engine
-	 *          the template engine
+	 *            the template engine
 	 * @param text
-	 *          the string containing smarty syntax
+	 *            the string containing smarty syntax
 	 * @throws TemplateException
-	 *           if syntax error in template
+	 *             if syntax error in template
 	 */
 	public Template(Engine engine, String text) throws TemplateException {
 		this(engine, null, new SimpleStringReader(text), true);
@@ -89,22 +89,19 @@ public class Template {
 	 * Constructs a template.
 	 * 
 	 * @param engine
-	 *          the template engine
-	 * @param path
-	 *          the path of the template file
+	 *            the template engine
+	 * @param name
+	 *            the name of the template file
 	 * @param reader
-	 *          the reader of the template file
+	 *            the reader of the template file
 	 * @param resolve
-	 *          if <tt>true</tt> then resolve the class
+	 *            if <tt>true</tt> then resolve the class
 	 * @throws TemplateException
-	 *           if syntax error in template
+	 *             if syntax error in template
 	 */
-	public Template(Engine engine, String path, Reader reader, boolean resolve)
-	    throws TemplateException {
+	public Template(Engine engine, String name, Reader reader, boolean resolve) throws TemplateException {
 		this.engine = engine;
-		if (path != null) {
-			name = path.replace('\\', '/').substring(engine.getTemplatePath().length());
-		}
+		this.name = name;
 		TemplateReader tplReader = new TemplateReader(reader);
 		VariableManager vm = new VariableManager(engine);
 		Analyzer analyzer = new Analyzer(this);
@@ -116,8 +113,7 @@ public class Template {
 		}
 	}
 
-	private Template(Engine engine, String name, Node root, VariableManager vm)
-	    throws TemplateException {
+	private Template(Engine engine, String name, Node root, VariableManager vm) throws TemplateException {
 		this.engine = engine;
 		this.name = name;
 		parse(root, vm);
@@ -164,9 +160,9 @@ public class Template {
 	 * 获得相对于模板地址的地址，如果以'/'开头，将取得相对模板控制器根路径的地址， 否则相对于当前模板地址转换。
 	 * 
 	 * @param path
-	 *          相对地址描述
+	 *            相对地址描述
 	 * @param isTemplateName
-	 *          <tt>true</tt>表示计算模板的名称; <tt>false</tt>表示计算绝对路径
+	 *            <tt>true</tt>表示计算模板的名称; <tt>false</tt>表示计算绝对路径
 	 * @return 转换后的文件名
 	 * @see com.ruixus.smarty4j.statement.function.$include
 	 */
@@ -184,7 +180,7 @@ public class Template {
 	 * 增加与模板文件相关联的文件。
 	 * 
 	 * @param file
-	 *          需要增加的文件描述对象
+	 *            需要增加的文件描述对象
 	 */
 	public void associate(File file) {
 		if (associated == null) {
@@ -198,7 +194,7 @@ public class Template {
 	 * 获取模板对象中指定的扩展节点。
 	 * 
 	 * @param index
-	 *          扩展节点的编号
+	 *            扩展节点的编号
 	 * @return 扩展节点
 	 */
 	public Object getNode(int index) {
@@ -209,7 +205,7 @@ public class Template {
 	 * 往模板对象中新增扩展节点。
 	 * 
 	 * @param node
-	 *          扩展节点
+	 *            扩展节点
 	 * @return 添加成功后扩展节点对应的序号
 	 */
 	public int addNode(Node node) {
@@ -235,18 +231,18 @@ public class Template {
 	 * 获取文本对应的字节数组
 	 * 
 	 * @param index
-	 *          字节数组编号
+	 *            字节数组编号
 	 * @return 文本字节数组
 	 */
 	public byte[] getTextBytes(int index) {
 		return (byte[]) bytes.get(index);
 	}
-	
+
 	/**
 	 * 获取文本对应的字符串
 	 * 
 	 * @param index
-	 *          字节数组编号
+	 *            字节数组编号
 	 * @return 文本内容
 	 */
 	public String getTextString(int index) {
@@ -257,11 +253,11 @@ public class Template {
 	 * 根据数据容器的内容解析模板，将结果输出到指定的nio缓冲区。
 	 * 
 	 * @param ctx
-	 *          数据容器
+	 *            数据容器
 	 * @param ch
-	 *          nio字节流写通道
+	 *            nio字节流写通道
 	 * @throws Exception
-	 *           如果合并执行时发生错误
+	 *             如果合并执行时发生错误
 	 */
 	public void merge(Context ctx, WritableByteChannel ch) throws Exception {
 		TemplateWriter templateWriter = new TemplateWriter(ch, engine.getCharset());
@@ -272,11 +268,11 @@ public class Template {
 	 * 根据数据容器的内容解析模板，将结果输出到指定的二进制输出流。
 	 * 
 	 * @param ctx
-	 *          数据容器
+	 *            数据容器
 	 * @param out
-	 *          二进制输出流
+	 *            二进制输出流
 	 * @throws Exception
-	 *           如果合并执行时发生错误
+	 *             如果合并执行时发生错误
 	 */
 	public void merge(Context ctx, OutputStream out) throws Exception {
 		TemplateWriter templateWriter = new TemplateWriter(out, engine.getCharset());
@@ -287,9 +283,9 @@ public class Template {
 	 * 根据数据容器的内容解析模板，将结果输出到指定的输出对象。
 	 * 
 	 * @param ctx
-	 *          数据容器
+	 *            数据容器
 	 * @param writer
-	 *          输出对象
+	 *            输出对象
 	 */
 	public void merge(Context ctx, Writer writer) throws Exception {
 		TemplateWriter templateWriter = new TemplateWriter(writer);
@@ -300,9 +296,9 @@ public class Template {
 	 * 根据数据容器的内容解析模板，将结果输出到指定的输出对象。
 	 * 
 	 * @param ctx
-	 *          数据容器
+	 *            数据容器
 	 * @param out
-	 *          输出对象
+	 *            输出对象
 	 */
 	public void merge(Context ctx, TemplateWriter writer) throws Exception {
 		ctx.setTemplate(this);
@@ -330,8 +326,7 @@ public class Template {
 		mv.visitEnd();
 
 		// 定义类的merge方法
-		mv = cw.visitMethod(ACC_PUBLIC, "merge", "(L" + Context.NAME + ";L" + TemplateWriter.NAME
-		    + ";)V", null, null);
+		mv = cw.visitMethod(ACC_PUBLIC, "merge", "(L" + Context.NAME + ";L" + TemplateWriter.NAME + ";)V", null, null);
 		mv.visitVarInsn(ALOAD, Node.CONTEXT);
 		if (vm.hasCached()) {
 			mv.visitInsn(DUP);

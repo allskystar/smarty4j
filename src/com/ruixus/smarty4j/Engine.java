@@ -3,6 +3,7 @@ package com.ruixus.smarty4j;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
@@ -241,14 +242,20 @@ public class Engine {
 	 *           if syntax error in template
 	 */
 	public Template getTemplate(String name) throws IOException, TemplateException {
-		name = root + name;
-		Template tpl = tpls.get(name);
+		String url = root + name;
+		Template tpl = tpls.get(url);
 		if (tpl != null && !(debug && tpl.isUpdated())) {
 			return tpl;
 		}
 
-		tpl = new Template(this, new File(name));
-		tpls.put(name, tpl);
+		File file = new File(url);
+		if (file.exists()) {
+			tpl = new Template(this, file);
+		} else {
+			url = name;
+			tpl = new Template(this, name, new InputStreamReader(Engine.class.getClassLoader().getResourceAsStream(url), cs), true);
+		}
+		tpls.put(url, tpl);
 		return tpl;
 	}
 
