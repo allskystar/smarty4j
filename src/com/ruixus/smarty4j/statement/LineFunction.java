@@ -2,10 +2,14 @@ package com.ruixus.smarty4j.statement;
 
 import static org.objectweb.asm.Opcodes.*;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+
 import com.ruixus.smarty4j.Analyzer;
 import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.ParseException;
 import com.ruixus.smarty4j.SafeContext;
+import com.ruixus.smarty4j.Template;
 import com.ruixus.smarty4j.TemplateReader;
 import com.ruixus.smarty4j.TemplateWriter;
 import com.ruixus.smarty4j.VariableManager;
@@ -23,8 +27,7 @@ import com.ruixus.smarty4j.expression.NullExpression;
  */
 public abstract class LineFunction extends Function {
 
-	/** 函数在模板中的编号 */
-	private int index;
+	private Template tpl;
 
 	/**
 	 * 获取赋值变量名
@@ -47,11 +50,11 @@ public abstract class LineFunction extends Function {
 	 * 返回值解析
 	 * 
 	 * @param mv
-	 *          ASM方法访问对象
+	 *            ASM方法访问对象
 	 * @param local
-	 *          ASM方法内部的语句栈局部变量起始位置
+	 *            ASM方法内部的语句栈局部变量起始位置
 	 * @param vm
-	 *          变量管理器
+	 *            变量管理器
 	 */
 	public void parseReturn(MethodVisitorProxy mv, int local, VariableManager vm) {
 		String name = getAssignName();
@@ -65,7 +68,7 @@ public abstract class LineFunction extends Function {
 	@Override
 	public void analyzeContent(Analyzer analyzer, TemplateReader reader) throws ParseException {
 		super.analyzeContent(analyzer, reader);
-		this.index = analyzer.getTemplate().addNode(this);
+		this.tpl = analyzer.getTemplate();
 	}
 
 	@Override
@@ -76,12 +79,25 @@ public abstract class LineFunction extends Function {
 				return;
 			}
 		}
-		String className = parseNode(mv, local, index);
+
+		Method method = getMethod("execute");
+		String returnType = method.getReturnType() == void.class ? "V" : "Ljava/lang/Object;";
+		int invokeType = Modifier.isStatic(method.getModifiers()) ? INVOKESTATIC : INVOKEVIRTUAL;
+
+		String className;
+		if (invokeType == INVOKESTATIC) {
+			className = this.getClass().getName().replace('.', '/');
+		} else {
+			className = parseNode(mv, local, tpl.addNode(this));
+		}
+
 		mv.visitVarInsn(ALOAD, CONTEXT);
 		mv.visitVarInsn(ALOAD, WRITER);
-		parseAllParameters(mv, local, vm);
-		mv.visitMethodInsn(INVOKEVIRTUAL, className, "execute", "(L" + SafeContext.NAME + ";L"
-		    + TemplateWriter.NAME + ';' + getDesc() + ")Ljava/lang/Object;");
-		parseReturn(mv, local, vm);
+		parseAllParameters(mv, local, vm);		
+		mv.visitMethodInsn(invokeType, className, "execute",
+				"(L" + SafeContext.NAME + ";L" + TemplateWriter.NAME + ';' + getDesc() + ")" + returnType);
+		if (returnType.length() > 1) {
+			parseReturn(mv, local, vm);
+		}
 	}
 }

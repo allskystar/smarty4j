@@ -26,7 +26,7 @@ public class $unescape extends Modifier {
 
 	private static final Pattern p = Pattern.compile("&(#([0-9]+)|[a-zA-Z]+);");
 
-	public Object execute(Object obj, int type, String charsetName) {
+	public static Object execute(Object obj, int type, String charsetName) {
 		switch (type) {
 		case HTML:
 			return unescapeHtml(obj.toString());
@@ -36,12 +36,12 @@ public class $unescape extends Modifier {
 		return null;
 	}
 
-	private String unescapeHtml(String s) {
+	private static String unescapeHtml(String s) {
 		return s.replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", "\"")
 		    .replace("&#39;", "'").replace("&amp;", "&");
 	}
 
-	private String unescapeHtmlall(String s) {
+	private static String unescapeHtmlall(String s) {
 		StringBuilder buf = new StringBuilder();
 		int last = 0;
 		Matcher m = p.matcher(s);

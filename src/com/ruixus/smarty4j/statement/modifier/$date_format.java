@@ -318,8 +318,8 @@ public class $date_format extends Modifier {
 	}
 
 	@Override
-	public void createParameters(Template parent, List<Expression> values) throws ParseException {
-		super.createParameters(parent, values);
+	public void createParameters(Template tpl, List<Expression> values) throws ParseException {
+		super.createParameters(tpl, values);
 		if (values.size() > 2) {
 			Expression exp = values.get(2);
 			if (exp instanceof StringExpression) {

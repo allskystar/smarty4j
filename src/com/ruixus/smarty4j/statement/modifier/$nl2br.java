@@ -23,7 +23,7 @@ import com.ruixus.smarty4j.statement.Modifier;
  */
 public class $nl2br extends Modifier {
 
-	public Object execute(Object obj) {
+	public static Object execute(Object obj) {
 		StringBuilder buf = new StringBuilder(64);
 		String text = obj.toString();
 		int size = text.length();

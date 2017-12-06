@@ -87,7 +87,7 @@ public class $indent extends Modifier {
 	    Definition.forModifier(Type.INTOBJ, new ConstInteger(4)),
 	    Definition.forModifier(Type.STROBJ, new StringExpression(" ")) };
 
-	public Object execute(Object obj, int count, String indent) {
+	public static Object execute(Object obj, int count, String indent) {
 		StringBuilder buf = new StringBuilder(indent.length() * count);
 		for (int i = 0; i < count; i++) {
 			buf.append(indent);

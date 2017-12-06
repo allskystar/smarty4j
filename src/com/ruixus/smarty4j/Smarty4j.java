@@ -11,20 +11,14 @@ import java.io.Reader;
 import java.io.Writer;
 
 /**
- * JavaScript压缩器
+ * Smarty4j Command Tools
  * 
  * @version 1.5.0, 2011/01/01
- * @author 欧阳先伟
+ * @author Ouyang Xianwei
  * @since Common 1.0
  */
 public class Smarty4j {
 
-	/**
-	 * smarty4j命令行入口
-	 * 
-	 * @param args
-	 *          命令行参数
-	 */
 	public static void main(String[] args) {
 		CmdLineParser parser = new CmdLineParser();
 		CmdLineParser.Option leftOpt = parser.addStringOption("left");

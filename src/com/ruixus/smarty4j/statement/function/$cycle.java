@@ -103,7 +103,7 @@ public class $cycle extends LineFunction {
 	    Definition.forFunction("assign", Type.STRING, NullExpression.VALUE),
 	    Definition.forFunction("reset", Type.BOOLEAN, FalseCheck.VALUE) };
 
-	private class Cycle {
+	private static class Cycle {
 
 		private Object[] objs;
 		private int index;
@@ -125,7 +125,7 @@ public class $cycle extends LineFunction {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Object execute(SafeContext ctx, TemplateWriter writer, String name, Object values,
+	public static Object execute(SafeContext ctx, TemplateWriter writer, String name, Object values,
 	    int print, boolean advance, String delimiter, String assign, boolean reset)
 	    throws IOException {
 		Map<String, Object> cycles = (Map<String, Object>) ctx.getProperties("cycle");

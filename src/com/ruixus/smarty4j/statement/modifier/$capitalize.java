@@ -78,7 +78,7 @@ public class $capitalize extends Modifier {
 	 * @param autoToLower
 	 * @return
 	 */
-	public Object execute(Object obj, boolean allowNumber, boolean autoToLower) {
+	public static Object execute(Object obj, boolean allowNumber, boolean autoToLower) {
 		Pattern p = allowNumber ? p2 : p1;
 		StringBuilder buf = new StringBuilder(obj.toString());
 		Matcher m = p.matcher(buf);

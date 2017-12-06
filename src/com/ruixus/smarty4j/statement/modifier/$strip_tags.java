@@ -38,7 +38,7 @@ public class $strip_tags extends Modifier {
 	private static final Pattern p = Pattern
 	    .compile("</?\\p{Alpha}+ *( +\\p{Alpha}+ *=(\"(\\\\.|[\\x00-\\x21\\x23-\\x5b\\u005d-\\uffff])*\"|'(\\\\.|[\\x00-\\x26\\x28-\\x5b\\u005d-\\uffff])*'|[\\x00-\\x3d\\u003f-\\uffff]*) *)*>");
 
-	public Object execute(Object obj, boolean oneSpace) {
+	public static Object execute(Object obj, boolean oneSpace) {
 		return p.matcher(obj.toString()).replaceAll(oneSpace ? " " : "");
 	}
 

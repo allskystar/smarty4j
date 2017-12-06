@@ -56,7 +56,7 @@ public class $spacify extends Modifier {
 	private static final Definition[] definitions = { Definition.forModifier(Type.STROBJ,
 	    new StringExpression(" ")) };
 
-	public Object execute(Object obj, String value) {
+	public static Object execute(Object obj, String value) {
 		StringBuilder buf = new StringBuilder(64);
 
 		String s = obj.toString();

@@ -87,7 +87,7 @@ public class $call extends LineFunction {
 	    Definition.forFunction("return", Type.STRING, NullExpression.VALUE, ""),
 	    Definition.forFunction("", Type.MAP, NullExpression.VALUE) };
 
-	public Object execute(SafeContext ctx, TemplateWriter writer, String name, String assign,
+	public static Object execute(SafeContext ctx, TemplateWriter writer, String name, String assign,
 	    Map<String, Object> data) throws Exception {
 		if (assign != null) {
 			writer = TemplateWriter.getTemporaryWriter();

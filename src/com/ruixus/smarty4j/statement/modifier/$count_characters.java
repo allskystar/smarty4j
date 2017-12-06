@@ -61,7 +61,7 @@ public class $count_characters extends Modifier {
 	 * @param countSpace
 	 * @return
 	 */
-	public Object execute(Object obj, boolean countSpace) {
+	public static Object execute(Object obj, boolean countSpace) {
 		String s = obj.toString();
 		int ret = s.length();
 		if (!countSpace) {

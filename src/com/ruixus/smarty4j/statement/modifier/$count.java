@@ -21,7 +21,7 @@ public class $count extends Modifier {
 	 * @param obj
 	 * @return
 	 */
-	public Object execute(Object obj) {
+	public static Object execute(Object obj) {
 		if (obj instanceof List) {
 			return ((List<?>) obj).size();
 		} else if (obj.getClass().isArray()) {

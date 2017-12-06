@@ -98,7 +98,7 @@ public class $counter extends LineFunction {
 	/**
 	 * 计数器对象，保存计数器的信息
 	 */
-	private class Counter {
+	private static class Counter {
 
 		/** 初始值 */
 		private int start = 1;
@@ -135,7 +135,7 @@ public class $counter extends LineFunction {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Object execute(SafeContext ctx, TemplateWriter writer, String name, Integer start,
+	public static Object execute(SafeContext ctx, TemplateWriter writer, String name, Integer start,
 	    Integer skip, int direction, int print, String assign) throws IOException {
 		Map<String, Object> counters = (Map<String, Object>) ctx.getProperties("counter");
 		// 获得计数器

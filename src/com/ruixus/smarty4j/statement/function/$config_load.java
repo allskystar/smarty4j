@@ -67,7 +67,7 @@ public class $config_load extends LineFunction {
 	    Definition.forFunction("file", Type.STRING),
 	    Definition.forFunction("scope", Type.STRING, new StringExpression("local"), "I") };
 
-	public Object execute(SafeContext ctx, TemplateWriter writer, String file, int scope) throws IOException {
+	public static void execute(SafeContext ctx, TemplateWriter writer, String file, int scope) throws IOException {
 		Template tpl = ctx.getTemplate();
 		FileInputStream in = new FileInputStream(tpl.getEngine().getTemplatePath()
 		    + tpl.getRelativePath(file));
@@ -104,7 +104,6 @@ public class $config_load extends LineFunction {
 				config.put(key, value);
 			}
 		}
-		return null;
 	}
 
 	@Override

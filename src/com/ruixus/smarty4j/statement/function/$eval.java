@@ -55,7 +55,7 @@ import com.ruixus.smarty4j.statement.LineFunction;
 public class $eval extends LineFunction {
 
 	/** 模板缓存 */
-	private Map<String, Template> templates = new HashMap<String, Template>();
+	private static Map<String, Template> templates = new HashMap<String, Template>();
 
 	/** 参数定义 */
 	private static final Definition[] definitions = {
@@ -67,14 +67,14 @@ public class $eval extends LineFunction {
 		return null;
 	}
 
-	public Object execute(SafeContext ctx, TemplateWriter writer, String text, String assign)
+	public static Object execute(SafeContext ctx, TemplateWriter writer, String text, String assign)
 	    throws Exception {
 		if (assign != null) {
 			writer = TemplateWriter.getTemporaryWriter();
 		}
 
 		if (templates.size() > 1024) {
-			synchronized (this) {
+			synchronized ($eval.class) {
 				templates.clear();
 			}
 		}

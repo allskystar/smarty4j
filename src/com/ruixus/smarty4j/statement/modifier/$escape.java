@@ -139,7 +139,7 @@ public class $escape extends Modifier {
 	    'E',
 	    'F' };
 
-	public Object execute(Object obj, int type, String charsetName, boolean doubleEncode) {
+	public static Object execute(Object obj, int type, String charsetName, boolean doubleEncode) {
 		switch (type) {
 		case HTML:
 			return escapeHtml(obj.toString(), false, doubleEncode);
@@ -163,7 +163,7 @@ public class $escape extends Modifier {
 		return null;
 	}
 
-	private String escapeHtml(String s, boolean all, boolean doubleEncode) {
+	private static String escapeHtml(String s, boolean all, boolean doubleEncode) {
 		int len = s.length();
 		StringBuilder buf = new StringBuilder(256);
 
@@ -219,7 +219,7 @@ public class $escape extends Modifier {
 		return buf.toString();
 	}
 
-	private String escapeUrl(String s, boolean escapePath, String charsetName) {
+	private static String escapeUrl(String s, boolean escapePath, String charsetName) {
 		Charset cs = Charset.forName(charsetName);
 		int len = s.length();
 		StringBuilder buf = new StringBuilder(256);
@@ -246,7 +246,7 @@ public class $escape extends Modifier {
 		return buf.toString();
 	}
 
-	private String escapeQuotes(String s) {
+	private static String escapeQuotes(String s) {
 		int len = s.length();
 		StringBuilder buf = new StringBuilder(256);
 
@@ -261,13 +261,13 @@ public class $escape extends Modifier {
 		return buf.toString();
 	}
 
-	private String escapeHex(String s, String charsetName) {
+	private static String escapeHex(String s, String charsetName) {
 		StringBuilder buf = new StringBuilder(256);
 		implEscapeHex(buf, s, Charset.forName(charsetName));
 		return buf.toString();
 	}
 
-	private String escapeHexEntity(String s) {
+	private static String escapeHexEntity(String s) {
 		int len = s.length();
 		StringBuilder buf = new StringBuilder(256);
 
@@ -293,7 +293,7 @@ public class $escape extends Modifier {
 		return buf.toString();
 	}
 
-	private String escapeJavascript(String s) {
+	private static String escapeJavascript(String s) {
 		int len = s.length();
 		StringBuilder buf = new StringBuilder(256);
 		for (int i = 0; i < len; i++) {
@@ -323,7 +323,7 @@ public class $escape extends Modifier {
 		return buf.toString();
 	}
 
-	private String escapeMail(String s) {
+	private static String escapeMail(String s) {
 		int len = s.length();
 		StringBuilder buf = new StringBuilder(256);
 
@@ -341,7 +341,7 @@ public class $escape extends Modifier {
 		return buf.toString();
 	}
 
-	private void implEscapeHex(StringBuilder buf, String s, Charset cs) {
+	private static void implEscapeHex(StringBuilder buf, String s, Charset cs) {
 		ByteBuffer bb = ByteBuffer.allocate(s.length() * 4);
 		SimpleEncoder.forCharset(cs).encode(CharBuffer.wrap(s.toCharArray()), bb);
 		byte[] array = bb.array();

@@ -2,9 +2,11 @@ package com.ruixus.smarty4j.statement;
 
 import static org.objectweb.asm.Opcodes.*;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.ruixus.smarty4j.MessageFormat;
 import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.Node;
 import com.ruixus.smarty4j.Template;
@@ -59,11 +61,11 @@ public abstract class Parameter extends Node {
 	 * 参数代码转换，根据节点的信息将参数转换成数组放入JVM语句栈中。
 	 * 
 	 * @param mv
-	 *          ASM方法访问对象
+	 *            ASM方法访问对象
 	 * @param local
-	 *          ASM方法内部的语句栈局部变量起始位置
+	 *            ASM方法内部的语句栈局部变量起始位置
 	 * @param vm
-	 *          变量管理器
+	 *            变量管理器
 	 */
 	public void parseAllParameters(MethodVisitorProxy mv, int local, VariableManager vm) {
 		int len = PARAMETERS != null ? PARAMETERS.length : 0;
@@ -99,6 +101,15 @@ public abstract class Parameter extends Node {
 		}
 	}
 
+	protected Method getMethod(String name) {
+		for (Method method : this.getClass().getMethods()) {
+			if (method.getName().equals(name)) {
+				return method;
+			}
+		}
+		throw new RuntimeException(String.format(MessageFormat.IS_NOT_FOUND, name));
+	}
+
 	/**
 	 * 将函数对象放入语句栈中，提供给LineFunction与BlockFunction使用。
 	 * 
@@ -106,11 +117,11 @@ public abstract class Parameter extends Node {
 	 * @see com.ruixus.smarty4j.statement.BlockFunction
 	 * 
 	 * @param mv
-	 *          ASM方法操作者
+	 *            ASM方法操作者
 	 * @param local
-	 *          ASM语句栈的局部变量起始位置
+	 *            ASM语句栈的局部变量起始位置
 	 * @param index
-	 *          函数在Template中保存的位置
+	 *            函数在Template中保存的位置
 	 */
 	protected String parseNode(MethodVisitorProxy mv, int local, int index) {
 		String name = this.getClass().getName().replace('.', '/');

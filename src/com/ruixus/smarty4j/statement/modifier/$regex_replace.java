@@ -77,8 +77,8 @@ public class $regex_replace extends Modifier {
 	}
 
 	@Override
-	public void createParameters(Template parent, List<Expression> values) throws ParseException {
-		super.createParameters(parent, values);
+	public void createParameters(Template tpl, List<Expression> values) throws ParseException {
+		super.createParameters(tpl, values);
 		rule = Pattern.compile(PARAMETERS[0].toString());
 		PARAMETERS[0] = VoidExpression.VALUE;
 	}

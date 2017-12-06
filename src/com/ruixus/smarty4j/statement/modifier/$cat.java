@@ -58,7 +58,7 @@ public class $cat extends Modifier {
 	 * @param value
 	 * @return
 	 */
-	public Object execute(Object obj, Object value) {
+	public static Object execute(Object obj, Object value) {
 		if (value == null) {
 			return obj;
 		}

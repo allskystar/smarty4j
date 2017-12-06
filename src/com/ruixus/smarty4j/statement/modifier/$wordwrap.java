@@ -96,7 +96,7 @@ public class $wordwrap extends Modifier {
 
 	private static Pattern p = Pattern.compile(" *(([A-Za-z_']+|[0-9]+\\.[0-9]+)([\\.,?!%])?|.)");
 
-	public Object execute(Object obj, int len, String replacement, boolean wordBoundary) {
+	public static Object execute(Object obj, int len, String replacement, boolean wordBoundary) {
 		String s = obj.toString();
 		StringBuilder buf = new StringBuilder(s.length() * 2);
 

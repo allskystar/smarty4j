@@ -25,9 +25,6 @@ public class $debug extends BlockFunction {
 		return new TemplateWriter(System.out, engine.getCharset());
 	}
 	
-	public void end(SafeContext ctx, TemplateWriter writer, TemplateWriter blockWriter) throws Exception {
-	}
-	
 	@Override
 	public void syntax(Analyzer analyzer, SimpleStack tokens) throws ParseException {
 		super.syntax(analyzer, tokens);

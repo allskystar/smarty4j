@@ -39,7 +39,7 @@ public class $count_paragraphs extends Modifier {
 	 * @param obj
 	 * @return
 	 */
-	public Object execute(Object obj) {
+	public static Object execute(Object obj) {
 		Matcher m = p.matcher(obj.toString());
 		int i = 0;
 		while (m.find()) {

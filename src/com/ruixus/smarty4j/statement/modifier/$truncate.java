@@ -106,7 +106,7 @@ public class $truncate extends Modifier {
 
 	private static Pattern p = Pattern.compile(" *([A-Za-z0-9_']+|.)");
 
-	public Object execute(Object obj, int len, String replacement, boolean wordBoundary,
+	public static Object execute(Object obj, int len, String replacement, boolean wordBoundary,
 	    boolean middle) {
 		String s = obj.toString();
 		int total = s.length();
