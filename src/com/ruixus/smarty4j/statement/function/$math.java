@@ -15,6 +15,8 @@ import com.ruixus.smarty4j.expression.Expression;
 import com.ruixus.smarty4j.expression.NullExpression;
 import com.ruixus.smarty4j.expression.ObjectExpression;
 import com.ruixus.smarty4j.expression.StringExpression;
+import com.ruixus.smarty4j.expression.number.DoubleAdapter;
+import com.ruixus.smarty4j.expression.number.IntegerAdapter;
 import com.ruixus.smarty4j.statement.Definition;
 import com.ruixus.smarty4j.statement.Definition.Type;
 import com.ruixus.smarty4j.statement.Function;
@@ -25,9 +27,9 @@ import com.ruixus.smarty4j.util.SimpleStack;
  * {math} allows the template designer to do math equations in the template.
  *
  * <table border="1">
- * <colgroup> <col align="center" class="param"> <col align="center" class="type"> <col
- * align="center" class="required"> <col align="center" class="default"> <col class="desc">
- * </colgroup> <thead>
+ * <colgroup> <col align="center" class="param">
+ * <col align="center" class="type"> <col align="center" class="required">
+ * <col align="center" class="default"> <col class="desc"> </colgroup> <thead>
  * <tr>
  * <th align="center">Attribute Name</th>
  * <th align="center">Type</th>
@@ -84,8 +86,7 @@ public class $math extends Function {
 		}
 
 		@Override
-		public void parseCheck(MethodVisitorProxy mv, int local, VariableManager vm, Label lblTrue,
-		    Label lblFalse) {
+		public void parseCheck(MethodVisitorProxy mv, int local, VariableManager vm, Label lblTrue, Label lblFalse) {
 		}
 
 		@Override
@@ -154,15 +155,14 @@ public class $math extends Function {
 	 * 词法分析
 	 * 
 	 * @param line
-	 *          需要分析的行
+	 *            需要分析的行
 	 * @param fields
-	 *          当前的参数列表
+	 *            当前的参数列表
 	 * @return 词法分析的结果
 	 * @throws ParseException
-	 *           语法产生错误时将产生异常
+	 *             语法产生错误时将产生异常
 	 */
-	private SimpleStack analyseMath(String line, Map<String, Expression> fields)
-	    throws ParseException {
+	private SimpleStack analyseMath(String line, Map<String, Expression> fields) throws ParseException {
 		// 保存所有的参数与值
 		Expression[] expressions = new Expression[fields.size() + 3];
 		expressions[0] = PARAMETERS[0];
@@ -253,8 +253,8 @@ public class $math extends Function {
 					while (end < len) {
 						char d = line.charAt(end);
 						if (Character.isJavaIdentifierStart(d)) {
-							throw new ParseException(String.format(MessageFormat.CANNOT_BE_RESOLVED_TO, "\""
-							    + line.substring(start, end + 1) + "\"", "a constant"));
+							throw new ParseException(String.format(MessageFormat.CANNOT_BE_RESOLVED_TO,
+									"\"" + line.substring(start, end + 1) + "\"", "a constant"));
 						} else if (!Character.isDigit(d)) {
 							break;
 						}
@@ -262,8 +262,7 @@ public class $math extends Function {
 					}
 
 					int index = tokens.size() - 1;
-					if (index > 3 && tokens.get(index) == Operator.SUB
-					    && tokens.get(index - 1) == Operator.SET) {
+					if (index > 3 && tokens.get(index) == Operator.SUB && tokens.get(index - 1) == Operator.SET) {
 						// 识别负数
 						tokens.push(new Integer(-Integer.parseInt(line.substring(start, end))));
 					} else {
@@ -297,23 +296,21 @@ public class $math extends Function {
 					continue;
 				}
 			}
-			throw new ParseException(String.format(MessageFormat.SYNTAX_ERROR_ON_TOKEN,
-			    line.substring(0, 1)));
+			throw new ParseException(String.format(MessageFormat.SYNTAX_ERROR_ON_TOKEN, line.substring(0, 1)));
 		}
 		return tokens;
 	}
 
 	@Override
-	public void createParameters(Definition[] parameters, Map<String, Expression> fields)
-	    throws ParseException {
+	public void createParameters(Definition[] parameters, Map<String, Expression> fields) throws ParseException {
 		super.createParameters(parameters, fields);
 		fields.remove("equation");
 		fields.remove("format");
 		fields.remove("assign");
 
 		SimpleStack tokens = analyseMath(PARAMETERS[0].toString(), fields);
-		iExp = Operator.merge(tokens, 0, tokens.size(), Operator.INTEGER | Operator.OBJECT);
-		fExp = Operator.merge(tokens, 0, tokens.size(), Operator.FLOAT | Operator.OBJECT);
+		iExp = new IntegerAdapter(Operator.merge(tokens, 0, tokens.size(), Operator.INTEGER | Operator.OBJECT));
+		fExp = new DoubleAdapter(Operator.merge(tokens, 0, tokens.size(), Operator.FLOAT | Operator.OBJECT));
 	}
 
 	@Override
@@ -367,7 +364,8 @@ public class $math extends Function {
 				mv.visitLdcInsn(0);
 				mv.visitVarInsn(ALOAD, local);
 				mv.visitInsn(AASTORE);
-				mv.visitMethodInsn(INVOKESTATIC, "java/lang/String", "format", "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;");
+				mv.visitMethodInsn(INVOKESTATIC, "java/lang/String", "format",
+						"(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;");
 			} else {
 				mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "toString", "()Ljava/lang/String;");
 			}

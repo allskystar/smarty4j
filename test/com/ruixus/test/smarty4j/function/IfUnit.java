@@ -117,6 +117,7 @@ public class IfUnit extends BaseUnit {
 
 		Assert.assertEquals("一元检测", getString("{if $null}1{/if}", data), "");
 		Assert.assertEquals("一元检测", getString("{if $list}1{/if}", data), "1");
+		Assert.assertEquals("一元检测", getString("{if $double+0}1{/if}", data), "");
 		Assert.assertEquals("一元检测", getString("{if null}1{/if}", data), "");
 		Assert.assertEquals("一元检测", getString("{if 0}1{/if}", data), "");
 		Assert.assertEquals("一元检测", getString("{if 0.0}1{/if}", data), "");
