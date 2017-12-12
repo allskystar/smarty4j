@@ -56,6 +56,7 @@ public class VariableUnit extends BaseUnit {
 		data.put("list", list);
 
 		Assert.assertEquals("Foo", getString("{$foo}", data));
+		Assert.assertEquals("Dragon", getString("{$list[`$x+3.0`]}", data));
 		Assert.assertEquals("Dragon", getString("{$list[4]}", data));
 		Assert.assertEquals("Dragon", getString("{$array[4]}", data));
 		Assert.assertEquals("Rat", getString("{$map.A1}", data));

@@ -15,6 +15,8 @@ import com.ruixus.smarty4j.expression.Expression;
 import com.ruixus.smarty4j.expression.NullExpression;
 import com.ruixus.smarty4j.expression.ObjectExpression;
 import com.ruixus.smarty4j.expression.StringExpression;
+import com.ruixus.smarty4j.expression.number.ConstDouble;
+import com.ruixus.smarty4j.expression.number.ConstInteger;
 import com.ruixus.smarty4j.expression.number.DoubleAdapter;
 import com.ruixus.smarty4j.expression.number.IntegerAdapter;
 import com.ruixus.smarty4j.statement.Definition;
@@ -140,10 +142,9 @@ public class $math extends Function {
 	}
 
 	/** 参数定义 */
-	private static final Definition[] definitions = {
-	    Definition.forFunction("equation", Type.STRING),
-	    Definition.forFunction("format", Type.STRING, new StringExpression("%d")),
-	    Definition.forFunction("assign", Type.STRING, NullExpression.VALUE) };
+	private static final Definition[] definitions = { Definition.forFunction("equation", Type.STRING),
+			Definition.forFunction("format", Type.STRING, new StringExpression("%d")),
+			Definition.forFunction("assign", Type.STRING, NullExpression.VALUE) };
 
 	/** 数学表达式 */
 	private Expression iExp;
@@ -248,6 +249,7 @@ public class $math extends Function {
 				continue;
 			default:
 				if (Character.isDigit(c)) {
+					boolean isFloat = false;
 					// 处理数值常量
 					int end = start + 1;
 					while (end < len) {
@@ -255,18 +257,22 @@ public class $math extends Function {
 						if (Character.isJavaIdentifierStart(d)) {
 							throw new ParseException(String.format(MessageFormat.CANNOT_BE_RESOLVED_TO,
 									"\"" + line.substring(start, end + 1) + "\"", "a constant"));
+						} else if (d == '.') {
+							if (isFloat) {
+								throw new ParseException(String.format(MessageFormat.CANNOT_BE_RESOLVED_TO,
+										"\"" + line.substring(start, end + 1) + "\"", "a constant"));
+							}
+							isFloat = true;
 						} else if (!Character.isDigit(d)) {
 							break;
 						}
 						end++;
 					}
 
-					int index = tokens.size() - 1;
-					if (index > 3 && tokens.get(index) == Operator.SUB && tokens.get(index - 1) == Operator.SET) {
-						// 识别负数
-						tokens.push(new Integer(-Integer.parseInt(line.substring(start, end))));
+					if (isFloat) {
+						tokens.push(new ConstDouble(Double.parseDouble(line.substring(start, end))));
 					} else {
-						tokens.push(new Integer(line.substring(start, end)));
+						tokens.push(new ConstInteger(Integer.parseInt(line.substring(start, end))));
 					}
 					start = end;
 					continue;

@@ -9,6 +9,7 @@ import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.Node;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.expression.number.ConstInteger;
+import com.ruixus.smarty4j.expression.number.IntegerAdapter;
 
 /**
  * 变量List型变量扩展节点, 将对象当成列表型结构, 根据提供的序号来访问对应的值. 当对象为NULL时返回NULL, 当对象为 <tt>java.util.List</tt>
@@ -75,7 +76,7 @@ public class ListExtended extends Node {
 	 *          索引表达式
 	 */
 	public ListExtended(Expression index) {
-		this.index = index;
+		this.index = new IntegerAdapter(index);
 	}
 
 	/**

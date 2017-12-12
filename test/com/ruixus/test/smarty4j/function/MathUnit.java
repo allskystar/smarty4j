@@ -10,7 +10,6 @@ public class MathUnit extends BaseUnit {
 
 	@Test
 	public void basic() throws Exception {
-		Assert.assertEquals("math", getString("{math equation=\"x\" x='3' y=1}"), "3");
 		Assert.assertEquals("math", getString("{math equation=\"(x+(x+y * y))*x\" x='3' y=1}"), "21");
 		Assert.assertEquals("math", getException("{math equation=\"(x+(x+y * y))*x\" y=1}"),
 		    "\"x\" not found");
