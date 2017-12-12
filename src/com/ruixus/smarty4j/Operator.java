@@ -362,7 +362,7 @@ public class Operator {
 		}
 		switch (type) {
 		case BNOT:
-			expressions.push(new BinaryInteger(IXOR, exp, ConstInteger.M1));
+			expressions.push(new BinaryInteger(IXOR, exp, new ConstInteger(-1)));
 			break;
 		case NOT:
 			expressions.push(new NotCheck(exp));

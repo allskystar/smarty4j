@@ -62,6 +62,10 @@ import com.ruixus.smarty4j.util.SimpleStack;
  */
 public class $config_load extends LineFunction {
 
+	private static final int GLOBAL = 0;
+	private static final int PARENT = 1;
+	private static final int LOCAL = 2;
+
 	/** 参数定义 */
 	private static final Definition[] definitions = {
 	    Definition.forFunction("file", Type.STRING),
@@ -94,9 +98,9 @@ public class $config_load extends LineFunction {
 			String key = i.nextElement().toString();
 			String value = prop.getProperty(key);
 			switch (scope) {
-			case 0:
+			case GLOBAL:
 				engine.addConfig(key, value);
-			case 1:
+			case PARENT:
 				if (parent != null) {
 					parent.put(key, value);
 				}
@@ -111,11 +115,11 @@ public class $config_load extends LineFunction {
 		super.syntax(analyzer, tokens);
 		String scope = PARAMETERS[1].toString();
 		if (scope.equals("local")) {
-			PARAMETERS[1] = new ConstInteger(2);
+			PARAMETERS[1] = new ConstInteger(LOCAL);
 		} else if (scope.equals("parent")) {
-			PARAMETERS[1] = new ConstInteger(1);
+			PARAMETERS[1] = new ConstInteger(PARENT);
 		} else if (scope.equals("global")) {
-			PARAMETERS[1] = new ConstInteger(0);
+			PARAMETERS[1] = ConstInteger.ZERO;
 		} else {
 			throw new ParseException(String.format(MessageFormat.CANNOT_BE_RESOLVED_TO, "scope",
 			    "either global, parent or local"));

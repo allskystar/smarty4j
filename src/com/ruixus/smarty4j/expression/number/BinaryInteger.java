@@ -23,9 +23,9 @@ public class BinaryInteger extends IntegerExpression {
 	 * 建立二元整数操作表达式节点
 	 * 
 	 * @param exp1
-	 *          表达式1
+	 *            表达式1
 	 * @param exp2
-	 *          表达式2
+	 *            表达式2
 	 */
 	public BinaryInteger(int opcode, Expression exp1, Expression exp2) {
 		this.opcode = opcode;
@@ -35,7 +35,7 @@ public class BinaryInteger extends IntegerExpression {
 
 	@Override
 	public void parseInteger(MethodVisitorProxy mv, int local, VariableManager vm) {
-		if (opcode == ISUB && exp1 == ConstInteger.ZERO) {
+		if (opcode == ISUB && exp1 instanceof ConstInteger && ((ConstInteger) exp1).getValue() == 0) {
 			exp2.parseInteger(mv, local, vm);
 			mv.visitInsn(INEG);
 		} else {

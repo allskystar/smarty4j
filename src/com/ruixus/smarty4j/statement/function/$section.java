@@ -140,7 +140,7 @@ public class $section extends LoopFunction {
 	private static final Definition[] definitions = {
 	    Definition.forFunction("loop", Type.OBJECT),
 	    Definition.forFunction("name", Type.STRING),
-	    Definition.forFunction("start", Type.INTOBJ, new ConstInteger(0)),
+	    Definition.forFunction("start", Type.INTOBJ, ConstInteger.ZERO),
 	    Definition.forFunction("step", Type.INTOBJ, new ConstInteger(1)),
 	    Definition.forFunction("max", Type.INTOBJ, new ConstInteger(Integer.MAX_VALUE)) };
 

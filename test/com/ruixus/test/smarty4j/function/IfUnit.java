@@ -157,6 +157,9 @@ public class IfUnit extends BaseUnit {
 		Assert.assertEquals("表达式计算", getString("{if (1.1+'1')>2}1{/if}", data), "1");
 		Assert.assertEquals("表达式计算", getString("{if 1.1+null<1.11}1{/if}", data), "1");
 
+		Assert.assertEquals("条件表达式短路处理", getString("{if 0 || 1}1{else}2{/if}", data), "1");
+		Assert.assertEquals("条件表达式短路处理", getString("{if 1 && 0}1{else}2{/if}", data), "2");
+
 		Assert.assertEquals("else语句", getString("{if 0}1{else}2{/if}", data), "2");
 		Assert.assertEquals("elseif语句", getString("{if 0}1{elseif 1}2{/if}", data), "2");
 

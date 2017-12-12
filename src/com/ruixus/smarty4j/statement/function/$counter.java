@@ -86,6 +86,11 @@ import com.ruixus.smarty4j.statement.LineFunction;
  */
 public class $counter extends LineFunction {
 
+	private static final int DEFAULT = 0;
+	private static final int UP = 1;
+	private static final int DOWN = 2;
+	private static final int KEEP = 3;
+
 	/** 参数定义 */
 	private static final Definition[] definitions = {
 	    Definition.forFunction("name", Type.STRING, new StringExpression("default")),
@@ -120,10 +125,10 @@ public class $counter extends LineFunction {
 			int result = start;
 
 			switch (direction) {
-			case 1:
+			case UP:
 				start += skip;
 				break;
-			case 2:
+			case DOWN:
 				start -= skip;
 				break;
 			default:
@@ -155,8 +160,8 @@ public class $counter extends LineFunction {
 			if (skip == null) {
 				counter.skip = 1;
 			}
-			if (direction == 0) {
-				counter.direction = 1;
+			if (direction == DEFAULT) {
+				counter.direction = UP;
 			}
 			if (print == 2) {
 				counter.print = true;
@@ -201,17 +206,17 @@ public class $counter extends LineFunction {
 		if (PARAMETERS[3] != NullExpression.VALUE) {
 			String direction = PARAMETERS[3].toString();
 			if (direction.equals("up")) {
-				PARAMETERS[3] = new ConstInteger(1);
+				PARAMETERS[3] = new ConstInteger(UP);
 			} else if (direction.equals("down")) {
-				PARAMETERS[3] = new ConstInteger(2);
+				PARAMETERS[3] = new ConstInteger(DOWN);
 			} else if (direction.equals("keep")) {
-				PARAMETERS[3] = new ConstInteger(3);
+				PARAMETERS[3] = new ConstInteger(KEEP);
 			} else {
 				throw new ParseException(String.format(MessageFormat.CANNOT_BE_RESOLVED_TO,
 				    "\"direction\"", "either up, down or keep"));
 			}
 		} else {
-			PARAMETERS[3] = new ConstInteger(0);
+			PARAMETERS[3] = ConstInteger.ZERO;
 		}
 		if (PARAMETERS[4] == NullExpression.VALUE) {
 			PARAMETERS[4] = new ConstInteger(2);

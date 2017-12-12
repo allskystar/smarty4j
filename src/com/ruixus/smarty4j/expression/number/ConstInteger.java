@@ -17,7 +17,6 @@ import com.ruixus.smarty4j.VariableManager;
 public class ConstInteger extends IntegerExpression {
 
 	public static final ConstInteger ZERO = new ConstInteger(0);  
-	public static final ConstInteger M1 = new ConstInteger(-1);  
 	
 	/** 常量值 */
 	private int value = 0;
