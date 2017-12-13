@@ -1,10 +1,14 @@
 package com.ruixus.test.smarty4j;
 
+import java.io.ByteArrayOutputStream;
+
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import com.ruixus.test.smarty4j.syntax.CoverageUnit;
+
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ SyntaxUnit.class, FunctionUnit.class, ModifierUnit.class })
+@Suite.SuiteClasses({ SyntaxUnit.class, FunctionUnit.class, ModifierUnit.class, CoverageUnit.class })
 public class Smarty4jUnit {
 	// {$map['A1']}
 	// {$map[$bar]}

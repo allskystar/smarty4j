@@ -37,7 +37,7 @@ public class TrueCheck extends CheckExpression {
 
 	@Override
 	public void parseDouble(MethodVisitorProxy mv, int local, VariableManager vm) {
-		mv.visitLdcInsn(DCONST_1);
+		mv.visitInsn(DCONST_1);
 	}
 
 	@Override

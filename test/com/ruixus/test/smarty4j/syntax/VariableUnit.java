@@ -57,6 +57,7 @@ public class VariableUnit extends BaseUnit {
 
 		Assert.assertEquals("Foo", getString("{$foo}", data));
 		Assert.assertEquals("Dragon", getString("{$list[`$x+3.0`]}", data));
+		Assert.assertEquals("Hare", getString("{$list[`3.0`]}", data));
 		Assert.assertEquals("Dragon", getString("{$list[4]}", data));
 		Assert.assertEquals("Dragon", getString("{$array[4]}", data));
 		Assert.assertEquals("Rat", getString("{$map.A1}", data));
@@ -64,6 +65,7 @@ public class VariableUnit extends BaseUnit {
 		Assert.assertEquals("foo", getString("{\"foo\"}", data));
 		Assert.assertEquals("3", getString("{$x+$y}", data));
 		Assert.assertEquals("Dragon", getString("{$list[$x+3]}", data));
+		Assert.assertEquals("--3.0", getString("{$x=-3.0}-{$x}", data));
 		Assert.assertEquals("-3", getString("{$x=3}-{$x}", data));
 		Assert.assertEquals("-3", getString("{$map.x=3}-{$map.x}", data));
 		Assert.assertEquals("-3", getString("{$list[0]=3}-{$list[0]}", data));

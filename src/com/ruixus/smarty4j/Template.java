@@ -113,7 +113,21 @@ public class Template {
 		}
 	}
 
-	private Template(Engine engine, String name, Node root, VariableManager vm) throws TemplateException {
+	/**
+	 * Constructs a template.
+	 * 
+	 * @param engine
+	 *            the template engine
+	 * @param name
+	 *            the name of the template file
+	 * @param root
+	 *            the syntax tree
+	 * @param vm
+	 *            variable manager
+	 * @throws TemplateException
+	 *             if syntax error in template
+	 */
+	public Template(Engine engine, String name, Node root, VariableManager vm) throws TemplateException {
 		this.engine = engine;
 		this.name = name;
 		parse(root, vm);
@@ -213,10 +227,27 @@ public class Template {
 		return nodes.size() - 1;
 	}
 
+	/**
+	 * 获取模板中的自定义函数。
+	 * 
+	 * @param name
+	 *            自定义函数名称
+	 * @return 自定义函数的模板对象
+	 */
 	public Template getFunction(String name) {
 		return funcs.get(name);
 	}
 
+	/**
+	 * 向模板中添加自定义函数。
+	 * 
+	 * @param name
+	 *            自定义函数名称
+	 * @param root
+	 *            自定义函数节点对象
+	 * @param vm
+	 *            变量管理器
+	 */
 	public void addFunction(String name, Node root, VariableManager vm) {
 		try {
 			if (funcs == null) {

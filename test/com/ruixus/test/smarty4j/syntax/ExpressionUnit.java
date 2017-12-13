@@ -179,6 +179,8 @@ public class ExpressionUnit {
 		Assert.assertEquals("表达式计算", getResult("{$int + 1}"), "0");
 		Assert.assertEquals("表达式计算", getResult("{$int + -1}"), "-2");
 		Assert.assertEquals("表达式计算", getResult("{'2' + '1'}"), "3");
+		Assert.assertEquals("表达式计算", getResult("{1 + true}"), "2");
+		Assert.assertEquals("表达式计算", getResult("{`true + 1.0`}"), "2.0");
 		Assert.assertEquals("表达式计算", getResult("{2 + 1.1}"), "3.1");
 
 		Assert.assertEquals("表达式计算优化", getResult("{0-2}"), "-2");

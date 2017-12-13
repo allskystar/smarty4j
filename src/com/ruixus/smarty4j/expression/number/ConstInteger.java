@@ -79,9 +79,4 @@ public class ConstInteger extends IntegerExpression {
 	public void parseString(MethodVisitorProxy mv, int local, VariableManager vm) {
 		mv.visitLdcInsn(Integer.toString(value));
 	}
-
-	@Override
-	public String toString() {
-		return Integer.toString(value);
-	}
 }
