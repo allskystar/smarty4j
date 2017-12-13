@@ -22,9 +22,13 @@ public class AssignUnit extends BaseUnit {
 		    "{a=1, b=true}");
 		Assert.assertEquals("常量赋值", getString("{assign var=test value=[true,, 10, 'test']}{$test}"),
 		    "[true, null, 10, test]");
-		Assert.assertEquals("常量赋值", getString("{assign var=test value=true}{$test}"),
-		    "true");
+		Assert.assertEquals("常量赋值", getString("{assign var=test value=false}{$test}"),
+		    "false");
 		Assert.assertEquals("常量赋值", getString("{assign var=test value=5}{$test}"), "5");
+		Assert.assertEquals("表达式赋值",
+			    getString("{assign var=test value=3<2}{$test}", data), "false");
+		Assert.assertEquals("表达式赋值",
+			    getString("{assign var=test value=3>2}{$test}", data), "true");
 		Assert.assertEquals("表达式赋值",
 		    getString("{assign var=test value=$name}{$test}", data), "Bob");
 		Assert.assertEquals("表达式赋值",

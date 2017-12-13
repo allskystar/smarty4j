@@ -86,6 +86,11 @@ public class ExpressionUnit {
 		Assert.assertNull("空语句", getResult("{}"));
 		Assert.assertNull("有空格的空语句", getResult("{  }"));
 
+		// 关键字语法测试
+		Assert.assertEquals(getResult("{true}"), "true");
+		Assert.assertEquals(getResult("{false}"), "false");
+		Assert.assertEquals(getResult("{null}"), "null");
+
 		// 函数语法测试
 		Assert.assertNull("函数必须的条件不能省略", getResult("{if}{/if}"));
 		Assert.assertNull("函数要有结束标记", getResult("{if $boolean}"));
@@ -179,9 +184,13 @@ public class ExpressionUnit {
 		Assert.assertEquals("表达式计算", getResult("{$int + 1}"), "0");
 		Assert.assertEquals("表达式计算", getResult("{$int + -1}"), "-2");
 		Assert.assertEquals("表达式计算", getResult("{'2' + '1'}"), "3");
-		Assert.assertEquals("表达式计算", getResult("{1 + true}"), "2");
+		Assert.assertEquals("表达式计算", getResult("{true + 1}"), "2");
 		Assert.assertEquals("表达式计算", getResult("{`true + 1.0`}"), "2.0");
+		Assert.assertEquals("表达式计算", getResult("{false + 1}"), "1");
+		Assert.assertEquals("表达式计算", getResult("{`false + 1.0`}"), "1.0");
 		Assert.assertEquals("表达式计算", getResult("{2 + 1.1}"), "3.1");
+		Assert.assertEquals("表达式计算", getResult("{(3 > 2) + 1}"), "2");
+		Assert.assertEquals("表达式计算", getResult("{(3 > 2) + 1.1}"), "2.1");
 
 		Assert.assertEquals("表达式计算优化", getResult("{0-2}"), "-2");
 	}

@@ -164,6 +164,16 @@ public class IfUnit extends BaseUnit {
 		Assert.assertEquals("条件表达式短路处理", getString("{if 1.0 && 0}1{else}2{/if}", data), "2");
 		Assert.assertEquals("条件表达式短路处理", getString("{if (false || 1) && true}1{else}2{/if}", data), "1");
 		Assert.assertEquals("条件表达式短路处理", getString("{if true && false || 1}1{else}2{/if}", data), "1");
+		Assert.assertEquals("条件表达式短路处理", getString("{if ($int===-1 || 1) && true}1{else}2{/if}", data), "1");
+		Assert.assertEquals("条件表达式短路处理", getString("{if $int===-1 && false || 1}1{else}2{/if}", data), "1");
+		Assert.assertEquals("条件表达式短路处理", getString("{if 1===1.0 || 1}1{else}2{/if}", data), "1");
+		Assert.assertEquals("条件表达式短路处理", getString("{if true===false}1{else}2{/if}", data), "2");
+		Assert.assertEquals("条件表达式短路处理", getString("{if ($int!==-1 || 1) && true}1{else}2{/if}", data), "1");
+		Assert.assertEquals("条件表达式短路处理", getString("{if $int!==-1 && false || 1}1{else}2{/if}", data), "1");
+		Assert.assertEquals("条件表达式短路处理", getString("{if 1!==1.0 && 1}1{else}2{/if}", data), "1");
+		Assert.assertEquals("条件表达式短路处理", getString("{if true!==false}1{else}2{/if}", data), "1");
+		Assert.assertEquals("条件表达式短路处理", getString("{if ($int!==-1) + 3 > 0}1{else}2{/if}", data), "1");
+		Assert.assertEquals("条件表达式短路处理", getString("{if ($int!==$int) + 3 > 3}1{else}2{/if}", data), "2");
 
 		Assert.assertEquals("else语句", getString("{if 0}1{else}2{/if}", data), "2");
 		Assert.assertEquals("elseif语句", getString("{if 0}1{elseif 1}2{/if}", data), "2");

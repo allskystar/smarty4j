@@ -777,6 +777,10 @@ public class Analyzer {
 			case 'z':
 			case '_': {
 				String s = findIdentifier(line);
+				Expression ret = Expression.forString(s);
+				if (!(ret instanceof StringExpression)) {
+					return ret;
+				}
 				if (useid) {
 					Expression exp = mergeModifier(line, s);
 					if (exp == null) {
@@ -785,7 +789,7 @@ public class Analyzer {
 						return exp;
 					}
 				} else {
-					return Expression.forString(s);
+					return ret;
 				}
 			}
 			case '\'':
