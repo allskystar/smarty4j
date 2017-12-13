@@ -1,7 +1,5 @@
 package com.ruixus.test.smarty4j;
 
-import java.io.ByteArrayOutputStream;
-
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
