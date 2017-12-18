@@ -1,5 +1,6 @@
 package com.ruixus.smarty4j;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +32,8 @@ import com.ruixus.smarty4j.util.SimpleStack;
  * @since Smarty 1.1
  */
 public class Analyzer {
+
+	private static final Charset utf8Charset = Charset.forName("UTF-8");
 
 	private Engine engine;
 	private Template tpl;
@@ -139,7 +142,7 @@ public class Analyzer {
 		if (!texts.containsKey(text)) {
 			byte[] bytes = text.getBytes(engine.getCharset());
 			tpl.bytes.push(bytes);
-			if (bytes.length > 65535) {
+			if (text.getBytes(utf8Charset).length > 65535 || ret >= 65534) {
 				tpl.strs.push(text);
 			} else {
 				tpl.strs.push(null);
