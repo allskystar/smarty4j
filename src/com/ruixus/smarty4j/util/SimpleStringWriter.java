@@ -11,7 +11,7 @@ import java.io.Writer;
  */
 public class SimpleStringWriter extends Writer {
 
-	private StringBuilder buf = new StringBuilder(64);
+	private SimpleCharBuffer buf = new SimpleCharBuffer(64);
 
 	@Override
 	public void write(int c) {
