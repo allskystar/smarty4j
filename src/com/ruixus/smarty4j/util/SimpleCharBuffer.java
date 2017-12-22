@@ -119,20 +119,20 @@ public class SimpleCharBuffer implements Appendable {
 	}
 
 	public SimpleCharBuffer append(boolean b) {
-        if (b) {
-            ensureCapacityInternal(off + 4);
-            buf[off++] = 't';
-            buf[off++] = 'r';
-            buf[off++] = 'u';
-            buf[off++] = 'e';
-        } else {
-            ensureCapacityInternal(off + 5);
-            buf[off++] = 'f';
-            buf[off++] = 'a';
-            buf[off++] = 'l';
-            buf[off++] = 's';
-            buf[off++] = 'e';
-        }
+		if (b) {
+			ensureCapacityInternal(off + 4);
+			buf[off++] = 't';
+			buf[off++] = 'r';
+			buf[off++] = 'u';
+			buf[off++] = 'e';
+		} else {
+			ensureCapacityInternal(off + 5);
+			buf[off++] = 'f';
+			buf[off++] = 'a';
+			buf[off++] = 'l';
+			buf[off++] = 's';
+			buf[off++] = 'e';
+		}
 		return this;
 	}
 
@@ -145,11 +145,11 @@ public class SimpleCharBuffer implements Appendable {
 	public SimpleCharBuffer append(float f) {
 		return append(Float.toString(f));
 	}
-	
+
 	public SimpleCharBuffer append(double d) {
 		return append(Double.toString(d));
 	}
-	
+
 	public SimpleCharBuffer append(String str) {
 		int len = str.length();
 		ensureCapacityInternal(off + len);
@@ -184,7 +184,7 @@ public class SimpleCharBuffer implements Appendable {
 
 	public SimpleCharBuffer appendString(String str) {
 		int len = str.length();
-		ensureCapacityInternal(off + len * 2);
+		ensureCapacityInternal(off + len * 2 + 2);
 		buf[off++] = '"';
 		for (int i = 0; i < len; i++) {
 			char c = str.charAt(i);
