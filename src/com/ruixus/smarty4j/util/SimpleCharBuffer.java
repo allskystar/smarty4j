@@ -5,7 +5,7 @@ import java.lang.Math;
 import java.lang.String;
 import java.lang.System;
 
-public class SimpleCharBuffer {
+public class SimpleCharBuffer implements Appendable {
 	public static final String NAME = SimpleCharBuffer.class.getName().replace('.', '/');
 
 	private char[] buf;
@@ -104,19 +104,21 @@ public class SimpleCharBuffer {
 		}
 	}
 
-	public void append(int i) {
+	public SimpleCharBuffer append(int i) {
 		off += (i < 0) ? stringSize(-i) + 1 : stringSize(i);
 		ensureCapacityInternal(off);
 		getChars(i, off, buf);
+		return this;
 	}
 
-	public void append(long l) {
+	public SimpleCharBuffer append(long l) {
 		off += (l < 0) ? stringSize(-l) + 1 : stringSize(l);
 		ensureCapacityInternal(off);
 		getChars(l, off, buf);
+		return this;
 	}
 
-	public void append(boolean b) {
+	public SimpleCharBuffer append(boolean b) {
         if (b) {
             ensureCapacityInternal(off + 4);
             buf[off++] = 't';
@@ -131,27 +133,56 @@ public class SimpleCharBuffer {
             buf[off++] = 's';
             buf[off++] = 'e';
         }
+		return this;
 	}
 
-	public void append(char c) {
+	public SimpleCharBuffer append(char c) {
 		ensureCapacityInternal(off + 1);
 		buf[off++] = c;
+		return this;
 	}
 
-	public void append(String str) {
+	public SimpleCharBuffer append(float f) {
+		return append(Float.toString(f));
+	}
+	
+	public SimpleCharBuffer append(double d) {
+		return append(Double.toString(d));
+	}
+	
+	public SimpleCharBuffer append(String str) {
 		int len = str.length();
 		ensureCapacityInternal(off + len);
 		str.getChars(0, len, buf, off);
 		off += len;
+		return this;
 	}
 
-	public void append(char[] str, int offset, int len) {
+	public SimpleCharBuffer append(char[] str, int offset, int len) {
 		ensureCapacityInternal(off + len);
 		System.arraycopy(str, offset, buf, off, len);
 		off += len;
+		return this;
 	}
 
-	public void appendString(String str) {
+	public SimpleCharBuffer append(CharSequence csq) {
+		int len = csq.length();
+		ensureCapacityInternal(off + len);
+		for (int i = 0; i < len; i++) {
+			buf[off++] = csq.charAt(i);
+		}
+		return this;
+	}
+
+	public SimpleCharBuffer append(CharSequence csq, int start, int end) {
+		ensureCapacityInternal(off + end - start);
+		for (int i = start; i < end; i++) {
+			buf[off++] = csq.charAt(i);
+		}
+		return this;
+	}
+
+	public SimpleCharBuffer appendString(String str) {
 		int len = str.length();
 		ensureCapacityInternal(off + len * 2);
 		buf[off++] = '"';
@@ -189,6 +220,7 @@ public class SimpleCharBuffer {
 			}
 		}
 		buf[off++] = '"';
+		return this;
 	}
 
 	public int length() {
