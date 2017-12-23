@@ -289,7 +289,7 @@ public class MethodVisitorProxy extends MethodVisitor {
 				mv.visitInsn(BASTORE);
 			}
 		} else if (cst instanceof Class) {
-			mv.visitLdcInsn(org.objectweb.asm.Type.getType(((Class<?>) cst).getName().replace('.', '/')));
+			mv.visitLdcInsn(org.objectweb.asm.Type.getType((Class<?>) cst));
 		} else {
 			mv.visitLdcInsn(cst);
 		}

@@ -5,7 +5,7 @@ import java.lang.Math;
 import java.lang.String;
 import java.lang.System;
 
-public class SimpleCharBuffer implements Appendable {
+public class SimpleCharBuffer {
 	public static final String NAME = SimpleCharBuffer.class.getName().replace('.', '/');
 
 	private char[] buf;
@@ -47,6 +47,40 @@ public class SimpleCharBuffer implements Appendable {
 			'5', '5', '5', '6', '6', '6', '6', '6', '6', '6', '6', '6', '6', '7', '7', '7', '7', '7', '7', '7', '7',
 			'7', '7', '8', '8', '8', '8', '8', '8', '8', '8', '8', '8', '9', '9', '9', '9', '9', '9', '9', '9', '9',
 			'9', };
+
+	private static final int[] EscapeChar = new int[128];
+
+	static {
+		for (int i = 0; i < 128; i++) {
+			switch (i) {
+			case '\\':
+				EscapeChar[i] = '\\';
+				break;
+			case '"':
+				EscapeChar[i] = '"';
+				break;
+			case '\b':
+				EscapeChar[i] = 'b';
+				break;
+			case '\f':
+				EscapeChar[i] = 'f';
+				break;
+			case '\n':
+				EscapeChar[i] = 'n';
+				break;
+			case '\r':
+				EscapeChar[i] = 'r';
+				break;
+			case '\t':
+				EscapeChar[i] = 't';
+				break;
+			default:
+				if (i < 32) {
+					EscapeChar[i] = -1;
+				}
+			}
+		}
+	}
 
 	private static void getChars(int i, int index, char[] buf) {
 		char sign = 0;
@@ -104,123 +138,100 @@ public class SimpleCharBuffer implements Appendable {
 		}
 	}
 
-	public SimpleCharBuffer append(int i) {
-		off += (i < 0) ? stringSize(-i) + 1 : stringSize(i);
-		ensureCapacityInternal(off);
+	public void append(int i) {
+		int capacity = off + ((i < 0) ? stringSize(-i) + 1 : stringSize(i));
+		ensureCapacityInternal(capacity);
+		off = capacity;
 		getChars(i, off, buf);
-		return this;
 	}
 
-	public SimpleCharBuffer append(long l) {
-		off += (l < 0) ? stringSize(-l) + 1 : stringSize(l);
-		ensureCapacityInternal(off);
+	public void append(long l) {
+		int capacity = off + ((l < 0) ? stringSize(-l) + 1 : stringSize(l));
+		ensureCapacityInternal(capacity);
+		off = capacity;
 		getChars(l, off, buf);
-		return this;
 	}
 
-	public SimpleCharBuffer append(boolean b) {
+	public void append(boolean b) {
+		int index = off;
 		if (b) {
-			ensureCapacityInternal(off + 4);
-			buf[off++] = 't';
-			buf[off++] = 'r';
-			buf[off++] = 'u';
-			buf[off++] = 'e';
+			ensureCapacityInternal(index + 4);
+			buf[index++] = 't';
+			buf[index++] = 'r';
+			buf[index++] = 'u';
+			buf[index++] = 'e';
 		} else {
 			ensureCapacityInternal(off + 5);
-			buf[off++] = 'f';
-			buf[off++] = 'a';
-			buf[off++] = 'l';
-			buf[off++] = 's';
-			buf[off++] = 'e';
+			buf[index++] = 'f';
+			buf[index++] = 'a';
+			buf[index++] = 'l';
+			buf[index++] = 's';
+			buf[index++] = 'e';
 		}
-		return this;
+		off = index;
 	}
 
-	public SimpleCharBuffer append(char c) {
+	public void append(char c) {
 		ensureCapacityInternal(off + 1);
 		buf[off++] = c;
-		return this;
 	}
 
-	public SimpleCharBuffer append(float f) {
-		return append(Float.toString(f));
+	public void append(float f) {
+		append(Float.toString(f));
 	}
 
-	public SimpleCharBuffer append(double d) {
-		return append(Double.toString(d));
+	public void append(double d) {
+		append(Double.toString(d));
 	}
 
-	public SimpleCharBuffer append(String str) {
+	public void append(String str) {
 		int len = str.length();
 		ensureCapacityInternal(off + len);
 		str.getChars(0, len, buf, off);
 		off += len;
-		return this;
 	}
 
-	public SimpleCharBuffer append(char[] str, int offset, int len) {
+	public void append(char[] str, int offset, int len) {
 		ensureCapacityInternal(off + len);
 		System.arraycopy(str, offset, buf, off, len);
 		off += len;
-		return this;
 	}
 
-	public SimpleCharBuffer append(CharSequence csq) {
-		int len = csq.length();
-		ensureCapacityInternal(off + len);
-		for (int i = 0; i < len; i++) {
-			buf[off++] = csq.charAt(i);
-		}
-		return this;
-	}
-
-	public SimpleCharBuffer append(CharSequence csq, int start, int end) {
-		ensureCapacityInternal(off + end - start);
-		for (int i = start; i < end; i++) {
-			buf[off++] = csq.charAt(i);
-		}
-		return this;
-	}
-
-	public SimpleCharBuffer appendString(String str) {
-		int len = str.length();
-		ensureCapacityInternal(off + len * 2 + 2);
+	public void appendString(char c) {
+		ensureCapacityInternal(off + 8);
 		buf[off++] = '"';
-		for (int i = 0; i < len; i++) {
-			char c = str.charAt(i);
-			switch (c) {
-			case '"':
-			case '\\':
-			case '/':
+		if (c < 128) {
+			int code = EscapeChar[c];
+			if (code > 0) {
 				buf[off++] = '\\';
-				buf[off++] = c;
-				break;
-			case '\b':
-				buf[off++] = '\\';
-				buf[off++] = 'b';
-				break;
-			case '\f':
-				buf[off++] = '\\';
-				buf[off++] = 'f';
-				break;
-			case '\n':
-				buf[off++] = '\\';
-				buf[off++] = 'n';
-				break;
-			case '\r':
-				buf[off++] = '\\';
-				buf[off++] = 'r';
-				break;
-			case '\t':
-				buf[off++] = '\\';
-				buf[off++] = 't';
-				break;
-			default:
-				buf[off++] = c;
+				c = (char) code;
 			}
 		}
+		buf[off++] = c;
 		buf[off++] = '"';
-		return this;
+	}
+
+	public void appendString(String str) {
+		int len = str.length();
+		int index = off;
+		int i = index + len * 5;
+		final int end = i + len;
+		ensureCapacityInternal(index + len * 6 + 2);
+		buf[index++] = '"';
+		str.getChars(0, len, buf, i);
+		for (; i < end; i++) {
+			char c = buf[i];
+			if (c < 128) {
+				int code = EscapeChar[c];
+				if (code > 0) {
+					buf[index++] = '\\';
+					c = (char) code;
+				}
+			}
+			buf[index++] = c;
+		}
+		buf[index++] = '"';
+		off = index;
 	}
 
 	public int length() {
