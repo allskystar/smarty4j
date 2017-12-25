@@ -220,6 +220,12 @@ public class SimpleCharBuffer {
 
 	public void appendString(String str) {
 		final int len = str.length();
+		if (len == 0) {
+			ensureCapacityInternal(off + 2);
+			buf[off++] = '"';
+			buf[off++] = '"';
+			return;
+		}
 		int index = off;
 		int i = index + len * 5;
 		final int end = i + len;
