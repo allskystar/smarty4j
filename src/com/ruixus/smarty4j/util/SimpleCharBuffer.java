@@ -34,49 +34,43 @@ public class SimpleCharBuffer {
 				return i + 1;
 	}
 
-	private static final char[] DigitOnes = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4',
-			'5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5',
-			'6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6',
-			'7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7',
-			'8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6', '7', '8',
-			'9', };
-
-	private static final char[] DigitTens = { '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '1', '1', '1', '1',
-			'1', '1', '1', '1', '1', '2', '2', '2', '2', '2', '2', '2', '2', '2', '2', '3', '3', '3', '3', '3', '3',
-			'3', '3', '3', '3', '4', '4', '4', '4', '4', '4', '4', '4', '4', '4', '5', '5', '5', '5', '5', '5', '5',
-			'5', '5', '5', '6', '6', '6', '6', '6', '6', '6', '6', '6', '6', '7', '7', '7', '7', '7', '7', '7', '7',
-			'7', '7', '8', '8', '8', '8', '8', '8', '8', '8', '8', '8', '9', '9', '9', '9', '9', '9', '9', '9', '9',
-			'9', };
-
-	private static final int[] EscapeChar = new int[128];
+	private static final char[] digitOnes = new char[100];
+	private static final char[] digitTens = new char[100];
+	private static final int[] escCodes = new int[128];
+	
+	private static final char[] hexChars = new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
 	static {
+		for (int i = 0; i < 100; i++) {
+			digitOnes[i] = (char) ('0' + i % 10);
+			digitTens[i] = (char) ('0' + i / 10);
+		}
 		for (int i = 0; i < 128; i++) {
 			switch (i) {
 			case '\\':
-				EscapeChar[i] = '\\';
+				escCodes[i] = '\\';
 				break;
 			case '"':
-				EscapeChar[i] = '"';
+				escCodes[i] = '"';
 				break;
 			case '\b':
-				EscapeChar[i] = 'b';
+				escCodes[i] = 'b';
 				break;
 			case '\f':
-				EscapeChar[i] = 'f';
+				escCodes[i] = 'f';
 				break;
 			case '\n':
-				EscapeChar[i] = 'n';
+				escCodes[i] = 'n';
 				break;
 			case '\r':
-				EscapeChar[i] = 'r';
+				escCodes[i] = 'r';
 				break;
 			case '\t':
-				EscapeChar[i] = 't';
+				escCodes[i] = 't';
 				break;
 			default:
 				if (i < 32) {
-					EscapeChar[i] = -1;
+					escCodes[i] = 'u';
 				}
 			}
 		}
@@ -93,13 +87,13 @@ public class SimpleCharBuffer {
 		while (i >= 100) {
 			int r = i % 100;
 			i = i / 100;
-			buf[--index] = DigitOnes[r];
-			buf[--index] = DigitTens[r];
+			buf[--index] = digitOnes[r];
+			buf[--index] = digitTens[r];
 		}
 
-		buf[--index] = DigitOnes[i];
+		buf[--index] = digitOnes[i];
 		if (i >= 10) {
-			buf[--index] = DigitTens[i];
+			buf[--index] = digitTens[i];
 		}
 		if (sign != 0) {
 			buf[--index] = sign;
@@ -117,21 +111,21 @@ public class SimpleCharBuffer {
 		while (l > Integer.MAX_VALUE) {
 			int r = (int) (l % 100);
 			l = l / 100;
-			buf[--index] = DigitOnes[r];
-			buf[--index] = DigitTens[r];
+			buf[--index] = digitOnes[r];
+			buf[--index] = digitTens[r];
 		}
 
 		int i = (int) l;
 		while (i >= 100) {
 			int r = i % 100;
 			i = i / 100;
-			buf[--index] = DigitOnes[r];
-			buf[--index] = DigitTens[r];
+			buf[--index] = digitOnes[r];
+			buf[--index] = digitTens[r];
 		}
 
-		buf[--index] = DigitOnes[i];
+		buf[--index] = digitOnes[i];
 		if (i >= 10) {
-			buf[--index] = DigitTens[i];
+			buf[--index] = digitTens[i];
 		}
 		if (sign != 0) {
 			buf[--index] = sign;
@@ -153,22 +147,20 @@ public class SimpleCharBuffer {
 	}
 
 	public void append(boolean b) {
-		int index = off;
 		if (b) {
-			ensureCapacityInternal(index + 4);
-			buf[index++] = 't';
-			buf[index++] = 'r';
-			buf[index++] = 'u';
-			buf[index++] = 'e';
+			ensureCapacityInternal(off + 4);
+			buf[off++] = 't';
+			buf[off++] = 'r';
+			buf[off++] = 'u';
+			buf[off++] = 'e';
 		} else {
 			ensureCapacityInternal(off + 5);
-			buf[index++] = 'f';
-			buf[index++] = 'a';
-			buf[index++] = 'l';
-			buf[index++] = 's';
-			buf[index++] = 'e';
+			buf[off++] = 'f';
+			buf[off++] = 'a';
+			buf[off++] = 'l';
+			buf[off++] = 's';
+			buf[off++] = 'e';
 		}
-		off = index;
 	}
 
 	public void append(char c) {
@@ -197,40 +189,62 @@ public class SimpleCharBuffer {
 		off += len;
 	}
 
+	public void appendNull() {
+		ensureCapacityInternal(off + 4);
+		buf[off++] = 'n';
+		buf[off++] = 'u';
+		buf[off++] = 'l';
+		buf[off++] = 'l';
+	}
+	
 	public void appendString(char c) {
 		ensureCapacityInternal(off + 8);
 		buf[off++] = '"';
+		buf[off] = c;
 		if (c < 128) {
-			int code = EscapeChar[c];
-			if (code > 0) {
+			int code = escCodes[c];
+			if (code != 0) {
 				buf[off++] = '\\';
-				c = (char) code;
+				buf[off] = (char) code;
+				if (code == 'u') {
+					buf[++off] = '0';
+					buf[++off] = '0';
+					buf[++off] = hexChars[(c >> 4)];
+					buf[++off] = hexChars[c & 0xF];
+				}
 			}
 		}
-		buf[off++] = c;
+		off++;
 		buf[off++] = '"';
 	}
 
 	public void appendString(String str) {
-		int len = str.length();
+		final int len = str.length();
 		int index = off;
 		int i = index + len * 5;
 		final int end = i + len;
 		ensureCapacityInternal(index + len * 6 + 2);
-		buf[index++] = '"';
-		str.getChars(0, len, buf, i);
-		for (; i < end; i++) {
-			char c = buf[i];
+		char[] pbuf = buf;
+		pbuf[index++] = '"';
+		str.getChars(0, len, pbuf, i);
+		for (; i < end; index++) {
+			char c = pbuf[i++];
+			pbuf[index] = c;
 			if (c < 128) {
-				int code = EscapeChar[c];
-				if (code > 0) {
-					buf[index++] = '\\';
-					c = (char) code;
+				int code = escCodes[c];
+				if (code != 0) {
+					pbuf[index++] = '\\';
+					pbuf[index] = (char) code;
+					if (code == 'u') {
+						pbuf[++index] = '0';
+						pbuf[++index] = '0';
+						pbuf[++index] = hexChars[(c >> 4)];
+						pbuf[++index] = hexChars[c & 0xF];
+					}
 				}
 			}
-			buf[index++] = c;
 		}
-		buf[index++] = '"';
+		pbuf[index++] = '"';
 		off = index;
 	}
 
