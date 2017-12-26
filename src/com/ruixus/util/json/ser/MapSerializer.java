@@ -34,7 +34,7 @@ public class MapSerializer implements Serializer, Generic {
 			if (key != null) {
 				cb.appendString(key.toString());
 				cb.append(':');
-				JSONSerializer.encodeValue(cb, entry.getValue(), provider);
+				JSONSerializer.serializeValue(cb, entry.getValue(), provider);
 				cb.append(',');
 			}
 		}

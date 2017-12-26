@@ -148,7 +148,7 @@ public class JSONSerializer {
 		this.provider = provider;
 	}
 
-	public String encode(Object o) {
+	public String serialize(Object o) {
 		SimpleCharBuffer cb;
 		synchronized (this) {
 			if (recycler.size() > 0) {
@@ -157,7 +157,7 @@ public class JSONSerializer {
 				cb = new SimpleCharBuffer(4000);
 			}
 		}
-		encodeValue(cb, o, provider);
+		serializeValue(cb, o, provider);
 		String ret = cb.toString();
 		synchronized (this) {
 			cb.setLength(0);
@@ -375,7 +375,7 @@ public class JSONSerializer {
 									mv.visitVarInsn(ILOAD, VALUE + 1);
 									mv.visitInsn(AALOAD);
 									mv.visitVarInsn(ALOAD, CACHE);
-									mv.visitMethodInsn(INVOKESTATIC, NAME, "encodeObject", "(L" + SimpleCharBuffer.NAME
+									mv.visitMethodInsn(INVOKESTATIC, NAME, "serializeObject", "(L" + SimpleCharBuffer.NAME
 											+ ";Ljava/lang/Object;L" + Provider.NAME + ";)V");
 								}
 								mv.visitVarInsn(ALOAD, SB);
@@ -405,7 +405,7 @@ public class JSONSerializer {
 									mv.visitVarInsn(ALOAD, SB);
 									mv.visitVarInsn(ALOAD, VALUE);
 									mv.visitVarInsn(ALOAD, CACHE);
-									mv.visitMethodInsn(INVOKESTATIC, NAME, "encodeObject", "(L" + SimpleCharBuffer.NAME
+									mv.visitMethodInsn(INVOKESTATIC, NAME, "serializeObject", "(L" + SimpleCharBuffer.NAME
 											+ ";Ljava/lang/Object;L" + Provider.NAME + ";)V");
 								}
 							}
@@ -440,7 +440,7 @@ public class JSONSerializer {
 		}
 	}
 
-	public static void encodeObject(SimpleCharBuffer cb, Object o, Provider provider) {
+	public static void serializeObject(SimpleCharBuffer cb, Object o, Provider provider) {
 		Class<?> clazz = o.getClass();
 		if (clazz.isArray()) {
 			Serializer serializer = provider.getSerializer(clazz, false);
@@ -450,7 +450,7 @@ public class JSONSerializer {
 				cb.append('[');
 				int len = Array.getLength(o);
 				for (int i = 0; i < len; i++) {
-					encodeValue(cb, Array.get(o, i), provider);
+					serializeValue(cb, Array.get(o, i), provider);
 					cb.append(',');
 				}
 				cb.setCharAt(cb.length() - 1, ']');
@@ -460,11 +460,11 @@ public class JSONSerializer {
 		}
 	}
 
-	public static void encodeValue(SimpleCharBuffer cb, Object o, Provider provider) {
+	public static void serializeValue(SimpleCharBuffer cb, Object o, Provider provider) {
 		if (o == null) {
 			cb.appendNull();
 		} else {
-			encodeObject(cb, o, provider);
+			serializeObject(cb, o, provider);
 		}
 	}
 }

@@ -24,7 +24,7 @@ public class ArrayListSerializer implements Serializer, Generic {
 	public static void $serialize(ArrayList<?> o, SimpleCharBuffer cb, Provider provider) {
 		cb.append('[');
 		for (int i = 0, len = o.size(); i < len; i++) {
-			JSONSerializer.encodeValue(cb, o.get(i), provider);
+			JSONSerializer.serializeValue(cb, o.get(i), provider);
 			cb.append(',');
 		}
 		cb.setCharAt(cb.length() - 1, ']');

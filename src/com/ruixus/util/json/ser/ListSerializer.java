@@ -24,7 +24,7 @@ public class ListSerializer implements Serializer, Generic {
 	public static void $serialize(List<?> o, SimpleCharBuffer cb, Provider provider) {
 		cb.append('[');
 		for (Object item : o) {
-			JSONSerializer.encodeValue(cb, item, provider);
+			JSONSerializer.serializeValue(cb, item, provider);
 			cb.append(',');
 		}
 		cb.setCharAt(cb.length() - 1, ']');
