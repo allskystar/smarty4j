@@ -5,6 +5,8 @@ import static org.objectweb.asm.Opcodes.*;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.IOException;
+import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
@@ -149,22 +151,37 @@ public class JSONSerializer {
 		this.provider = provider;
 	}
 
-	public String serialize(Object o) {
-		SimpleCharBuffer cb;
+	private SimpleCharBuffer getBuffer() {
 		synchronized (this) {
 			if (recycler.size() > 0) {
-				cb = (SimpleCharBuffer) recycler.pop();
+				return (SimpleCharBuffer) recycler.pop();
 			} else {
-				cb = new SimpleCharBuffer(4000);
+				return new SimpleCharBuffer(4000);
 			}
 		}
-		serializeValue(o, cb, provider);
-		String ret = cb.toString();
+	}
+	
+	private void freeBuffer(SimpleCharBuffer cb) {
 		synchronized (this) {
-			cb.setLength(0);
 			recycler.push(cb);
 		}
+	}
+	
+	public String serialize(Object o) {
+		SimpleCharBuffer cb = getBuffer();
+		serializeValue(o, cb, provider);
+		String ret = cb.toString();
+		cb.setLength(0);
+		freeBuffer(cb);
 		return ret;
+	}
+
+	public void serialize(Writer writer, Object o) throws IOException {
+		SimpleCharBuffer cb = getBuffer();
+		cb.setWriter(writer);
+		serializeValue(o, cb, provider);
+		cb.flush();
+		freeBuffer(cb);
 	}
 
 	private static final int OBJ = 0;
