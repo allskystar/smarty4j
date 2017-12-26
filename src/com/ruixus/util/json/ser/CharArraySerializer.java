@@ -10,7 +10,7 @@ public class CharArraySerializer implements Serializer {
 			cb.appendString(item);
 			cb.append(',');
 		}
-		cb.setCharAt(cb.length() - 1, ']');
+		cb.appendClose(']');
 	}
 
 	@Override

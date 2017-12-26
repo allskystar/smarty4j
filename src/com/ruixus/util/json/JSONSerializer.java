@@ -474,7 +474,7 @@ public class JSONSerializer {
 					serializeValue(Array.get(o, i), cb, provider);
 					cb.append(',');
 				}
-				cb.setCharAt(cb.length() - 1, ']');
+				cb.appendClose(']');
 			}
 		} else {
 			provider.getSerializer(clazz).serialize(o, cb, provider);

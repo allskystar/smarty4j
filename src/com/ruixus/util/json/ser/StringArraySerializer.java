@@ -10,7 +10,7 @@ public class StringArraySerializer implements Serializer {
 			cb.appendString(item);
 			cb.append(',');
 		}
-		cb.setCharAt(cb.length() - 1, ']');
+		cb.appendClose(']');
 	}
 
 	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {

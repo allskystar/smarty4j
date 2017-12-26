@@ -259,6 +259,14 @@ public class SimpleCharBuffer {
 		buf[off++] = '"';
 	}
 
+	public void appendClose(char c) {
+		if (buf[off - 1] == ',') {
+			buf[off - 1] = c;
+		} else {
+			buf[off++] = c;
+		}
+	}
+	
 	public void flush() throws IOException {
 		if (writer != null) {
 			writer.write(buf, 0, off);

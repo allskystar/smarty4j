@@ -18,7 +18,7 @@ public class ArrayListSerializer implements Serializer, Generic {
 			serializer.serialize(o.get(i), cb, provider);
 			cb.append(',');
 		}
-		cb.setCharAt(cb.length() - 1, ']');
+		cb.appendClose(']');
 	}
 
 	public static void $serialize(ArrayList<?> o, SimpleCharBuffer cb, Provider provider) {
@@ -27,7 +27,7 @@ public class ArrayListSerializer implements Serializer, Generic {
 			JSONSerializer.serializeValue(o.get(i), cb, provider);
 			cb.append(',');
 		}
-		cb.setCharAt(cb.length() - 1, ']');
+		cb.appendClose(']');
 	}
 
 	@Override

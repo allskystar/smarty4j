@@ -10,7 +10,7 @@ public class LongArraySerializer implements Serializer {
 			cb.append(item);
 			cb.append(',');
 		}
-		cb.setCharAt(cb.length() - 1, ']');
+		cb.appendClose(']');
 	}
 
 	@Override

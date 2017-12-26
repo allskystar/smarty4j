@@ -24,7 +24,7 @@ public class MapSerializer implements Serializer, Generic {
 				cb.append(',');
 			}
 		}
-		cb.setCharAt(cb.length() - 1, '}');
+		cb.appendClose('}');
 	}
 
 	public static void $serialize(Map<?, ?> o, SimpleCharBuffer cb, Provider provider) {
@@ -38,7 +38,7 @@ public class MapSerializer implements Serializer, Generic {
 				cb.append(',');
 			}
 		}
-		cb.setCharAt(cb.length() - 1, '}');
+		cb.appendClose('}');
 	}
 
 	@Override

@@ -10,7 +10,7 @@ public class DoubleArraySerializer implements Serializer {
 			cb.append(Double.toString(item));
 			cb.append(',');
 		}
-		cb.setCharAt(cb.length() - 1, ']');
+		cb.appendClose(']');
 	}
 
 	@Override

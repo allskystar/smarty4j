@@ -10,7 +10,7 @@ public class FloatArraySerializer implements Serializer {
 			cb.append(Float.toString(item));
 			cb.append(',');
 		}
-		cb.setCharAt(cb.length() - 1, ']');
+		cb.appendClose(']');
 	}
 
 	@Override

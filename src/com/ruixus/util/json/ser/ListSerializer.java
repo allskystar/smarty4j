@@ -18,7 +18,7 @@ public class ListSerializer implements Serializer, Generic {
 			serializer.serialize(item, cb, provider);
 			cb.append(',');
 		}
-		cb.setCharAt(cb.length() - 1, ']');
+		cb.appendClose(']');
 	}
 
 	public static void $serialize(List<?> o, SimpleCharBuffer cb, Provider provider) {
@@ -27,7 +27,7 @@ public class ListSerializer implements Serializer, Generic {
 			JSONSerializer.serializeValue(item, cb, provider);
 			cb.append(',');
 		}
-		cb.setCharAt(cb.length() - 1, ']');
+		cb.appendClose(']');
 	}
 
 	@Override
