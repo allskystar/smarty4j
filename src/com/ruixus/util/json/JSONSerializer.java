@@ -105,15 +105,19 @@ public class JSONSerializer {
 		}
 
 		public void addBeanSerializer(Class<?> beanClass, Serializer beanSerializer) {
-			beanMapper.put(beanClass, beanSerializer);
+			synchronized (beanMapper) {
+				beanMapper.put(beanClass, beanSerializer);
+			}
 		}
 
 		public void addAssignableSerializer(Class<?> baseClass, Serializer beanSerializer) {
-			Class<?>[] newAssignables = new Class<?>[assignableSize + 1];
-			System.arraycopy(assignables, 0, newAssignables, 0, assignableSize);
-			newAssignables[assignableSize++] = baseClass;
-			assignables = newAssignables;
-			beanMapper.put(baseClass, beanSerializer);
+			synchronized (beanMapper) {
+				Class<?>[] newAssignables = new Class<?>[assignableSize + 1];
+				System.arraycopy(assignables, 0, newAssignables, 0, assignableSize);
+				newAssignables[assignableSize++] = baseClass;
+				assignables = newAssignables;
+				beanMapper.put(baseClass, beanSerializer);
+			}
 		}
 
 		public Serializer getSerializer(Class<?> cc) {
@@ -126,16 +130,19 @@ public class JSONSerializer {
 				for (Class<?> item : assignables) {
 					if (item.isAssignableFrom(cc)) {
 						serializer = beanMapper.get(item);
-						synchronized (JSONSerializer.class) {
+						synchronized (beanMapper) {
 							beanMapper.put(cc, serializer);
 						}
 						break;
 					}
 				}
 				if (serializer == null && needBuild) {
-					serializer = createSerializer(cc, this);
-					synchronized (JSONSerializer.class) {
-						beanMapper.put(cc, serializer);
+					synchronized (beanMapper) {
+						serializer = beanMapper.get(cc);
+						if (serializer == null) {
+							serializer = createSerializer(cc, this);
+							beanMapper.put(cc, serializer);
+						}
 					}
 				}
 			}
@@ -155,7 +162,7 @@ public class JSONSerializer {
 	}
 
 	private SimpleCharBuffer getBuffer() {
-		synchronized (this) {
+		synchronized (recycler) {
 			if (recycler.size() > 0) {
 				return (SimpleCharBuffer) recycler.pop();
 			} else {
@@ -165,7 +172,7 @@ public class JSONSerializer {
 	}
 	
 	private void freeBuffer(SimpleCharBuffer cb) {
-		synchronized (this) {
+		synchronized (recycler) {
 			recycler.push(cb);
 		}
 	}
@@ -448,12 +455,9 @@ public class JSONSerializer {
 		byte[] code = cw.toByteArray();
 		try {
 			return (Serializer) ObjectMapper.defineClass(mapperName, code).newInstance();
-		} catch (Exception e) {
-			try {
-				return (Serializer) Class.forName(mapperName).newInstance();
-			} catch (Exception ex) {
-				throw new NullPointerException();
-			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new NullPointerException();
 		}
 	}
 
