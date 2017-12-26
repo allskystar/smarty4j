@@ -1,4 +1,4 @@
-package com.ruixus.util.json.encoder;
+package com.ruixus.util.json.ser;
 
 import java.lang.reflect.Type;
 

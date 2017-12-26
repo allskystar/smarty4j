@@ -1,4 +1,4 @@
-package com.ruixus.util.json.encoder;
+package com.ruixus.util.json.ser;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -7,34 +7,34 @@ import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
 import com.ruixus.util.SimpleCharBuffer;
-import com.ruixus.util.json.JSONEncoder;
-import com.ruixus.util.json.JSONEncoder.Provider;
+import com.ruixus.util.json.JSONSerializer;
+import com.ruixus.util.json.JSONSerializer.Provider;
 
-public class MapEncoder implements Encoder, Generic {
-	public static void $stringify(Map<?, ?> o, SimpleCharBuffer cb, Provider provider,
+public class MapSerializer implements Serializer, Generic {
+	public static void $serialize(Map<?, ?> o, SimpleCharBuffer cb, Provider provider,
 			Class<?> generic) {
-		Encoder encoder = provider.getEncoder(generic);
+		Serializer serializer = provider.getSerializer(generic);
 		cb.append('{');
 		for (Map.Entry<?, ?> entry : o.entrySet()) {
 			Object key = entry.getKey();
 			if (key != null) {
 				cb.appendString(key.toString());
 				cb.append(':');
-				encoder.stringify(cb, entry.getValue(), provider);
+				serializer.serialize(cb, entry.getValue(), provider);
 				cb.append(',');
 			}
 		}
 		cb.setCharAt(cb.length() - 1, '}');
 	}
 
-	public static void $stringify(Map<?, ?> o, SimpleCharBuffer cb, Provider provider) {
+	public static void $serialize(Map<?, ?> o, SimpleCharBuffer cb, Provider provider) {
 		cb.append('{');
 		for (Map.Entry<?, ?> entry : o.entrySet()) {
 			Object key = entry.getKey();
 			if (key != null) {
 				cb.appendString(key.toString());
 				cb.append(':');
-				JSONEncoder.encodeValue(cb, entry.getValue(), provider);
+				JSONSerializer.encodeValue(cb, entry.getValue(), provider);
 				cb.append(',');
 			}
 		}
@@ -42,8 +42,8 @@ public class MapEncoder implements Encoder, Generic {
 	}
 
 	@Override
-	public void stringify(SimpleCharBuffer cb, Object o, Provider provider) {
-		MapEncoder.$stringify((Map<?, ?>) o, cb, provider);
+	public void serialize(SimpleCharBuffer cb, Object o, Provider provider) {
+		MapSerializer.$serialize((Map<?, ?>) o, cb, provider);
 	}
 
 	@Override

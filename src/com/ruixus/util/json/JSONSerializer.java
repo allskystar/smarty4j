@@ -1,4 +1,5 @@
 package com.ruixus.util.json;
+
 import static org.objectweb.asm.Opcodes.*;
 
 import java.beans.Introspector;
@@ -19,28 +20,28 @@ import org.objectweb.asm.MethodVisitor;
 
 import com.ruixus.util.SimpleCharBuffer;
 import com.ruixus.util.SimpleStack;
-import com.ruixus.util.json.encoder.ArrayListEncoder;
-import com.ruixus.util.json.encoder.BooleanArrayEncoder;
-import com.ruixus.util.json.encoder.BooleanEncoder;
-import com.ruixus.util.json.encoder.ByteArrayEncoder;
-import com.ruixus.util.json.encoder.CharArrayEncoder;
-import com.ruixus.util.json.encoder.CharacterEncoder;
-import com.ruixus.util.json.encoder.DoubleArrayEncoder;
-import com.ruixus.util.json.encoder.Encoder;
-import com.ruixus.util.json.encoder.FloatArrayEncoder;
-import com.ruixus.util.json.encoder.Generic;
-import com.ruixus.util.json.encoder.IntArrayEncoder;
-import com.ruixus.util.json.encoder.IntegerEncoder;
-import com.ruixus.util.json.encoder.ListEncoder;
-import com.ruixus.util.json.encoder.LongArrayEncoder;
-import com.ruixus.util.json.encoder.LongEncoder;
-import com.ruixus.util.json.encoder.MapEncoder;
-import com.ruixus.util.json.encoder.NumberEncoder;
-import com.ruixus.util.json.encoder.ShortArrayEncoder;
-import com.ruixus.util.json.encoder.StringArrayEncoder;
-import com.ruixus.util.json.encoder.StringEncoder;
+import com.ruixus.util.json.ser.ArrayListSerializer;
+import com.ruixus.util.json.ser.BooleanArraySerializer;
+import com.ruixus.util.json.ser.BooleanSerializer;
+import com.ruixus.util.json.ser.ByteArraySerializer;
+import com.ruixus.util.json.ser.CharArraySerializer;
+import com.ruixus.util.json.ser.CharacterSerializer;
+import com.ruixus.util.json.ser.DoubleArraySerializer;
+import com.ruixus.util.json.ser.FloatArraySerializer;
+import com.ruixus.util.json.ser.Generic;
+import com.ruixus.util.json.ser.IntArraySerializer;
+import com.ruixus.util.json.ser.IntegerSerializer;
+import com.ruixus.util.json.ser.ListSerializer;
+import com.ruixus.util.json.ser.LongArraySerializer;
+import com.ruixus.util.json.ser.LongSerializer;
+import com.ruixus.util.json.ser.MapSerializer;
+import com.ruixus.util.json.ser.NumberSerializer;
+import com.ruixus.util.json.ser.Serializer;
+import com.ruixus.util.json.ser.ShortArraySerializer;
+import com.ruixus.util.json.ser.StringArraySerializer;
+import com.ruixus.util.json.ser.StringSerializer;
 
-public class JSONEncoder {
+public class JSONSerializer {
 	private static class ObjectMapper extends ClassLoader {
 		private static final ObjectMapper loader = new ObjectMapper();
 
@@ -53,100 +54,100 @@ public class JSONEncoder {
 		}
 	}
 
-	private static final String NAME = JSONEncoder.class.getName().replace('.', '/');
+	private static final String NAME = JSONSerializer.class.getName().replace('.', '/');
 
 	public static class Provider {
 		public static final String NAME = Provider.class.getName().replace('.', '/');
-		private static final Map<Class<?>, Encoder> defBeanMapper = new HashMap<Class<?>, Encoder>();
+		private static final Map<Class<?>, Serializer> defBeanMapper = new HashMap<Class<?>, Serializer>();
 		private static final Class<?>[] defAssignables;
 
 		static {
-			defAssignables = new Class<?>[] {Number.class, Map.class, List.class};
-			defBeanMapper.put(String.class, new StringEncoder());
-			defBeanMapper.put(Character.class, new CharacterEncoder());
-			defBeanMapper.put(Boolean.class, new BooleanEncoder());
-			defBeanMapper.put(Byte.class, new IntegerEncoder());
-			defBeanMapper.put(Short.class, new IntegerEncoder());
-			defBeanMapper.put(Integer.class, new IntegerEncoder());
-			defBeanMapper.put(Long.class, new LongEncoder());
+			defAssignables = new Class<?>[] { Number.class, Map.class, List.class };
+			defBeanMapper.put(String.class, new StringSerializer());
+			defBeanMapper.put(Character.class, new CharacterSerializer());
+			defBeanMapper.put(Boolean.class, new BooleanSerializer());
+			defBeanMapper.put(Byte.class, new IntegerSerializer());
+			defBeanMapper.put(Short.class, new IntegerSerializer());
+			defBeanMapper.put(Integer.class, new IntegerSerializer());
+			defBeanMapper.put(Long.class, new LongSerializer());
 
-			defBeanMapper.put(Number.class, new NumberEncoder());
-			defBeanMapper.put(Map.class, new MapEncoder());
-			defBeanMapper.put(List.class, new ListEncoder());
+			defBeanMapper.put(Number.class, new NumberSerializer());
+			defBeanMapper.put(Map.class, new MapSerializer());
+			defBeanMapper.put(List.class, new ListSerializer());
 
-			defBeanMapper.put(ArrayList.class, new ArrayListEncoder());
-			defBeanMapper.put(String[].class, new StringArrayEncoder());
-			defBeanMapper.put(char[].class, new CharArrayEncoder());
-			defBeanMapper.put(boolean[].class, new BooleanArrayEncoder());
-			defBeanMapper.put(byte[].class, new ByteArrayEncoder());
-			defBeanMapper.put(short[].class, new ShortArrayEncoder());
-			defBeanMapper.put(int[].class, new IntArrayEncoder());
-			defBeanMapper.put(long[].class, new LongArrayEncoder());
-			defBeanMapper.put(float[].class, new FloatArrayEncoder());
-			defBeanMapper.put(double[].class, new DoubleArrayEncoder());
+			defBeanMapper.put(ArrayList.class, new ArrayListSerializer());
+			defBeanMapper.put(String[].class, new StringArraySerializer());
+			defBeanMapper.put(char[].class, new CharArraySerializer());
+			defBeanMapper.put(boolean[].class, new BooleanArraySerializer());
+			defBeanMapper.put(byte[].class, new ByteArraySerializer());
+			defBeanMapper.put(short[].class, new ShortArraySerializer());
+			defBeanMapper.put(int[].class, new IntArraySerializer());
+			defBeanMapper.put(long[].class, new LongArraySerializer());
+			defBeanMapper.put(float[].class, new FloatArraySerializer());
+			defBeanMapper.put(double[].class, new DoubleArraySerializer());
 		}
 
-		private Map<Class<?>, Encoder> beanMapper;
+		private Map<Class<?>, Serializer> beanMapper;
 		private Class<?>[] assignables;
 		private int assignableSize;
-		
+
 		public Provider() {
-			this.beanMapper = new HashMap<Class<?>, Encoder>(defBeanMapper);
+			this.beanMapper = new HashMap<Class<?>, Serializer>(defBeanMapper);
 			assignableSize = defAssignables.length;
 			this.assignables = new Class[assignableSize];
 			System.arraycopy(defAssignables, 0, assignables, 0, assignableSize);
 		}
 
-		public void addBeanEncoder(Class<?> beanClass, Encoder beanEncoder) {
-			beanMapper.put(beanClass, beanEncoder);
+		public void addBeanSerializer(Class<?> beanClass, Serializer beanSerializer) {
+			beanMapper.put(beanClass, beanSerializer);
 		}
 
-		public void addAssignableEncoder(Class<?> baseClass, Encoder beanEncoder) {
+		public void addAssignableSerializer(Class<?> baseClass, Serializer beanSerializer) {
 			Class<?>[] newAssignables = new Class<?>[assignableSize + 1];
 			System.arraycopy(assignables, 0, newAssignables, 0, assignableSize);
 			newAssignables[assignableSize++] = baseClass;
 			assignables = newAssignables;
-			beanMapper.put(baseClass, beanEncoder);
-		}
-		
-		public Encoder getEncoder(Class<?> cc) {
-			return this.getEncoder(cc, true);
+			beanMapper.put(baseClass, beanSerializer);
 		}
 
-		public Encoder getEncoder(Class<?> cc, boolean needBuild) {
-			Encoder encoder = beanMapper.get(cc);
-			if (encoder == null) {
+		public Serializer getSerializer(Class<?> cc) {
+			return this.getSerializer(cc, true);
+		}
+
+		public Serializer getSerializer(Class<?> cc, boolean needBuild) {
+			Serializer serializer = beanMapper.get(cc);
+			if (serializer == null) {
 				for (Class<?> item : assignables) {
 					if (item.isAssignableFrom(cc)) {
-						encoder = beanMapper.get(item);
-						synchronized (JSONEncoder.class) {
-							beanMapper.put(cc, encoder);
+						serializer = beanMapper.get(item);
+						synchronized (JSONSerializer.class) {
+							beanMapper.put(cc, serializer);
 						}
 						break;
 					}
 				}
-				if (encoder == null && needBuild) {
-					encoder = createEncoder(cc, this);
-					synchronized (JSONEncoder.class) {
-						beanMapper.put(cc, encoder);
+				if (serializer == null && needBuild) {
+					serializer = createSerializer(cc, this);
+					synchronized (JSONSerializer.class) {
+						beanMapper.put(cc, serializer);
 					}
 				}
 			}
-			return encoder;
+			return serializer;
 		}
 	}
-	
+
 	private SimpleStack recycler = new SimpleStack();
 	private Provider provider;
 
-	public JSONEncoder() {
+	public JSONSerializer() {
 		this(new Provider());
 	}
 
-	public JSONEncoder(Provider provider) {
+	public JSONSerializer(Provider provider) {
 		this.provider = provider;
 	}
-	
+
 	public String encode(Object o) {
 		SimpleCharBuffer cb;
 		synchronized (this) {
@@ -170,17 +171,17 @@ public class JSONEncoder {
 	private static final int CACHE = SB + 1;
 	private static final int VALUE = CACHE + 1;
 
-	private static void callStaticEncode(MethodVisitor mv, Provider provider, Encoder encoder, Type type) {
+	private static void callStaticEncode(MethodVisitor mv, Provider provider, Serializer serializer, Type type) {
 		Class<?> generic = null;
-		if (encoder instanceof Generic) {
-			type = ((Generic) encoder).getGeneric(mv, type);
+		if (serializer instanceof Generic) {
+			type = ((Generic) serializer).getGeneric(mv, type);
 			if (type instanceof Class) {
 				if (Modifier.isFinal(((Class<?>) type).getModifiers())) {
 					generic = (Class<?>) type;
 				}
 			}
 		}
-		Class<?> clazz = encoder.getClass();
+		Class<?> clazz = serializer.getClass();
 		String name = null;
 		for (Method method : clazz.getDeclaredMethods()) {
 			if (method.getName().charAt(0) == '$') {
@@ -189,27 +190,33 @@ public class JSONEncoder {
 				break;
 			}
 		}
+		if (name == null) {
+			throw new RuntimeException(
+					"Please provide a static method 'serialize(E value, SimpleCharBuffer cb, Provider provider)' in Class "
+							+ serializer.getClass().getName() + " to serialize ‘value’");
+		}
 		mv.visitVarInsn(ALOAD, SB);
 		mv.visitVarInsn(ALOAD, CACHE);
 		if (generic != null) {
-			provider.getEncoder(generic);
+			provider.getSerializer(generic);
 			mv.visitLdcInsn(org.objectweb.asm.Type.getType(generic));
-			mv.visitMethodInsn(INVOKESTATIC, clazz.getName().replace('.', '/'), "$stringify",
+			mv.visitMethodInsn(INVOKESTATIC, clazz.getName().replace('.', '/'), "$serialize",
 					"(" + name + "L" + SimpleCharBuffer.NAME + ";L" + Provider.NAME + ";Ljava/lang/Class;)V");
 		} else {
-			mv.visitMethodInsn(INVOKESTATIC, clazz.getName().replace('.', '/'), "$stringify",
+			mv.visitMethodInsn(INVOKESTATIC, clazz.getName().replace('.', '/'), "$serialize",
 					"(" + name + "L" + SimpleCharBuffer.NAME + ";L" + Provider.NAME + ";)V");
 		}
 	}
 
-	public static Encoder createEncoder(Class<?> clazz, Provider provider) {
+	public static Serializer createSerializer(Class<?> clazz, Provider provider) {
 		boolean first = true;
 		String className = clazz.getName().replace('.', '/');
-		String mapperName = Encoder.class.getName() + "$" + clazz.getName().replace('.', '$');
+		String mapperName = Serializer.class.getName() + "$" + clazz.getName().replace('.', '$');
 
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
 		MethodVisitor mv;
-		cw.visit(V1_5, ACC_PUBLIC, mapperName.replace('.', '/'), null, "java/lang/Object", new String[] { Encoder.NAME });
+		cw.visit(V1_5, ACC_PUBLIC, mapperName.replace('.', '/'), null, "java/lang/Object",
+				new String[] { Serializer.NAME });
 
 		// 定义类的构造方法
 		mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
@@ -219,20 +226,20 @@ public class JSONEncoder {
 		mv.visitMaxs(0, 0);
 		mv.visitEnd();
 
-		mv = cw.visitMethod(ACC_PUBLIC + ACC_FINAL, "stringify",
+		mv = cw.visitMethod(ACC_PUBLIC + ACC_FINAL, "serialize",
 				"(L" + SimpleCharBuffer.NAME + ";Ljava/lang/Object;L" + Provider.NAME + ";)V", null, null);
 		mv.visitVarInsn(ALOAD, 2);
 		mv.visitTypeInsn(CHECKCAST, className);
 		mv.visitVarInsn(ALOAD, 1);
 		mv.visitVarInsn(ALOAD, 3);
-		mv.visitMethodInsn(INVOKESTATIC, mapperName.replace('.', '/'), "$stringify",
+		mv.visitMethodInsn(INVOKESTATIC, mapperName.replace('.', '/'), "$serialize",
 				"(L" + className + ";L" + SimpleCharBuffer.NAME + ";L" + Provider.NAME + ";)V");
 		mv.visitInsn(RETURN);
 		mv.visitMaxs(0, 0);
 		mv.visitEnd();
 
 		Label ret = new Label();
-		mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, "$stringify",
+		mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, "$serialize",
 				"(L" + className + ";L" + SimpleCharBuffer.NAME + ";L" + Provider.NAME + ";)V", null, null);
 
 		mv.visitVarInsn(ALOAD, SB);
@@ -322,20 +329,20 @@ public class JSONEncoder {
 
 					Annotation[] annos = accessor.getDeclaredAnnotations();
 					for (Annotation anno : annos) {
-						Encoder encoder = provider.getEncoder(anno.getClass().getInterfaces()[0], false);
-						if (encoder != null) {
+						Serializer serializer = provider.getSerializer(anno.getClass().getInterfaces()[0], false);
+						if (serializer != null) {
 							mv.visitVarInsn(ALOAD, VALUE);
-							callStaticEncode(mv, provider, encoder, accessor.getGenericReturnType());
+							callStaticEncode(mv, provider, serializer, accessor.getGenericReturnType());
 							assign = true;
 							break;
 						}
 					}
 
 					if (!assign) {
-						Encoder encoder = provider.getEncoder(type, false);
-						if (encoder != null) {
+						Serializer serializer = provider.getSerializer(type, false);
+						if (serializer != null) {
 							mv.visitVarInsn(ALOAD, VALUE);
-							callStaticEncode(mv, provider, encoder, accessor.getGenericReturnType());
+							callStaticEncode(mv, provider, serializer, accessor.getGenericReturnType());
 						} else {
 							if (type.isArray()) {
 								clazz = type.getComponentType();
@@ -344,7 +351,7 @@ public class JSONEncoder {
 								Label condition = new Label();
 								Label loop = new Label();
 
-								encoder = provider.getEncoder(clazz);
+								serializer = provider.getSerializer(clazz);
 								mv.visitVarInsn(ALOAD, SB);
 								mv.visitLdcInsn('[');
 								mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(C)V");
@@ -361,15 +368,15 @@ public class JSONEncoder {
 									mv.visitVarInsn(ALOAD, VALUE);
 									mv.visitVarInsn(ILOAD, VALUE + 1);
 									mv.visitInsn(AALOAD);
-									callStaticEncode(mv, provider, encoder, accessor.getGenericReturnType());
+									callStaticEncode(mv, provider, serializer, accessor.getGenericReturnType());
 								} else {
 									mv.visitVarInsn(ALOAD, SB);
 									mv.visitVarInsn(ALOAD, VALUE);
 									mv.visitVarInsn(ILOAD, VALUE + 1);
 									mv.visitInsn(AALOAD);
 									mv.visitVarInsn(ALOAD, CACHE);
-									mv.visitMethodInsn(INVOKESTATIC, NAME, "encodeObject",
-											"(L" + SimpleCharBuffer.NAME + ";Ljava/lang/Object;L" + Provider.NAME + ";)V");
+									mv.visitMethodInsn(INVOKESTATIC, NAME, "encodeObject", "(L" + SimpleCharBuffer.NAME
+											+ ";Ljava/lang/Object;L" + Provider.NAME + ";)V");
 								}
 								mv.visitVarInsn(ALOAD, SB);
 								mv.visitLdcInsn(',');
@@ -389,17 +396,17 @@ public class JSONEncoder {
 								mv.visitLdcInsn(']');
 								mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "setCharAt", "(IC)V");
 							} else {
-								encoder = provider.getEncoder(type);
+								serializer = provider.getSerializer(type);
 
 								if (Modifier.isFinal(type.getModifiers())) {
 									mv.visitVarInsn(ALOAD, VALUE);
-									callStaticEncode(mv, provider, encoder, accessor.getGenericReturnType());
+									callStaticEncode(mv, provider, serializer, accessor.getGenericReturnType());
 								} else {
 									mv.visitVarInsn(ALOAD, SB);
 									mv.visitVarInsn(ALOAD, VALUE);
 									mv.visitVarInsn(ALOAD, CACHE);
-									mv.visitMethodInsn(INVOKESTATIC, NAME, "encodeObject",
-											"(L" + SimpleCharBuffer.NAME + ";Ljava/lang/Object;L" + Provider.NAME + ";)V");
+									mv.visitMethodInsn(INVOKESTATIC, NAME, "encodeObject", "(L" + SimpleCharBuffer.NAME
+											+ ";Ljava/lang/Object;L" + Provider.NAME + ";)V");
 								}
 							}
 						}
@@ -423,10 +430,10 @@ public class JSONEncoder {
 
 		byte[] code = cw.toByteArray();
 		try {
-			return (Encoder) ObjectMapper.defineClass(mapperName, code).newInstance();
+			return (Serializer) ObjectMapper.defineClass(mapperName, code).newInstance();
 		} catch (Exception e) {
 			try {
-				return (Encoder) Class.forName(mapperName).newInstance();
+				return (Serializer) Class.forName(mapperName).newInstance();
 			} catch (Exception ex) {
 				throw new NullPointerException();
 			}
@@ -436,9 +443,9 @@ public class JSONEncoder {
 	public static void encodeObject(SimpleCharBuffer cb, Object o, Provider provider) {
 		Class<?> clazz = o.getClass();
 		if (clazz.isArray()) {
-			Encoder encoder = provider.getEncoder(clazz, false);
-			if (encoder != null) {
-				encoder.stringify(cb, o, provider);
+			Serializer serializer = provider.getSerializer(clazz, false);
+			if (serializer != null) {
+				serializer.serialize(cb, o, provider);
 			} else {
 				cb.append('[');
 				int len = Array.getLength(o);
@@ -449,7 +456,7 @@ public class JSONEncoder {
 				cb.setCharAt(cb.length() - 1, ']');
 			}
 		} else {
-			provider.getEncoder(clazz).stringify(cb, o, provider);
+			provider.getSerializer(clazz).serialize(cb, o, provider);
 		}
 	}
 
