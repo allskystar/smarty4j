@@ -17,7 +17,7 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
-import com.ruixus.smarty4j.MethodVisitorProxy;
+import com.ruixus.util.MethodVisitorProxy;
 import com.ruixus.util.SimpleCharBuffer;
 import com.ruixus.util.SimpleStack;
 import com.ruixus.util.json.encoder.ArrayListEncoder;

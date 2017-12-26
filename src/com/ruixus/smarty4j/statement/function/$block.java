@@ -3,13 +3,13 @@ package com.ruixus.smarty4j.statement.function;
 import static org.objectweb.asm.Opcodes.*;
 
 import com.ruixus.smarty4j.Context;
-import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.ParseException;
 import com.ruixus.smarty4j.TemplateWriter;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.statement.Block;
 import com.ruixus.smarty4j.statement.Definition;
 import com.ruixus.smarty4j.statement.Definition.Type;
+import com.ruixus.util.MethodVisitorProxy;
 import com.ruixus.smarty4j.statement.Document;
 
 /**

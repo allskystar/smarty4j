@@ -8,10 +8,10 @@ import java.util.regex.Pattern;
 
 import com.ruixus.smarty4j.Analyzer;
 import com.ruixus.smarty4j.MessageFormat;
-import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.TemplateReader;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.statement.Function;
+import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * The tag allow a block of data to be taken literally. This is typically used around Javascript or

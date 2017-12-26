@@ -2,10 +2,10 @@ package com.ruixus.smarty4j.statement;
 
 import static org.objectweb.asm.Opcodes.*;
 
-import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.Node;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.expression.Expression;
+import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * 表达式输出语句。

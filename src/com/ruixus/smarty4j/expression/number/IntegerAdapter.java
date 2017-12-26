@@ -1,8 +1,8 @@
 package com.ruixus.smarty4j.expression.number;
 
-import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.expression.Expression;
+import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * 整数表达式转换节点, 将表达式转换成整数表达式

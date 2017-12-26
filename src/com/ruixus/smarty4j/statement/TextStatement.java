@@ -3,11 +3,11 @@ package com.ruixus.smarty4j.statement;
 import static org.objectweb.asm.Opcodes.*;
 
 import com.ruixus.smarty4j.Analyzer;
-import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.Node;
 import com.ruixus.smarty4j.Template;
 import com.ruixus.smarty4j.TemplateWriter;
 import com.ruixus.smarty4j.VariableManager;
+import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * 文本输出语句，简单的将模板文件中的文本进行输出。

@@ -2,9 +2,9 @@ package com.ruixus.smarty4j.statement.modifier;
 
 import static org.objectweb.asm.Opcodes.*;
 
-import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.statement.Modifier;
+import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * This is used to lowercase a variable.

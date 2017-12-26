@@ -4,8 +4,8 @@ import static org.objectweb.asm.Opcodes.*;
 
 import java.util.Map;
 
-import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.VariableManager;
+import com.ruixus.util.MethodVisitorProxy;
 
 public class MapExpression extends ObjectExpression {
 

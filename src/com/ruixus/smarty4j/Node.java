@@ -2,6 +2,8 @@ package com.ruixus.smarty4j;
 
 import static org.objectweb.asm.Opcodes.*;
 
+import com.ruixus.util.MethodVisitorProxy;
+
 /**
  * The syntax tree node, which is an atomic operation.
  * 

@@ -8,12 +8,12 @@ import com.ruixus.smarty4j.Analyzer;
 import com.ruixus.smarty4j.Context;
 import com.ruixus.smarty4j.Engine;
 import com.ruixus.smarty4j.MessageFormat;
-import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.Node;
 import com.ruixus.smarty4j.Template;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.statement.function.$foreach;
 import com.ruixus.smarty4j.statement.function.$section;
+import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * 变量表达式节点, 向JVM语句栈内放入从数据容器中引用的对象

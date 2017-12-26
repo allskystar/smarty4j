@@ -3,7 +3,6 @@ package com.ruixus.smarty4j.statement.function;
 import static org.objectweb.asm.Opcodes.*;
 
 import com.ruixus.smarty4j.Context;
-import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.TemplateWriter;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.expression.NullExpression;
@@ -11,6 +10,7 @@ import com.ruixus.smarty4j.expression.StringExpression;
 import com.ruixus.smarty4j.statement.Block;
 import com.ruixus.smarty4j.statement.Definition;
 import com.ruixus.smarty4j.statement.Definition.Type;
+import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * This is used to collect the output of the template between the tags into a variable instead of

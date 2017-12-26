@@ -2,9 +2,9 @@ package com.ruixus.smarty4j.statement;
 
 import org.objectweb.asm.Label;
 
-import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.Node;
 import com.ruixus.smarty4j.VariableManager;
+import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * 调试语句，记录当前处理的行号，在解析错误时，JVM将提示出错的行号信息，

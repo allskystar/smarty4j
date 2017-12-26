@@ -3,9 +3,9 @@ package com.ruixus.smarty4j.statement.function;
 import static org.objectweb.asm.Opcodes.*;
 
 import com.ruixus.smarty4j.Engine;
-import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.statement.Function;
+import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * The tag is used for escaping template right-delimiters.

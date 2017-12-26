@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 import com.ruixus.smarty4j.Analyzer;
 import com.ruixus.smarty4j.Engine;
 import com.ruixus.smarty4j.MessageFormat;
-import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.Node;
 import com.ruixus.smarty4j.Operator;
 import com.ruixus.smarty4j.ParseException;
@@ -19,6 +18,7 @@ import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.expression.StringExpression;
 import com.ruixus.smarty4j.expression.VariableExpression;
 import com.ruixus.smarty4j.statement.function.$call;
+import com.ruixus.util.MethodVisitorProxy;
 import com.ruixus.util.SimpleStack;
 
 /**

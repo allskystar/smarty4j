@@ -7,7 +7,6 @@ import org.objectweb.asm.Label;
 import com.ruixus.smarty4j.Analyzer;
 import com.ruixus.smarty4j.Context;
 import com.ruixus.smarty4j.MessageFormat;
-import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.Node;
 import com.ruixus.smarty4j.Operator;
 import com.ruixus.smarty4j.ParseException;
@@ -18,6 +17,7 @@ import com.ruixus.smarty4j.expression.VariableExpression;
 import com.ruixus.smarty4j.expression.number.ConstInteger;
 import com.ruixus.smarty4j.statement.Block;
 import com.ruixus.smarty4j.statement.LoopFunction;
+import com.ruixus.util.MethodVisitorProxy;
 import com.ruixus.util.SimpleStack;
 
 /**

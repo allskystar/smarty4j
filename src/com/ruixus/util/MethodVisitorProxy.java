@@ -1,4 +1,4 @@
-package com.ruixus.smarty4j;
+package com.ruixus.util;
 
 import static org.objectweb.asm.Opcodes.*;
 

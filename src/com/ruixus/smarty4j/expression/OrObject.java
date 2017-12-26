@@ -4,8 +4,8 @@ import static org.objectweb.asm.Opcodes.*;
 
 import org.objectweb.asm.Label;
 
-import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.VariableManager;
+import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * 或操作对象表达式节点, 如果某一个对象表达式为<tt>true</tt>, 返回这个对象,

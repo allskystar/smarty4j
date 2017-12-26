@@ -6,7 +6,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import com.ruixus.smarty4j.Analyzer;
-import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.ParseException;
 import com.ruixus.smarty4j.SafeContext;
 import com.ruixus.smarty4j.Template;
@@ -14,6 +13,7 @@ import com.ruixus.smarty4j.TemplateReader;
 import com.ruixus.smarty4j.TemplateWriter;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.expression.NullExpression;
+import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * 自定义单行函数节点，单行函数是指不需要结束标签的函数，语句只占用一行， 在模板解析过程中， 将调用execute方法，如果不希望进行jvm字节码开发，

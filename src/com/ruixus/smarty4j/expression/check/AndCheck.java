@@ -4,9 +4,9 @@ import static org.objectweb.asm.Opcodes.*;
 
 import org.objectweb.asm.Label;
 
-import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.expression.Expression;
+import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * 与操作布尔表达式节点, 检测两个表达式的与操作结果

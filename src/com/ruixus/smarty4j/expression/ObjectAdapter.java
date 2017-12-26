@@ -2,8 +2,8 @@ package com.ruixus.smarty4j.expression;
 
 import org.objectweb.asm.Label;
 
-import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.VariableManager;
+import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * 对象转换节点, 将表达式转换成对象表达式

@@ -5,9 +5,9 @@ import static org.objectweb.asm.Opcodes.*;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.Node;
 import com.ruixus.smarty4j.VariableManager;
+import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * 变量Map型变量扩展节点, 将对象当成映射型结构, 根据提供的名称来访问对应的值, 如果对象为NULL返回NULL, 如果对象是 <tt>java.util.Map</tt>

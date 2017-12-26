@@ -2,9 +2,9 @@ package com.ruixus.smarty4j.expression.number;
 
 import static org.objectweb.asm.Opcodes.*;
 
-import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.expression.Expression;
+import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * 二元整数操作表达式, 向JVM语句栈内放入一个整数值表示两个对象的操作结果

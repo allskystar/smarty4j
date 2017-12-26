@@ -1,10 +1,10 @@
 package com.ruixus.smarty4j.statement;
 
-import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.Node;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.expression.Expression;
 import com.ruixus.smarty4j.expression.VariableExpression;
+import com.ruixus.util.MethodVisitorProxy;
 
 public class SetStatement extends Node {
 

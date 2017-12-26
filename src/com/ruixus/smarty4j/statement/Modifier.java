@@ -4,11 +4,11 @@ import static org.objectweb.asm.Opcodes.*;
 
 import java.util.List;
 
-import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.ParseException;
 import com.ruixus.smarty4j.Template;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.expression.Expression;
+import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * 自定义变量调节器节点，它提供了一个高级的调用<br>
