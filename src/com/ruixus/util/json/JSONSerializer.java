@@ -2,6 +2,7 @@ package com.ruixus.util.json;
 
 import static org.objectweb.asm.Opcodes.*;
 
+import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
@@ -415,7 +416,7 @@ public class JSONSerializer {
 					mv.visitLabel(end);
 				}
 			}
-		} catch (Exception e) {
+		} catch (IntrospectionException e) {
 		}
 
 		mv.visitVarInsn(ALOAD, SB);
