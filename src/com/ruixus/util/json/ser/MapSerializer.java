@@ -20,7 +20,7 @@ public class MapSerializer implements Serializer, Generic {
 			if (key != null) {
 				cb.appendString(key.toString());
 				cb.append(':');
-				serializer.serialize(cb, entry.getValue(), provider);
+				serializer.serialize(entry.getValue(), cb, provider);
 				cb.append(',');
 			}
 		}
@@ -34,7 +34,7 @@ public class MapSerializer implements Serializer, Generic {
 			if (key != null) {
 				cb.appendString(key.toString());
 				cb.append(':');
-				JSONSerializer.serializeValue(cb, entry.getValue(), provider);
+				JSONSerializer.serializeValue(entry.getValue(), cb, provider);
 				cb.append(',');
 			}
 		}
@@ -42,7 +42,7 @@ public class MapSerializer implements Serializer, Generic {
 	}
 
 	@Override
-	public void serialize(SimpleCharBuffer cb, Object o, Provider provider) {
+	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
 		MapSerializer.$serialize((Map<?, ?>) o, cb, provider);
 	}
 

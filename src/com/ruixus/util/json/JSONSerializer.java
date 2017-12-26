@@ -158,7 +158,7 @@ public class JSONSerializer {
 				cb = new SimpleCharBuffer(4000);
 			}
 		}
-		serializeValue(cb, o, provider);
+		serializeValue(o, cb, provider);
 		String ret = cb.toString();
 		synchronized (this) {
 			cb.setLength(0);
@@ -168,9 +168,9 @@ public class JSONSerializer {
 	}
 
 	private static final int OBJ = 0;
-	private static final int SB = OBJ + 1;
-	private static final int CACHE = SB + 1;
-	private static final int VALUE = CACHE + 1;
+	private static final int CB = OBJ + 1;
+	private static final int PROVIDER = CB + 1;
+	private static final int VALUE = PROVIDER + 1;
 
 	private static void callStaticEncode(MethodVisitor mv, Provider provider, Serializer serializer, Type type) {
 		Class<?> generic = null;
@@ -196,8 +196,8 @@ public class JSONSerializer {
 					"Please provide a static method 'serialize(E value, SimpleCharBuffer cb, Provider provider)' in Class "
 							+ serializer.getClass().getName() + " to serialize ‘value’");
 		}
-		mv.visitVarInsn(ALOAD, SB);
-		mv.visitVarInsn(ALOAD, CACHE);
+		mv.visitVarInsn(ALOAD, CB);
+		mv.visitVarInsn(ALOAD, PROVIDER);
 		if (generic != null) {
 			provider.getSerializer(generic);
 			mv.visitLdcInsn(org.objectweb.asm.Type.getType(generic));
@@ -227,11 +227,11 @@ public class JSONSerializer {
 		mv.visitMaxs(0, 0);
 		mv.visitEnd();
 
-		mv = cw.visitMethod(ACC_PUBLIC + ACC_FINAL, "serialize",
-				"(L" + SimpleCharBuffer.NAME + ";Ljava/lang/Object;L" + Provider.NAME + ";)V", null, null);
-		mv.visitVarInsn(ALOAD, 2);
-		mv.visitTypeInsn(CHECKCAST, className);
+		mv = cw.visitMethod(ACC_PUBLIC, "serialize",
+				"(Ljava/lang/Object;L" + SimpleCharBuffer.NAME + ";L" + Provider.NAME + ";)V", null, null);
 		mv.visitVarInsn(ALOAD, 1);
+		mv.visitTypeInsn(CHECKCAST, className);
+		mv.visitVarInsn(ALOAD, 2);
 		mv.visitVarInsn(ALOAD, 3);
 		mv.visitMethodInsn(INVOKESTATIC, mapperName.replace('.', '/'), "$serialize",
 				"(L" + className + ";L" + SimpleCharBuffer.NAME + ";L" + Provider.NAME + ";)V");
@@ -243,7 +243,7 @@ public class JSONSerializer {
 		mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, "$serialize",
 				"(L" + className + ";L" + SimpleCharBuffer.NAME + ";L" + Provider.NAME + ";)V", null, null);
 
-		mv.visitVarInsn(ALOAD, SB);
+		mv.visitVarInsn(ALOAD, CB);
 		mv.visitLdcInsn('{');
 		mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(C)V");
 
@@ -260,7 +260,7 @@ public class JSONSerializer {
 					continue;
 				}
 
-				mv.visitVarInsn(ALOAD, SB);
+				mv.visitVarInsn(ALOAD, CB);
 				mv.visitLdcInsn((first ? "" : ",") + "\"" + name + "\":");
 				mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(Ljava/lang/String;)V");
 
@@ -268,42 +268,42 @@ public class JSONSerializer {
 
 				Class<?> type = accessor.getReturnType();
 				if (type == int.class) {
-					mv.visitVarInsn(ALOAD, SB);
+					mv.visitVarInsn(ALOAD, CB);
 					mv.visitVarInsn(ALOAD, OBJ);
 					mv.visitMethodInsn(INVOKEVIRTUAL, className, accessor.getName(), "()I");
 					mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(I)V");
 				} else if (type == long.class) {
-					mv.visitVarInsn(ALOAD, SB);
+					mv.visitVarInsn(ALOAD, CB);
 					mv.visitVarInsn(ALOAD, OBJ);
 					mv.visitMethodInsn(INVOKEVIRTUAL, className, accessor.getName(), "()J");
 					mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(J)V");
 				} else if (type == short.class) {
-					mv.visitVarInsn(ALOAD, SB);
+					mv.visitVarInsn(ALOAD, CB);
 					mv.visitVarInsn(ALOAD, OBJ);
 					mv.visitMethodInsn(INVOKEVIRTUAL, className, accessor.getName(), "()S");
 					mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(I)V");
 				} else if (type == byte.class) {
-					mv.visitVarInsn(ALOAD, SB);
+					mv.visitVarInsn(ALOAD, CB);
 					mv.visitVarInsn(ALOAD, OBJ);
 					mv.visitMethodInsn(INVOKEVIRTUAL, className, accessor.getName(), "()B");
 					mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(I)V");
 				} else if (type == double.class) {
-					mv.visitVarInsn(ALOAD, SB);
+					mv.visitVarInsn(ALOAD, CB);
 					mv.visitVarInsn(ALOAD, OBJ);
 					mv.visitMethodInsn(INVOKEVIRTUAL, className, accessor.getName(), "()D");
 					mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(D)V");
 				} else if (type == float.class) {
-					mv.visitVarInsn(ALOAD, SB);
+					mv.visitVarInsn(ALOAD, CB);
 					mv.visitVarInsn(ALOAD, OBJ);
 					mv.visitMethodInsn(INVOKEVIRTUAL, className, accessor.getName(), "()F");
 					mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(F)V");
 				} else if (type == boolean.class) {
-					mv.visitVarInsn(ALOAD, SB);
+					mv.visitVarInsn(ALOAD, CB);
 					mv.visitVarInsn(ALOAD, OBJ);
 					mv.visitMethodInsn(INVOKEVIRTUAL, className, accessor.getName(), "()Z");
 					mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(Z)V");
 				} else if (type == char.class) {
-					mv.visitVarInsn(ALOAD, SB);
+					mv.visitVarInsn(ALOAD, CB);
 					mv.visitVarInsn(ALOAD, OBJ);
 					mv.visitMethodInsn(INVOKEVIRTUAL, className, accessor.getName(), "()C");
 					mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "appendString", "(C)V");
@@ -320,7 +320,7 @@ public class JSONSerializer {
 					mv.visitVarInsn(ALOAD, VALUE);
 					mv.visitJumpInsn(IFNONNULL, nonull);
 
-					mv.visitVarInsn(ALOAD, SB);
+					mv.visitVarInsn(ALOAD, CB);
 					mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "appendNull", "()V");
 					mv.visitJumpInsn(GOTO, end);
 
@@ -353,7 +353,7 @@ public class JSONSerializer {
 								Label loop = new Label();
 
 								serializer = provider.getSerializer(clazz);
-								mv.visitVarInsn(ALOAD, SB);
+								mv.visitVarInsn(ALOAD, CB);
 								mv.visitLdcInsn('[');
 								mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(C)V");
 
@@ -371,15 +371,15 @@ public class JSONSerializer {
 									mv.visitInsn(AALOAD);
 									callStaticEncode(mv, provider, serializer, accessor.getGenericReturnType());
 								} else {
-									mv.visitVarInsn(ALOAD, SB);
 									mv.visitVarInsn(ALOAD, VALUE);
 									mv.visitVarInsn(ILOAD, VALUE + 1);
 									mv.visitInsn(AALOAD);
-									mv.visitVarInsn(ALOAD, CACHE);
-									mv.visitMethodInsn(INVOKESTATIC, NAME, "serializeObject", "(L" + SimpleCharBuffer.NAME
-											+ ";Ljava/lang/Object;L" + Provider.NAME + ";)V");
+									mv.visitVarInsn(ALOAD, CB);
+									mv.visitVarInsn(ALOAD, PROVIDER);
+									mv.visitMethodInsn(INVOKESTATIC, NAME, "serializeObject", "(Ljava/lang/Object;L" + SimpleCharBuffer.NAME
+											+ ";L" + Provider.NAME + ";)V");
 								}
-								mv.visitVarInsn(ALOAD, SB);
+								mv.visitVarInsn(ALOAD, CB);
 								mv.visitLdcInsn(',');
 								mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(C)V");
 								mv.visitIincInsn(VALUE + 1, 1);
@@ -389,8 +389,8 @@ public class JSONSerializer {
 								mv.visitVarInsn(ILOAD, VALUE + 2);
 								mv.visitJumpInsn(IF_ICMPLT, loop);
 
-								mv.visitVarInsn(ALOAD, SB);
-								mv.visitVarInsn(ALOAD, SB);
+								mv.visitVarInsn(ALOAD, CB);
+								mv.visitVarInsn(ALOAD, CB);
 								mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "length", "()I");
 								mv.visitInsn(ICONST_1);
 								mv.visitInsn(ISUB);
@@ -403,11 +403,11 @@ public class JSONSerializer {
 									mv.visitVarInsn(ALOAD, VALUE);
 									callStaticEncode(mv, provider, serializer, accessor.getGenericReturnType());
 								} else {
-									mv.visitVarInsn(ALOAD, SB);
 									mv.visitVarInsn(ALOAD, VALUE);
-									mv.visitVarInsn(ALOAD, CACHE);
-									mv.visitMethodInsn(INVOKESTATIC, NAME, "serializeObject", "(L" + SimpleCharBuffer.NAME
-											+ ";Ljava/lang/Object;L" + Provider.NAME + ";)V");
+									mv.visitVarInsn(ALOAD, CB);
+									mv.visitVarInsn(ALOAD, PROVIDER);
+									mv.visitMethodInsn(INVOKESTATIC, NAME, "serializeObject", "(Ljava/lang/Object;L" + SimpleCharBuffer.NAME
+											+ ";L" + Provider.NAME + ";)V");
 								}
 							}
 						}
@@ -419,7 +419,7 @@ public class JSONSerializer {
 		} catch (IntrospectionException e) {
 		}
 
-		mv.visitVarInsn(ALOAD, SB);
+		mv.visitVarInsn(ALOAD, CB);
 		mv.visitLdcInsn('}');
 		mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(C)V");
 
@@ -441,31 +441,31 @@ public class JSONSerializer {
 		}
 	}
 
-	public static void serializeObject(SimpleCharBuffer cb, Object o, Provider provider) {
+	public static void serializeObject(Object o, SimpleCharBuffer cb, Provider provider) {
 		Class<?> clazz = o.getClass();
 		if (clazz.isArray()) {
 			Serializer serializer = provider.getSerializer(clazz, false);
 			if (serializer != null) {
-				serializer.serialize(cb, o, provider);
+				serializer.serialize(o, cb, provider);
 			} else {
 				cb.append('[');
 				int len = Array.getLength(o);
 				for (int i = 0; i < len; i++) {
-					serializeValue(cb, Array.get(o, i), provider);
+					serializeValue(Array.get(o, i), cb, provider);
 					cb.append(',');
 				}
 				cb.setCharAt(cb.length() - 1, ']');
 			}
 		} else {
-			provider.getSerializer(clazz).serialize(cb, o, provider);
+			provider.getSerializer(clazz).serialize(o, cb, provider);
 		}
 	}
 
-	public static void serializeValue(SimpleCharBuffer cb, Object o, Provider provider) {
+	public static void serializeValue(Object o, SimpleCharBuffer cb, Provider provider) {
 		if (o == null) {
 			cb.appendNull();
 		} else {
-			serializeObject(cb, o, provider);
+			serializeObject(o, cb, provider);
 		}
 	}
 }

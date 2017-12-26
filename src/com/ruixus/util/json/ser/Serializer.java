@@ -6,5 +6,5 @@ import com.ruixus.util.json.JSONSerializer.Provider;
 public interface Serializer {
 	public static final String NAME = Serializer.class.getName().replace('.', '/');
 
-	public void serialize(SimpleCharBuffer cb, Object o, Provider provider);
+	public void serialize(Object o, SimpleCharBuffer cb, Provider provider);
 }

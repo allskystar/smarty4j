@@ -9,7 +9,7 @@ public class StringSerializer implements Serializer {
 	}
 
 	@Override
-	public void serialize(SimpleCharBuffer cb, Object o, Provider provider) {
+	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
 		StringSerializer.$serialize((String) o, cb, provider);
 	}
 }

@@ -15,7 +15,7 @@ public class ListSerializer implements Serializer, Generic {
 		Serializer serializer = provider.getSerializer(generic);
 		cb.append('[');
 		for (Object item : o) {
-			serializer.serialize(cb, item, provider);
+			serializer.serialize(item, cb, provider);
 			cb.append(',');
 		}
 		cb.setCharAt(cb.length() - 1, ']');
@@ -24,14 +24,14 @@ public class ListSerializer implements Serializer, Generic {
 	public static void $serialize(List<?> o, SimpleCharBuffer cb, Provider provider) {
 		cb.append('[');
 		for (Object item : o) {
-			JSONSerializer.serializeValue(cb, item, provider);
+			JSONSerializer.serializeValue(item, cb, provider);
 			cb.append(',');
 		}
 		cb.setCharAt(cb.length() - 1, ']');
 	}
 
 	@Override
-	public void serialize(SimpleCharBuffer cb, Object o, Provider provider) {
+	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
 		ListSerializer.$serialize((List<?>) o, cb, provider);
 	}
 

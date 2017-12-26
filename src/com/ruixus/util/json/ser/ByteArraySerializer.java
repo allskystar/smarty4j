@@ -13,7 +13,8 @@ public class ByteArraySerializer implements Serializer {
 		cb.setCharAt(cb.length() - 1, ']');
 	}
 
-	public void serialize(SimpleCharBuffer cb, Object o, Provider provider) {
+	@Override
+	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
 		ByteArraySerializer.$serialize((byte[]) o, cb, provider);
 	}
 }

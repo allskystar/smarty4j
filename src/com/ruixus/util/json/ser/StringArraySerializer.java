@@ -13,7 +13,7 @@ public class StringArraySerializer implements Serializer {
 		cb.setCharAt(cb.length() - 1, ']');
 	}
 
-	public void serialize(SimpleCharBuffer cb, Object o, Provider provider) {
+	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
 		StringArraySerializer.$serialize((String[]) o, cb, provider);
 	}
 }

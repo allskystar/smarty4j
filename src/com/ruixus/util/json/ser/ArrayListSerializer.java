@@ -15,7 +15,7 @@ public class ArrayListSerializer implements Serializer, Generic {
 		Serializer serializer = provider.getSerializer(generic);
 		cb.append('[');
 		for (int i = 0, len = o.size(); i < len; i++) {
-			serializer.serialize(cb, o.get(i), provider);
+			serializer.serialize(o.get(i), cb, provider);
 			cb.append(',');
 		}
 		cb.setCharAt(cb.length() - 1, ']');
@@ -24,14 +24,14 @@ public class ArrayListSerializer implements Serializer, Generic {
 	public static void $serialize(ArrayList<?> o, SimpleCharBuffer cb, Provider provider) {
 		cb.append('[');
 		for (int i = 0, len = o.size(); i < len; i++) {
-			JSONSerializer.serializeValue(cb, o.get(i), provider);
+			JSONSerializer.serializeValue(o.get(i), cb, provider);
 			cb.append(',');
 		}
 		cb.setCharAt(cb.length() - 1, ']');
 	}
 
 	@Override
-	public void serialize(SimpleCharBuffer cb, Object o, Provider provider) {
+	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
 		ArrayListSerializer.$serialize((ArrayList<?>) o, cb, provider);
 	}
 

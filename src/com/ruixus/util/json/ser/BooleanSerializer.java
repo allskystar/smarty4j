@@ -9,7 +9,7 @@ public class BooleanSerializer implements Serializer {
 	}
 
 	@Override
-	public void serialize(SimpleCharBuffer cb, Object o, Provider provider) {
+	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
 		BooleanSerializer.$serialize((Boolean) o, cb, provider);
 	}
 }

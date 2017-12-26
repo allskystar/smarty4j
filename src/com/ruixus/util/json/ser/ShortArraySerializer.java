@@ -13,7 +13,8 @@ public class ShortArraySerializer implements Serializer {
 		cb.setCharAt(cb.length() - 1, ']');
 	}
 
-	public void serialize(SimpleCharBuffer cb, Object o, Provider provider) {
+	@Override
+	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
 		ShortArraySerializer.$serialize((short[]) o, cb, provider);
 	}
 }
