@@ -10,6 +10,7 @@ import org.objectweb.asm.Label;
 import com.ruixus.smarty4j.Analyzer;
 import com.ruixus.smarty4j.Context;
 import com.ruixus.smarty4j.MessageFormat;
+import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.Node;
 import com.ruixus.smarty4j.ParseException;
 import com.ruixus.smarty4j.TemplateReader;
@@ -19,7 +20,6 @@ import com.ruixus.smarty4j.expression.NullExpression;
 import com.ruixus.smarty4j.statement.Block;
 import com.ruixus.smarty4j.statement.Definition;
 import com.ruixus.smarty4j.statement.Definition.Type;
-import com.ruixus.util.MethodVisitorProxy;
 import com.ruixus.smarty4j.statement.LoopFunction;
 
 /**

@@ -2,9 +2,9 @@ package com.ruixus.smarty4j.expression.check;
 
 import org.objectweb.asm.Label;
 
+import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.expression.Expression;
-import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * 布尔表达式转换节点, 将其它表达式转换成布尔表达式

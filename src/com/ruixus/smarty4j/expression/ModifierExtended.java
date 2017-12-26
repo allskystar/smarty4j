@@ -1,9 +1,9 @@
 package com.ruixus.smarty4j.expression;
 
+import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.Node;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.statement.Modifier;
-import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * 变量调节器扩展节点

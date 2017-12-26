@@ -20,7 +20,6 @@ import org.objectweb.asm.MethodVisitor;
 
 import com.ruixus.smarty4j.statement.Document;
 import com.ruixus.util.DynamicClassLoader;
-import com.ruixus.util.MethodVisitorProxy;
 import com.ruixus.util.SimpleStack;
 import com.ruixus.util.SimpleStringReader;
 

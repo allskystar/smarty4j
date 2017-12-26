@@ -7,11 +7,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.ruixus.smarty4j.MessageFormat;
+import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.Node;
 import com.ruixus.smarty4j.Template;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.expression.Expression;
-import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * 包含参数定义的节点虚基类。

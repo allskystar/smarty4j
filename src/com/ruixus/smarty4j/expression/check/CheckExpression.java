@@ -2,9 +2,9 @@ package com.ruixus.smarty4j.expression.check;
 
 import static org.objectweb.asm.Opcodes.*;
 
+import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.expression.Expression;
-import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * 布尔表达式节点, 向JVM语句栈内放入一个整数值, 1表示<tt>true</tt>, 0表示 <tt>false</tt>

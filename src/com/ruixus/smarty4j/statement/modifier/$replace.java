@@ -2,10 +2,10 @@ package com.ruixus.smarty4j.statement.modifier;
 
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 
+import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.statement.Definition;
 import com.ruixus.smarty4j.statement.Definition.Type;
-import com.ruixus.util.MethodVisitorProxy;
 import com.ruixus.smarty4j.statement.Modifier;
 
 /**

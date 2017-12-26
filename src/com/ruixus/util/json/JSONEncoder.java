@@ -17,7 +17,6 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
-import com.ruixus.util.MethodVisitorProxy;
 import com.ruixus.util.SimpleCharBuffer;
 import com.ruixus.util.SimpleStack;
 import com.ruixus.util.json.encoder.ArrayListEncoder;
@@ -186,7 +185,7 @@ public class JSONEncoder {
 		mv.visitVarInsn(ALOAD, CACHE);
 		if (generic != null) {
 			provider.getEncoder(generic);
-			mv.visitLdcInsn(generic);
+			mv.visitLdcInsn(org.objectweb.asm.Type.getType(generic));
 			mv.visitMethodInsn(INVOKESTATIC, clazz.getName().replace('.', '/'), "$stringify",
 					"(" + name + "L" + SimpleCharBuffer.NAME + ";L" + Provider.NAME + ";Ljava/lang/Class;)V");
 		} else {
@@ -225,12 +224,12 @@ public class JSONEncoder {
 		mv.visitEnd();
 
 		Label ret = new Label();
-		mv = new MethodVisitorProxy(cw.visitMethod(ACC_PUBLIC + ACC_STATIC, "$stringify",
-				"(L" + className + ";L" + SimpleCharBuffer.NAME + ";L" + Provider.NAME + ";)V", null, null));
+		mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, "$stringify",
+				"(L" + className + ";L" + SimpleCharBuffer.NAME + ";L" + Provider.NAME + ";)V", null, null);
 
 		mv.visitVarInsn(ALOAD, SB);
-		mv.visitLdcInsn("{");
-		mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(Ljava/lang/String;)V");
+		mv.visitLdcInsn('{');
+		mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(C)V");
 
 		try {
 			// 序列化JavaBean可读属性
@@ -345,7 +344,7 @@ public class JSONEncoder {
 								mv.visitVarInsn(ALOAD, VALUE);
 								mv.visitInsn(ARRAYLENGTH);
 								mv.visitVarInsn(ISTORE, VALUE + 2);
-								mv.visitLdcInsn(0);
+								mv.visitInsn(ICONST_0);
 								mv.visitVarInsn(ISTORE, VALUE + 1);
 								mv.visitJumpInsn(GOTO, condition);
 
@@ -377,7 +376,7 @@ public class JSONEncoder {
 								mv.visitVarInsn(ALOAD, SB);
 								mv.visitVarInsn(ALOAD, SB);
 								mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "length", "()I");
-								mv.visitLdcInsn(1);
+								mv.visitInsn(ICONST_1);
 								mv.visitInsn(ISUB);
 								mv.visitLdcInsn(']');
 								mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "setCharAt", "(IC)V");

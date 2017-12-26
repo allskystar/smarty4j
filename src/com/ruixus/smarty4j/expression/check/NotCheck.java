@@ -4,9 +4,9 @@ import static org.objectweb.asm.Opcodes.*;
 
 import org.objectweb.asm.Label;
 
+import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.expression.Expression;
-import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * 非操作布尔表达式节点, 将JVM语句栈内的布尔表达式逻辑值设置成相反的值

@@ -4,11 +4,11 @@ import static org.objectweb.asm.Opcodes.*;
 
 import org.objectweb.asm.Label;
 
+import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.expression.Expression;
 import com.ruixus.smarty4j.expression.ObjectExpression;
 import com.ruixus.smarty4j.expression.number.NumberExpression;
-import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * 二元弱类型布尔表达式节点, 向JVM语句栈内放入整数值表示两个对象的弱类型逻辑操作结果

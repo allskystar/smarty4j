@@ -2,8 +2,8 @@ package com.ruixus.smarty4j.statement;
 
 import org.objectweb.asm.Label;
 
+import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.VariableManager;
-import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * 循环区块函数节点，被用于支持break与continue等指令。

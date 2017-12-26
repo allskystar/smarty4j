@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.ruixus.smarty4j.Context;
+import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.ParseException;
 import com.ruixus.smarty4j.SafeContext;
 import com.ruixus.smarty4j.Template;
@@ -25,7 +26,6 @@ import com.ruixus.smarty4j.expression.NullExpression;
 import com.ruixus.smarty4j.expression.VoidExpression;
 import com.ruixus.smarty4j.statement.Definition;
 import com.ruixus.smarty4j.statement.Definition.Type;
-import com.ruixus.util.MethodVisitorProxy;
 import com.ruixus.smarty4j.statement.LineFunction;
 
 /**

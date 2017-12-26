@@ -5,11 +5,11 @@ import static org.objectweb.asm.Opcodes.*;
 import org.objectweb.asm.Label;
 
 import com.ruixus.smarty4j.Context;
+import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.expression.MapExtended;
 import com.ruixus.smarty4j.statement.Definition;
 import com.ruixus.smarty4j.statement.Definition.Type;
-import com.ruixus.util.MethodVisitorProxy;
 import com.ruixus.smarty4j.statement.LineFunction;
 
 /**

@@ -6,12 +6,12 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import com.ruixus.smarty4j.Analyzer;
+import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.SafeContext;
 import com.ruixus.smarty4j.Template;
 import com.ruixus.smarty4j.TemplateReader;
 import com.ruixus.smarty4j.TemplateWriter;
 import com.ruixus.smarty4j.VariableManager;
-import com.ruixus.util.MethodVisitorProxy;
 import com.ruixus.util.NullWriter;
 
 /**

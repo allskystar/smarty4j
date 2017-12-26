@@ -9,6 +9,7 @@ import org.objectweb.asm.Label;
 
 import com.ruixus.smarty4j.Analyzer;
 import com.ruixus.smarty4j.Context;
+import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.Node;
 import com.ruixus.smarty4j.ParseException;
 import com.ruixus.smarty4j.TemplateReader;
@@ -17,7 +18,6 @@ import com.ruixus.smarty4j.expression.Expression;
 import com.ruixus.smarty4j.statement.Block;
 import com.ruixus.smarty4j.statement.Definition;
 import com.ruixus.smarty4j.statement.Definition.Type;
-import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * The tag is used to create functions within a template and call them just like a plugin function.

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import com.ruixus.smarty4j.Analyzer;
+import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.ParseException;
 import com.ruixus.smarty4j.Template;
 import com.ruixus.smarty4j.TemplateReader;
@@ -13,7 +14,6 @@ import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.statement.Block;
 import com.ruixus.smarty4j.statement.Definition;
 import com.ruixus.smarty4j.statement.Definition.Type;
-import com.ruixus.util.MethodVisitorProxy;
 import com.ruixus.smarty4j.statement.Function;
 
 /**

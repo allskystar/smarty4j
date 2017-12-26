@@ -1,8 +1,8 @@
 package com.ruixus.smarty4j.expression.number;
 
+import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.expression.Expression;
-import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * 二元浮点数操作表达式, 向JVM语句栈内放入一个浮点数值表示两个对象的操作结果

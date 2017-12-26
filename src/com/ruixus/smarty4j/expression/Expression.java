@@ -2,11 +2,11 @@ package com.ruixus.smarty4j.expression;
 
 import org.objectweb.asm.Label;
 
+import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.Node;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.expression.check.FalseCheck;
 import com.ruixus.smarty4j.expression.check.TrueCheck;
-import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * 表达式节点, 向JVM语句栈内放入一个数据

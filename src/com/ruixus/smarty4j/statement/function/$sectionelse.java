@@ -1,9 +1,9 @@
 package com.ruixus.smarty4j.statement.function;
 
+import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.statement.Function;
 import com.ruixus.smarty4j.statement.ParentType;
-import com.ruixus.util.MethodVisitorProxy;
 
 /**
  * @see com.ruixus.smarty4j.statement.function.$section

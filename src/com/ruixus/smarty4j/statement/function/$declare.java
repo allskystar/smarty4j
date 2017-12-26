@@ -1,12 +1,12 @@
 package com.ruixus.smarty4j.statement.function;
 
 import com.ruixus.smarty4j.Analyzer;
+import com.ruixus.smarty4j.MethodVisitorProxy;
 import com.ruixus.smarty4j.ParseException;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.statement.Block;
 import com.ruixus.smarty4j.statement.Definition;
 import com.ruixus.smarty4j.statement.Definition.Type;
-import com.ruixus.util.MethodVisitorProxy;
 import com.ruixus.util.SimpleStack;
 import com.ruixus.smarty4j.statement.Function;
 
