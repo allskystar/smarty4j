@@ -1,5 +1,7 @@
 package com.ruixus.util;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.lang.Integer;
 import java.lang.Math;
 import java.lang.String;
@@ -8,6 +10,7 @@ import java.lang.System;
 public class SimpleCharBuffer {
 	public static final String NAME = SimpleCharBuffer.class.getName().replace('.', '/');
 
+	private Writer writer;
 	private char[] buf;
 	private int off;
 
@@ -37,8 +40,9 @@ public class SimpleCharBuffer {
 	private static final char[] digitOnes = new char[100];
 	private static final char[] digitTens = new char[100];
 	private static final int[] escCodes = new int[128];
-	
-	private static final char[] hexChars = new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+
+	private static final char[] hexChars = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c',
+			'd', 'e', 'f' };
 
 	static {
 		for (int i = 0; i < 100; i++) {
@@ -132,6 +136,10 @@ public class SimpleCharBuffer {
 		}
 	}
 
+	public void setWriter(Writer writer) {
+		this.writer = writer;
+	}
+
 	public void append(int i) {
 		int capacity = off + ((i < 0) ? stringSize(-i) + 1 : stringSize(i));
 		ensureCapacityInternal(capacity);
@@ -196,7 +204,7 @@ public class SimpleCharBuffer {
 		buf[off++] = 'l';
 		buf[off++] = 'l';
 	}
-	
+
 	public void appendString(char c) {
 		ensureCapacityInternal(off + 8);
 		buf[off++] = '"';
@@ -251,6 +259,13 @@ public class SimpleCharBuffer {
 		buf[off++] = '"';
 	}
 
+	public void flush() throws IOException {
+		if (writer != null) {
+			writer.write(buf, 0, off);
+			off = 0;
+		}
+	}
+
 	public int length() {
 		return off;
 	}
@@ -268,6 +283,17 @@ public class SimpleCharBuffer {
 	}
 
 	private void ensureCapacityInternal(int size) {
+		if (size > 1024 * 1024) {
+			if (writer != null) {
+				try {
+					writer.write(buf, 0, off);
+				} catch (IOException ex) {
+					throw new RuntimeException("IOException");
+				}
+				size -= off;
+				off = 0;
+			}
+		}
 		int len = buf.length;
 		if (size > len) {
 			char[] newBuf = new char[Math.max(size * 2 - len, len * 2)];
