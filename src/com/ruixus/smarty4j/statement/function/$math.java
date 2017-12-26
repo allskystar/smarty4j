@@ -21,9 +21,9 @@ import com.ruixus.smarty4j.expression.number.DoubleAdapter;
 import com.ruixus.smarty4j.expression.number.IntegerAdapter;
 import com.ruixus.smarty4j.statement.Definition;
 import com.ruixus.smarty4j.statement.Definition.Type;
+import com.ruixus.util.ExtInteger;
+import com.ruixus.util.SimpleStack;
 import com.ruixus.smarty4j.statement.Function;
-import com.ruixus.smarty4j.util.ExtInteger;
-import com.ruixus.smarty4j.util.SimpleStack;
 
 /**
  * {math} allows the template designer to do math equations in the template.

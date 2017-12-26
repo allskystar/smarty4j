@@ -18,7 +18,7 @@ import com.ruixus.smarty4j.expression.VariableExpression;
 import com.ruixus.smarty4j.expression.number.ConstInteger;
 import com.ruixus.smarty4j.statement.Block;
 import com.ruixus.smarty4j.statement.LoopFunction;
-import com.ruixus.smarty4j.util.SimpleStack;
+import com.ruixus.util.SimpleStack;
 
 /**
  * The tag is used to create simple loops.<br>

@@ -7,8 +7,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 
-import com.ruixus.smarty4j.util.SimpleOutputStreamWriter;
-import com.ruixus.smarty4j.util.SimpleStringWriter;
+import com.ruixus.util.SimpleOutputStreamWriter;
+import com.ruixus.util.SimpleStringWriter;
 
 /**
  * , it 能够选择被代理的Writer或OutputStream输出

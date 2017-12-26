@@ -1,4 +1,4 @@
-package com.ruixus.smarty4j.util;
+package com.ruixus.util;
 
 /**
  * The class loader is an object that is responsible for loading the ASM dynamically generated

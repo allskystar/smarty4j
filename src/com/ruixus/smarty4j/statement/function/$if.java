@@ -17,7 +17,7 @@ import com.ruixus.smarty4j.ParseException;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.expression.Expression;
 import com.ruixus.smarty4j.statement.Block;
-import com.ruixus.smarty4j.util.SimpleStack;
+import com.ruixus.util.SimpleStack;
 
 /**
  * The tag statements in Smarty have much the same flexibility as PHP if statements, with a few

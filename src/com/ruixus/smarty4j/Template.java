@@ -19,9 +19,9 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 
 import com.ruixus.smarty4j.statement.Document;
-import com.ruixus.smarty4j.util.DynamicClassLoader;
-import com.ruixus.smarty4j.util.SimpleStack;
-import com.ruixus.smarty4j.util.SimpleStringReader;
+import com.ruixus.util.DynamicClassLoader;
+import com.ruixus.util.SimpleStack;
+import com.ruixus.util.SimpleStringReader;
 
 /**
  * The template class save the information of template file, and built-in

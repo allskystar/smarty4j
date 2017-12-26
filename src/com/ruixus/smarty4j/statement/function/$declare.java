@@ -7,8 +7,8 @@ import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.statement.Block;
 import com.ruixus.smarty4j.statement.Definition;
 import com.ruixus.smarty4j.statement.Definition.Type;
+import com.ruixus.util.SimpleStack;
 import com.ruixus.smarty4j.statement.Function;
-import com.ruixus.smarty4j.util.SimpleStack;
 
 /**
  * @version 1.1.0, 2015/05/16

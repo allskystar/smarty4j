@@ -24,7 +24,7 @@ import com.ruixus.smarty4j.expression.number.BinaryInteger;
 import com.ruixus.smarty4j.expression.number.ConstDouble;
 import com.ruixus.smarty4j.expression.number.ConstInteger;
 import com.ruixus.smarty4j.expression.number.DoubleExpression;
-import com.ruixus.smarty4j.util.SimpleStack;
+import com.ruixus.util.SimpleStack;
 
 /**
  * This class manages operator information, and provide a method for the combined expression.

@@ -14,7 +14,7 @@ import org.junit.Test;
 import com.ruixus.smarty4j.Context;
 import com.ruixus.smarty4j.Engine;
 import com.ruixus.smarty4j.Template;
-import com.ruixus.smarty4j.util.SimpleStringWriter;
+import com.ruixus.util.SimpleStringWriter;
 
 public class ExpressionUnit {
 

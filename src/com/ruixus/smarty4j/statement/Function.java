@@ -11,7 +11,7 @@ import com.ruixus.smarty4j.Operator;
 import com.ruixus.smarty4j.ParseException;
 import com.ruixus.smarty4j.TemplateReader;
 import com.ruixus.smarty4j.expression.Expression;
-import com.ruixus.smarty4j.util.SimpleStack;
+import com.ruixus.util.SimpleStack;
 
 /**
  * 基本函数节点，表示一个完整的操作。

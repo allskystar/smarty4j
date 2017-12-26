@@ -12,7 +12,7 @@ import com.ruixus.smarty4j.Template;
 import com.ruixus.smarty4j.TemplateReader;
 import com.ruixus.smarty4j.TemplateWriter;
 import com.ruixus.smarty4j.VariableManager;
-import com.ruixus.smarty4j.util.NullWriter;
+import com.ruixus.util.NullWriter;
 
 /**
  * 自定义区块函数，区块函数指的是函数内部包含其它函数或文本，所以必须拥有结束标签的函数，

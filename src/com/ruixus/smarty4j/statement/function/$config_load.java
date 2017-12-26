@@ -17,8 +17,8 @@ import com.ruixus.smarty4j.expression.StringExpression;
 import com.ruixus.smarty4j.expression.number.ConstInteger;
 import com.ruixus.smarty4j.statement.Definition;
 import com.ruixus.smarty4j.statement.Definition.Type;
+import com.ruixus.util.SimpleStack;
 import com.ruixus.smarty4j.statement.LineFunction;
-import com.ruixus.smarty4j.util.SimpleStack;
 
 /**
  * This is used for loading config #variables# from a configuration file into the template.

@@ -8,7 +8,7 @@ import com.ruixus.smarty4j.SafeContext;
 import com.ruixus.smarty4j.TemplateWriter;
 import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.statement.BlockFunction;
-import com.ruixus.smarty4j.util.SimpleStack;
+import com.ruixus.util.SimpleStack;
 
 /**
  * The tag redirects the output to the console.

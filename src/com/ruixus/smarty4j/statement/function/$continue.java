@@ -13,7 +13,7 @@ import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.expression.number.ConstInteger;
 import com.ruixus.smarty4j.statement.Function;
 import com.ruixus.smarty4j.statement.LoopFunction;
-import com.ruixus.smarty4j.util.SimpleStack;
+import com.ruixus.util.SimpleStack;
 
 /**
  * The tag leaves the current iteration and begins with the next iteration.

@@ -19,7 +19,7 @@ import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.expression.StringExpression;
 import com.ruixus.smarty4j.expression.VariableExpression;
 import com.ruixus.smarty4j.statement.function.$call;
-import com.ruixus.smarty4j.util.SimpleStack;
+import com.ruixus.util.SimpleStack;
 
 /**
  * 区块函数语句节点虚基类，区块函数指的是函数内部包含其它函数或文本，需要拥有结束标签的函数， 在模板分析过程中，系统首先调用函数的初始化方法，然后解析函数的参数，

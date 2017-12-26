@@ -22,7 +22,7 @@ import com.ruixus.smarty4j.expression.VariableExpression;
 import com.ruixus.smarty4j.expression.number.ConstDouble;
 import com.ruixus.smarty4j.expression.number.ConstInteger;
 import com.ruixus.smarty4j.statement.Modifier;
-import com.ruixus.smarty4j.util.SimpleStack;
+import com.ruixus.util.SimpleStack;
 
 /**
  * The Smarty's syntax analyser.

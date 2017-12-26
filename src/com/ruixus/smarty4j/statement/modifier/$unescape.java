@@ -13,7 +13,6 @@ import com.ruixus.smarty4j.expression.number.ConstInteger;
 import com.ruixus.smarty4j.statement.Definition;
 import com.ruixus.smarty4j.statement.Definition.Type;
 import com.ruixus.smarty4j.statement.Modifier;
-import com.ruixus.smarty4j.util.HTMLEscape;
 
 public class $unescape extends Modifier {
 

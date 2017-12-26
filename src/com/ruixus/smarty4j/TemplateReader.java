@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ruixus.smarty4j.ParseMessage.Level;
-import com.ruixus.smarty4j.util.SimpleStack;
+import com.ruixus.util.SimpleStack;
 
 /**
  * 模板的文本输入对象，与java.io.LineNumberReader不同，它读取单行时， 会把换行的控制字符如\n,\r等同样输出，为了方便模板的解析，支持单行的回滚，

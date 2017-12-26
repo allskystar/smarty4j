@@ -11,7 +11,7 @@ import com.ruixus.smarty4j.VariableManager;
 import com.ruixus.smarty4j.expression.Expression;
 import com.ruixus.smarty4j.expression.VariableExpression;
 import com.ruixus.smarty4j.statement.Function;
-import com.ruixus.smarty4j.util.SimpleStack;
+import com.ruixus.util.SimpleStack;
 
 /**
  * 用于输出指定的字节数组。

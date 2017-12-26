@@ -1,4 +1,4 @@
-package com.ruixus.smarty4j.util;
+package com.ruixus.smarty4j.statement.modifier;
 
 import java.util.HashMap;
 import java.util.Map;

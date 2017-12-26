@@ -1,4 +1,4 @@
-package com.ruixus.smarty4j.util;
+package com.ruixus.util;
 
 /**
  * The {@code IntNumber} class wraps a value of the primitive type {@code int} or {@code boolean} in

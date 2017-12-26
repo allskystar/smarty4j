@@ -23,8 +23,8 @@ import com.ruixus.smarty4j.expression.VariableExpression;
 import com.ruixus.smarty4j.statement.Block;
 import com.ruixus.smarty4j.statement.Definition;
 import com.ruixus.smarty4j.statement.Definition.Type;
+import com.ruixus.util.SimpleStack;
 import com.ruixus.smarty4j.statement.LoopFunction;
-import com.ruixus.smarty4j.util.SimpleStack;
 
 /**
  * The tag is used for looping over arrays of data. {foreach} has a simpler and cleaner syntax than

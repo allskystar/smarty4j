@@ -15,9 +15,8 @@ import com.ruixus.smarty4j.expression.check.TrueCheck;
 import com.ruixus.smarty4j.expression.number.ConstInteger;
 import com.ruixus.smarty4j.statement.Definition;
 import com.ruixus.smarty4j.statement.Definition.Type;
+import com.ruixus.util.SimpleEncoder;
 import com.ruixus.smarty4j.statement.Modifier;
-import com.ruixus.smarty4j.util.HTMLEscape;
-import com.ruixus.smarty4j.util.SimpleEncoder;
 
 /**
  * escape is used to encode or escape a variable to html, url, single quotes, hex, hexentity,

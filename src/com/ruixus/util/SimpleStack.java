@@ -1,4 +1,4 @@
-package com.ruixus.smarty4j.util;
+package com.ruixus.util;
 
 public class SimpleStack {
 	

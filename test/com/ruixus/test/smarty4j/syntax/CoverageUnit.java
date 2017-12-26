@@ -15,7 +15,7 @@ import com.ruixus.smarty4j.expression.check.CheckAdapter;
 import com.ruixus.smarty4j.expression.number.ConstInteger;
 import com.ruixus.smarty4j.expression.number.DoubleAdapter;
 import com.ruixus.smarty4j.statement.PrintStatement;
-import com.ruixus.smarty4j.util.SimpleStack;
+import com.ruixus.util.SimpleStack;
 
 public class CoverageUnit {
 
