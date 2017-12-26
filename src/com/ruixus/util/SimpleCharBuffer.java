@@ -226,32 +226,29 @@ public class SimpleCharBuffer {
 			buf[off++] = '"';
 			return;
 		}
-		int index = off;
-		int i = index + len * 5;
+		int i = off + len * 5;
 		final int end = i + len;
-		ensureCapacityInternal(index + len * 6 + 2);
-		char[] pbuf = buf;
-		pbuf[index++] = '"';
-		str.getChars(0, len, pbuf, i);
-		for (; i < end; index++) {
-			char c = pbuf[i++];
-			pbuf[index] = c;
+		ensureCapacityInternal(off + len * 6 + 2);
+		buf[off++] = '"';
+		str.getChars(0, len, buf, i);
+		for (; i < end; off++) {
+			char c = buf[i++];
+			buf[off] = c;
 			if (c < 128) {
 				int code = escCodes[c];
 				if (code != 0) {
-					pbuf[index++] = '\\';
-					pbuf[index] = (char) code;
+					buf[off++] = '\\';
+					buf[off] = (char) code;
 					if (code == 'u') {
-						pbuf[++index] = '0';
-						pbuf[++index] = '0';
-						pbuf[++index] = hexChars[(c >> 4)];
-						pbuf[++index] = hexChars[c & 0xF];
+						buf[++off] = '0';
+						buf[++off] = '0';
+						buf[++off] = hexChars[(c >> 4)];
+						buf[++off] = hexChars[c & 0xF];
 					}
 				}
 			}
 		}
-		pbuf[index++] = '"';
-		off = index;
+		buf[off++] = '"';
 	}
 
 	public int length() {
