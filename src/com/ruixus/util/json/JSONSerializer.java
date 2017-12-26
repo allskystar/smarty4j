@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
@@ -40,6 +41,7 @@ import com.ruixus.util.json.ser.LongSerializer;
 import com.ruixus.util.json.ser.MapSerializer;
 import com.ruixus.util.json.ser.NumberSerializer;
 import com.ruixus.util.json.ser.Serializer;
+import com.ruixus.util.json.ser.SetSerializer;
 import com.ruixus.util.json.ser.ShortArraySerializer;
 import com.ruixus.util.json.ser.StringArraySerializer;
 import com.ruixus.util.json.ser.StringSerializer;
@@ -65,7 +67,7 @@ public class JSONSerializer {
 		private static final Class<?>[] defAssignables;
 
 		static {
-			defAssignables = new Class<?>[] { Number.class, Map.class, List.class };
+			defAssignables = new Class<?>[] { Number.class, Map.class, List.class, Set.class };
 			defBeanMapper.put(String.class, new StringSerializer());
 			defBeanMapper.put(Character.class, new CharacterSerializer());
 			defBeanMapper.put(Boolean.class, new BooleanSerializer());
@@ -77,6 +79,7 @@ public class JSONSerializer {
 			defBeanMapper.put(Number.class, new NumberSerializer());
 			defBeanMapper.put(Map.class, new MapSerializer());
 			defBeanMapper.put(List.class, new ListSerializer());
+			defBeanMapper.put(Set.class, new SetSerializer());
 
 			defBeanMapper.put(ArrayList.class, new ArrayListSerializer());
 			defBeanMapper.put(String[].class, new StringArraySerializer());
