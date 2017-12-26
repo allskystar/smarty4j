@@ -1,7 +1,7 @@
 package com.ruixus.util.json.ser;
 
 import com.ruixus.util.SimpleCharBuffer;
-import com.ruixus.util.json.JSONSerializer.Provider;
+import com.ruixus.util.json.Provider;
 
 public class BooleanArraySerializer implements Serializer {
 	public static void $serialize(boolean[] o, SimpleCharBuffer cb, Provider provider) {

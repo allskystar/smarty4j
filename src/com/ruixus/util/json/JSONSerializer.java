@@ -12,11 +12,6 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
@@ -24,27 +19,8 @@ import org.objectweb.asm.MethodVisitor;
 
 import com.ruixus.util.SimpleCharBuffer;
 import com.ruixus.util.SimpleStack;
-import com.ruixus.util.json.ser.ArrayListSerializer;
-import com.ruixus.util.json.ser.BooleanArraySerializer;
-import com.ruixus.util.json.ser.BooleanSerializer;
-import com.ruixus.util.json.ser.ByteArraySerializer;
-import com.ruixus.util.json.ser.CharArraySerializer;
-import com.ruixus.util.json.ser.CharacterSerializer;
-import com.ruixus.util.json.ser.DoubleArraySerializer;
-import com.ruixus.util.json.ser.FloatArraySerializer;
 import com.ruixus.util.json.ser.Generic;
-import com.ruixus.util.json.ser.IntArraySerializer;
-import com.ruixus.util.json.ser.IntegerSerializer;
-import com.ruixus.util.json.ser.ListSerializer;
-import com.ruixus.util.json.ser.LongArraySerializer;
-import com.ruixus.util.json.ser.LongSerializer;
-import com.ruixus.util.json.ser.MapSerializer;
-import com.ruixus.util.json.ser.NumberSerializer;
 import com.ruixus.util.json.ser.Serializer;
-import com.ruixus.util.json.ser.SetSerializer;
-import com.ruixus.util.json.ser.ShortArraySerializer;
-import com.ruixus.util.json.ser.StringArraySerializer;
-import com.ruixus.util.json.ser.StringSerializer;
 
 public class JSONSerializer {
 	private static class ObjectMapper extends ClassLoader {
@@ -60,95 +36,6 @@ public class JSONSerializer {
 	}
 
 	private static final String NAME = JSONSerializer.class.getName().replace('.', '/');
-
-	public static class Provider {
-		public static final String NAME = Provider.class.getName().replace('.', '/');
-		private static final Map<Class<?>, Serializer> defBeanMapper = new HashMap<Class<?>, Serializer>();
-		private static final Class<?>[] defAssignables;
-
-		static {
-			defAssignables = new Class<?>[] { Number.class, Map.class, List.class, Set.class };
-			defBeanMapper.put(String.class, new StringSerializer());
-			defBeanMapper.put(Character.class, new CharacterSerializer());
-			defBeanMapper.put(Boolean.class, new BooleanSerializer());
-			defBeanMapper.put(Byte.class, new IntegerSerializer());
-			defBeanMapper.put(Short.class, new IntegerSerializer());
-			defBeanMapper.put(Integer.class, new IntegerSerializer());
-			defBeanMapper.put(Long.class, new LongSerializer());
-
-			defBeanMapper.put(Number.class, new NumberSerializer());
-			defBeanMapper.put(Map.class, new MapSerializer());
-			defBeanMapper.put(List.class, new ListSerializer());
-			defBeanMapper.put(Set.class, new SetSerializer());
-
-			defBeanMapper.put(ArrayList.class, new ArrayListSerializer());
-			defBeanMapper.put(String[].class, new StringArraySerializer());
-			defBeanMapper.put(char[].class, new CharArraySerializer());
-			defBeanMapper.put(boolean[].class, new BooleanArraySerializer());
-			defBeanMapper.put(byte[].class, new ByteArraySerializer());
-			defBeanMapper.put(short[].class, new ShortArraySerializer());
-			defBeanMapper.put(int[].class, new IntArraySerializer());
-			defBeanMapper.put(long[].class, new LongArraySerializer());
-			defBeanMapper.put(float[].class, new FloatArraySerializer());
-			defBeanMapper.put(double[].class, new DoubleArraySerializer());
-		}
-
-		private Map<Class<?>, Serializer> beanMapper;
-		private Class<?>[] assignables;
-		private int assignableSize;
-
-		public Provider() {
-			this.beanMapper = new HashMap<Class<?>, Serializer>(defBeanMapper);
-			assignableSize = defAssignables.length;
-			this.assignables = new Class[assignableSize];
-			System.arraycopy(defAssignables, 0, assignables, 0, assignableSize);
-		}
-
-		public void addBeanSerializer(Class<?> beanClass, Serializer beanSerializer) {
-			synchronized (beanMapper) {
-				beanMapper.put(beanClass, beanSerializer);
-			}
-		}
-
-		public void addAssignableSerializer(Class<?> baseClass, Serializer beanSerializer) {
-			synchronized (beanMapper) {
-				Class<?>[] newAssignables = new Class<?>[assignableSize + 1];
-				System.arraycopy(assignables, 0, newAssignables, 0, assignableSize);
-				newAssignables[assignableSize++] = baseClass;
-				assignables = newAssignables;
-				beanMapper.put(baseClass, beanSerializer);
-			}
-		}
-
-		public Serializer getSerializer(Class<?> cc) {
-			return this.getSerializer(cc, true);
-		}
-
-		public Serializer getSerializer(Class<?> cc, boolean needBuild) {
-			Serializer serializer = beanMapper.get(cc);
-			if (serializer == null) {
-				for (Class<?> item : assignables) {
-					if (item.isAssignableFrom(cc)) {
-						serializer = beanMapper.get(item);
-						synchronized (beanMapper) {
-							beanMapper.put(cc, serializer);
-						}
-						break;
-					}
-				}
-				if (serializer == null && needBuild) {
-					synchronized (beanMapper) {
-						serializer = beanMapper.get(cc);
-						if (serializer == null) {
-							serializer = createSerializer(cc, this);
-							beanMapper.put(cc, serializer);
-						}
-					}
-				}
-			}
-			return serializer;
-		}
-	}
 
 	private SimpleStack recycler = new SimpleStack();
 	private Provider provider;
@@ -279,6 +166,7 @@ public class JSONSerializer {
 
 		try {
 			// 序列化JavaBean可读属性
+			loop:
 			for (PropertyDescriptor prop : Introspector.getBeanInfo(clazz).getPropertyDescriptors()) {
 				Method accessor = prop.getReadMethod();
 				if (accessor == null) {
@@ -290,6 +178,13 @@ public class JSONSerializer {
 					continue;
 				}
 
+				Annotation[] annos = accessor.getDeclaredAnnotations();
+				for (Annotation anno : annos) {
+					if (anno.getClass().getInterfaces()[0] == NoSerialize.class) {
+						continue loop;
+					}
+				}
+					
 				mv.visitVarInsn(ALOAD, CB);
 				mv.visitLdcInsn((first ? "" : ",") + "\"" + name + "\":");
 				mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(Ljava/lang/String;)V");
@@ -300,7 +195,7 @@ public class JSONSerializer {
 				String typeName = org.objectweb.asm.Type.getDescriptor(type);
 				if (typeName.length() == 1) {
 					boolean assign = false;
-					Annotation[] annos = accessor.getDeclaredAnnotations();
+
 					for (Annotation anno : annos) {
 						Serializer serializer = provider.getSerializer(anno.getClass().getInterfaces()[0], false);
 						if (serializer != null) {
@@ -350,7 +245,6 @@ public class JSONSerializer {
 
 					boolean assign = false;
 
-					Annotation[] annos = accessor.getDeclaredAnnotations();
 					for (Annotation anno : annos) {
 						Serializer serializer = provider.getSerializer(anno.getClass().getInterfaces()[0], false);
 						if (serializer != null) {

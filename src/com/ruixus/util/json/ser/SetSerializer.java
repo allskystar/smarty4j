@@ -8,7 +8,7 @@ import org.objectweb.asm.MethodVisitor;
 
 import com.ruixus.util.SimpleCharBuffer;
 import com.ruixus.util.json.JSONSerializer;
-import com.ruixus.util.json.JSONSerializer.Provider;
+import com.ruixus.util.json.Provider;
 
 public class SetSerializer implements Serializer, Generic {
 	public static void $serialize(Set<?> o, SimpleCharBuffer cb, Provider provider, Class<?> generic) {
