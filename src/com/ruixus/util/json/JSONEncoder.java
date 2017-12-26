@@ -137,8 +137,16 @@ public class JSONEncoder {
 	}
 	
 	private SimpleStack recycler = new SimpleStack();
-	private Provider provider = new Provider();
+	private Provider provider;
 
+	public JSONEncoder() {
+		this(new Provider());
+	}
+
+	public JSONEncoder(Provider provider) {
+		this.provider = provider;
+	}
+	
 	public String encode(Object o) {
 		SimpleCharBuffer cb;
 		synchronized (this) {
