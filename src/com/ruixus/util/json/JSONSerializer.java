@@ -410,12 +410,8 @@ public class JSONSerializer {
 								mv.visitJumpInsn(IF_ICMPLT, loop);
 
 								mv.visitVarInsn(ALOAD, CB);
-								mv.visitVarInsn(ALOAD, CB);
-								mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "length", "()I");
-								mv.visitInsn(ICONST_1);
-								mv.visitInsn(ISUB);
 								mv.visitLdcInsn(']');
-								mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "setCharAt", "(IC)V");
+								mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "appendClose", "(C)V");
 							} else {
 								serializer = provider.getSerializer(type);
 
