@@ -22,7 +22,7 @@ import com.ruixus.util.SimpleStack;
 import com.ruixus.util.json.ser.Generic;
 import com.ruixus.util.json.ser.Serializer;
 
-public class JSONSerializer {
+public class JsonSerializer {
 	private static class ObjectMapper extends ClassLoader {
 		private static final ObjectMapper loader = new ObjectMapper();
 
@@ -35,16 +35,16 @@ public class JSONSerializer {
 		}
 	}
 
-	private static final String NAME = JSONSerializer.class.getName().replace('.', '/');
+	private static final String NAME = JsonSerializer.class.getName().replace('.', '/');
 
 	private SimpleStack recycler = new SimpleStack();
 	private Provider provider;
 
-	public JSONSerializer() {
+	public JsonSerializer() {
 		this(new Provider());
 	}
 
-	public JSONSerializer(Provider provider) {
+	public JsonSerializer(Provider provider) {
 		this.provider = provider;
 	}
 
@@ -180,8 +180,11 @@ public class JSONSerializer {
 
 				Annotation[] annos = accessor.getDeclaredAnnotations();
 				for (Annotation anno : annos) {
-					if (anno.getClass().getInterfaces()[0] == NoSerialize.class) {
+					Class<?> cc = anno.annotationType();
+					if (cc == JsonIgnore.class) {
 						continue loop;
+					} else if (cc == JsonProperty.class) {
+						name = ((JsonProperty) anno).value();
 					}
 				}
 					
