@@ -7,7 +7,7 @@ import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
 import com.ruixus.util.SimpleCharBuffer;
-import com.ruixus.util.json.JSONSerializer;
+import com.ruixus.util.json.JsonSerializer;
 import com.ruixus.util.json.Provider;
 
 public class MapSerializer implements Serializer, Generic {
@@ -34,7 +34,7 @@ public class MapSerializer implements Serializer, Generic {
 			if (key != null) {
 				cb.appendString(key.toString());
 				cb.append(':');
-				JSONSerializer.serializeValue(entry.getValue(), cb, provider);
+				JsonSerializer.serializeValue(entry.getValue(), cb, provider);
 				cb.append(',');
 			}
 		}

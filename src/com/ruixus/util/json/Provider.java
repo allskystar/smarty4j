@@ -106,7 +106,7 @@ public class Provider {
 				synchronized (beanMapper) {
 					serializer = beanMapper.get(cc);
 					if (serializer == null) {
-						serializer = JSONSerializer.createSerializer(cc, this);
+						serializer = JsonSerializer.createSerializer(cc, this);
 						beanMapper.put(cc, serializer);
 					}
 				}
