@@ -7,6 +7,8 @@ import com.ruixus.util.SimpleCharBuffer;
 
 public class JsonReader extends Reader {
 
+	private SimpleCharBuffer buf = new SimpleCharBuffer(128);
+
 	/** 文本输入流数据来源 */
 	private Reader in;
 
@@ -35,8 +37,23 @@ public class JsonReader extends Reader {
 		nextChar--;
 	}
 
+	public String readNumber() throws IOException {
+		int ch = read();
+		int i = nextChar - 1;
+		if (nextChar > 8000) {
+			fill();
+		}
+		while (true) {
+			ch = cb[nextChar++];
+			if ((ch < '0' || ch > '9') && ch != '.') {
+				nextChar--;
+				return new String(cb, i, nextChar - i);
+			}
+		}
+	}
+
 	public String readString() throws IOException {
-		SimpleCharBuffer cb = new SimpleCharBuffer(128);
+		buf.setLength(0);
 		if (read() != '"') {
 			//TODO 异常
 			throw new NullPointerException();
@@ -48,13 +65,13 @@ public class JsonReader extends Reader {
 				throw new NullPointerException();
 			}
 			if (ch == '"') {
-				return cb.toString();
+				return buf.toString();
 			}
 			if (ch == '\\') {
 				//TODO 转义，回头再处理
 				throw new NullPointerException();
 			}
-			cb.append((char) ch);
+			buf.append((char) ch);
 		}
 	}
 

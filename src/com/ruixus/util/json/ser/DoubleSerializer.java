@@ -18,16 +18,6 @@ public class DoubleSerializer implements Serializer {
 
 	@Override
 	public Object deserialize(Class<?> cc, JsonReader reader, Provider provider) throws IOException {
-		char[] buf = new char[64];
-		for (int i = 0; i < 64;) {
-			int ch = reader.read();
-			if (ch != ',' && ch != ']' && ch != '}' && ch != -1) {
-				buf[i++] = (char) ch;
-			} else {
-				reader.unread();
-				return Double.valueOf(new String(buf, 0, i));
-			}
-		}
-		return null;
+		return Double.valueOf(reader.readNumber());
 	}
 }

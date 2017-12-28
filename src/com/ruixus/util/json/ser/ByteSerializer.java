@@ -18,16 +18,6 @@ public class ByteSerializer implements Serializer {
 
 	@Override
 	public Object deserialize(Class<?> cc, JsonReader reader, Provider provider) throws IOException {
-		char[] buf = new char[64];
-		for (int i = 0; i < 64;) {
-			int ch = reader.read();
-			if (ch != ',' && ch != ']' && ch != '}' && ch != -1) {
-				buf[i++] = (char) ch;
-			} else {
-				reader.unread();
-				return Byte.valueOf(new String(buf, 0, i));
-			}
-		}
-		return null;
+		return Byte.valueOf(reader.readNumber());
 	}
 }
