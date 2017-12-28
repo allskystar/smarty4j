@@ -13,7 +13,7 @@ public class DoubleSerializer implements Serializer {
 
 	@Override
 	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
-		DoubleSerializer.$serialize((Double) o, cb, provider);
+		$serialize((Double) o, cb, provider);
 	}
 
 	@Override

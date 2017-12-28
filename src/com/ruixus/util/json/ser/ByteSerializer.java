@@ -13,7 +13,7 @@ public class ByteSerializer implements Serializer {
 
 	@Override
 	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
-		ByteSerializer.$serialize((Byte) o, cb, provider);
+		$serialize((Byte) o, cb, provider);
 	}
 
 	@Override

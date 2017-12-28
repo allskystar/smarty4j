@@ -18,7 +18,7 @@ public class IntArraySerializer implements Serializer {
 
 	@Override
 	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
-		IntArraySerializer.$serialize((int[]) o, cb, provider);
+		$serialize((int[]) o, cb, provider);
 	}
 
 	@Override

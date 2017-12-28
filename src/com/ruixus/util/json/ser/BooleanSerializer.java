@@ -13,7 +13,7 @@ public class BooleanSerializer implements Serializer {
 
 	@Override
 	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
-		BooleanSerializer.$serialize((Boolean) o, cb, provider);
+		$serialize((Boolean) o, cb, provider);
 	}
 
 	@Override

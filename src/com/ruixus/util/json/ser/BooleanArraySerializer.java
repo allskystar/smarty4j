@@ -18,7 +18,7 @@ public class BooleanArraySerializer implements Serializer {
 
 	@Override
 	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
-		BooleanArraySerializer.$serialize((boolean[]) o, cb, provider);
+		$serialize((boolean[]) o, cb, provider);
 	}
 
 	@Override

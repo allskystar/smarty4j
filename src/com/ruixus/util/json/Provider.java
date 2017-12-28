@@ -96,7 +96,7 @@ public class Provider {
 
 	public Serializer getSerializer(Class<?> cc, boolean needBuild) {
 		Serializer serializer = beanMapper.get(cc);
-		if (serializer == null) {
+		if (serializer == null && cc != null) {
 			for (Class<?> item : assignables) {
 				if (item.isAssignableFrom(cc)) {
 					serializer = beanMapper.get(item);

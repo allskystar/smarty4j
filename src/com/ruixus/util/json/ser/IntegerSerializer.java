@@ -13,7 +13,7 @@ public class IntegerSerializer implements Serializer {
 
 	@Override
 	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
-		IntegerSerializer.$serialize((Integer) o, cb, provider);
+		$serialize((Integer) o, cb, provider);
 	}
 
 	@Override

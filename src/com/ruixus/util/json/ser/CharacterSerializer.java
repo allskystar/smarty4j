@@ -13,7 +13,7 @@ public class CharacterSerializer implements Serializer {
 
 	@Override
 	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
-		CharacterSerializer.$serialize((Character) o, cb, provider);
+		$serialize((Character) o, cb, provider);
 	}
 
 	@Override

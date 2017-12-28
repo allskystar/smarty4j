@@ -17,7 +17,7 @@ public class StringArraySerializer implements Serializer {
 	}
 
 	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
-		StringArraySerializer.$serialize((String[]) o, cb, provider);
+		$serialize((String[]) o, cb, provider);
 	}
 
 	@Override

@@ -18,7 +18,7 @@ public class LongArraySerializer implements Serializer {
 
 	@Override
 	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
-		LongArraySerializer.$serialize((long[]) o, cb, provider);
+		$serialize((long[]) o, cb, provider);
 	}
 
 	@Override

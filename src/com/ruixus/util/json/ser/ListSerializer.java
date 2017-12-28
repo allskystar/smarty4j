@@ -34,7 +34,7 @@ public class ListSerializer implements Serializer, Generic {
 
 	@Override
 	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
-		ListSerializer.$serialize((List<?>) o, cb, provider);
+		$serialize((List<?>) o, cb, provider);
 	}
 
 	@Override

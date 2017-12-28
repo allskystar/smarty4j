@@ -18,7 +18,7 @@ public class ByteArraySerializer implements Serializer {
 
 	@Override
 	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
-		ByteArraySerializer.$serialize((byte[]) o, cb, provider);
+		$serialize((byte[]) o, cb, provider);
 	}
 
 	@Override

@@ -18,7 +18,7 @@ public class DoubleArraySerializer implements Serializer {
 
 	@Override
 	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
-		DoubleArraySerializer.$serialize((double[]) o, cb, provider);
+		$serialize((double[]) o, cb, provider);
 	}
 
 	@Override

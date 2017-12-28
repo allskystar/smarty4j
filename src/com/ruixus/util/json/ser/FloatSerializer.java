@@ -13,7 +13,7 @@ public class FloatSerializer implements Serializer {
 
 	@Override
 	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
-		FloatSerializer.$serialize((Float) o, cb, provider);
+		$serialize((Float) o, cb, provider);
 	}
 
 	@Override

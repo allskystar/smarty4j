@@ -18,7 +18,7 @@ public class FloatArraySerializer implements Serializer {
 
 	@Override
 	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
-		FloatArraySerializer.$serialize((float[]) o, cb, provider);
+		$serialize((float[]) o, cb, provider);
 	}
 
 	@Override

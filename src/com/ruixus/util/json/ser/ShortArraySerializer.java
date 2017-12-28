@@ -18,7 +18,7 @@ public class ShortArraySerializer implements Serializer {
 
 	@Override
 	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
-		ShortArraySerializer.$serialize((short[]) o, cb, provider);
+		$serialize((short[]) o, cb, provider);
 	}
 
 	@Override

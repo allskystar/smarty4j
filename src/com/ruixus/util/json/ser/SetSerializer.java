@@ -34,7 +34,7 @@ public class SetSerializer implements Serializer, Generic {
 
 	@Override
 	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
-		SetSerializer.$serialize((Set<?>) o, cb, provider);
+		$serialize((Set<?>) o, cb, provider);
 	}
 
 	@Override

@@ -13,7 +13,7 @@ public class LongSerializer implements Serializer {
 
 	@Override
 	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
-		LongSerializer.$serialize((Long) o, cb, provider);
+		$serialize((Long) o, cb, provider);
 	}
 
 	@Override

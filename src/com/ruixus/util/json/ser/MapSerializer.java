@@ -45,7 +45,7 @@ public class MapSerializer implements Serializer, Generic {
 
 	@Override
 	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
-		MapSerializer.$serialize((Map<?, ?>) o, cb, provider);
+		$serialize((Map<?, ?>) o, cb, provider);
 	}
 
 	@Override
