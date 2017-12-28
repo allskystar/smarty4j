@@ -279,6 +279,13 @@ public class JsonSerializer {
 					mv.visitVarInsn(ALOAD, VALUE);
 					mv.visitJumpInsn(IFNULL, isnull);
 
+					if (jsonInclude == Include.NON_EMPTY) {
+						mv.visitVarInsn(ALOAD, VALUE);
+						mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "toString", "()Ljava/lang/String;");
+						mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "length", "()I");
+						mv.visitJumpInsn(IFEQ, end);
+					}
+
 					boolean assign = false;
 
 					for (Annotation anno : annos) {
@@ -296,12 +303,6 @@ public class JsonSerializer {
 					}
 
 					if (!assign) {
-						if (jsonInclude == Include.NON_EMPTY) {
-							mv.visitVarInsn(ALOAD, VALUE);
-							mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "toString", "()Ljava/lang/String;");
-							mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "length", "()I");
-							mv.visitJumpInsn(IFEQ, end);
-						}
 						mv.visitVarInsn(ALOAD, CB);
 						mv.visitLdcInsn("\"" + name + "\":");
 						mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(Ljava/lang/String;)V");
