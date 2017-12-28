@@ -18,7 +18,16 @@ public class LongSerializer implements Serializer {
 
 	@Override
 	public Object deserialize(Class<?> cc, JsonReader reader, Provider provider) throws IOException {
-		// TODO Auto-generated method stub
+		char[] buf = new char[64];
+		for (int i = 0; i < 64;) {
+			int ch = reader.read();
+			if (ch != ',' && ch != ']' && ch != '}' && ch != -1) {
+				buf[i++] = (char) ch;
+			} else {
+				reader.unread();
+				return Long.valueOf(new String(buf, 0, i));
+			}
+		}
 		return null;
 	}
 }

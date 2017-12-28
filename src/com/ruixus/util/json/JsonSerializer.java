@@ -14,7 +14,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
@@ -42,7 +44,8 @@ public class JsonSerializer {
 
 	private static final String NAME = JsonSerializer.class.getName().replace('.', '/');
 
-	private SimpleStack recycler = new SimpleStack();
+	private SimpleStack cbRecycler = new SimpleStack();
+	private SimpleStack jrRecycler = new SimpleStack();
 	private Provider provider;
 
 	public JsonSerializer() {
@@ -54,9 +57,9 @@ public class JsonSerializer {
 	}
 
 	private SimpleCharBuffer getBuffer() {
-		synchronized (recycler) {
-			if (recycler.size() > 0) {
-				return (SimpleCharBuffer) recycler.pop();
+		synchronized (cbRecycler) {
+			if (cbRecycler.size() > 0) {
+				return (SimpleCharBuffer) cbRecycler.pop();
 			} else {
 				return new SimpleCharBuffer(4000);
 			}
@@ -64,8 +67,24 @@ public class JsonSerializer {
 	}
 
 	private void freeBuffer(SimpleCharBuffer cb) {
-		synchronized (recycler) {
-			recycler.push(cb);
+		synchronized (cbRecycler) {
+			cbRecycler.push(cb);
+		}
+	}
+
+	private JsonReader getReader() {
+		synchronized (jrRecycler) {
+			if (jrRecycler.size() > 0) {
+				return (JsonReader) jrRecycler.pop();
+			} else {
+				return new JsonReader();
+			}
+		}
+	}
+
+	private void freeReader(JsonReader cb) {
+		synchronized (jrRecycler) {
+			jrRecycler.push(cb);
 		}
 	}
 
@@ -88,7 +107,8 @@ public class JsonSerializer {
 
 	public Object deserialize(Reader reader, Class<?> cc) throws Exception {
 		Serializer serializer = provider.getSerializer(cc);
-		JsonReader jsonReader = new JsonReader(reader);
+		JsonReader jsonReader = getReader();
+		jsonReader.bind(reader);
 		int ch = jsonReader.read();
 		if (ch == '[') {
 			List<Object> list = new ArrayList<Object>();
@@ -105,7 +125,9 @@ public class JsonSerializer {
 			return list;
 		}
 		jsonReader.unread();
-		return serializer.deserialize(cc, jsonReader, provider);
+		Object value = serializer.deserialize(cc, jsonReader, provider);
+		freeReader(jsonReader);
+		return value;
 	}
 
 	private static final int OBJ = 0;
@@ -166,7 +188,7 @@ public class JsonSerializer {
 			JsonInclude anno = clazz.getAnnotation(JsonInclude.class);
 			classJsonInclude = anno != null ? anno.value() : null;
 		}
-		int index = 0;
+		Map<String, Object> names = new HashMap<String, Object>();
 
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
 		MethodVisitor mv;
@@ -192,14 +214,6 @@ public class JsonSerializer {
 		mv.visitMaxs(0, 0);
 		mv.visitEnd();
 
-		MethodVisitor mvGet = cw.visitMethod(ACC_PUBLIC, "getType",
-				"(Ljava/lang/String;)Ljava/lang/Class;", null, null);
-		Label endGet = new Label();
-
-		MethodVisitor mvSet = cw.visitMethod(ACC_PUBLIC, "setValue",
-				"(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;)V", null, null);
-		Label endSet = new Label();
-		
 		mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, "$serialize",
 				"(L" + className + ";L" + SimpleCharBuffer.NAME + ";L" + Provider.NAME + ";)V", null, null);
 
@@ -218,30 +232,7 @@ public class JsonSerializer {
 
 				Method accessor = prop.getWriteMethod();
 				if (accessor != null) {
-					Class<?> type = accessor.getParameterTypes()[0];
-					String typeName = type.getName().replace('.', '/');
-					
-					Label ifeq = new Label();
-					mvGet.visitVarInsn(ALOAD, 1);
-					mvGet.visitLdcInsn(name);
-					mvGet.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z");
-					mvGet.visitJumpInsn(IFNE, ifeq);
-					mvGet.visitLdcInsn(org.objectweb.asm.Type.getType(type));
-					mvGet.visitJumpInsn(GOTO, endGet);
-					mvGet.visitLabel(ifeq);
-					
-					ifeq = new Label();
-					mvSet.visitVarInsn(ALOAD, 2);
-					mvSet.visitLdcInsn(name);
-					mvSet.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z");
-					mvSet.visitJumpInsn(IFNE, ifeq);
-					mvSet.visitVarInsn(ALOAD, 1);
-					mvSet.visitTypeInsn(CHECKCAST, className);
-					mvSet.visitVarInsn(ALOAD, 3);
-					mvSet.visitTypeInsn(CHECKCAST, typeName);
-					mvSet.visitMethodInsn(INVOKEVIRTUAL, className, accessor.getName(), "(L" + typeName + ";)V");
-					mvSet.visitJumpInsn(GOTO, endSet);
-					mvSet.visitLabel(ifeq);
+					names.put(name, accessor);
 				}
 
 				accessor = prop.getReadMethod();
@@ -455,13 +446,56 @@ public class JsonSerializer {
 		mv.visitMaxs(0, 0);
 		mv.visitEnd();
 
+		int size = names.size();
+		MethodVisitor mvGet = cw.visitMethod(ACC_PUBLIC, "getType", "(I)Ljava/lang/Class;", null, null);
+		Label defaultGet = new Label();
+		Label[] switchGet = new Label[size];
+
+		MethodVisitor mvSet = cw.visitMethod(ACC_PUBLIC, "setValue", "(Ljava/lang/Object;ILjava/lang/Object;)V", null,
+				null);
+		Label defaultSet = new Label();
+		Label[] switchSet = new Label[size];
+
+		for (int i = 0; i < size; i++) {
+			switchGet[i] = new Label();
+			switchSet[i] = new Label();
+		}
+
+		mvGet.visitVarInsn(ILOAD, 1);
+		mvGet.visitTableSwitchInsn(0, size - 1, defaultGet, switchGet);
+		mvSet.visitVarInsn(ILOAD, 2);
+		mvSet.visitTableSwitchInsn(0, size - 1, defaultSet, switchSet);
+
+		int i = 0;
+		for (Map.Entry<String, Object> name : names.entrySet()) {
+			Method accessor = (Method) name.getValue();
+			name.setValue(i);
+
+			Class<?> type = accessor.getParameterTypes()[0];
+			String typeName = type.getName().replace('.', '/');
+
+			mvGet.visitLabel(switchGet[i]);
+			mvGet.visitLdcInsn(org.objectweb.asm.Type.getType(type));
+			mvGet.visitInsn(ARETURN);
+
+			mvSet.visitLabel(switchSet[i]);
+			mvSet.visitVarInsn(ALOAD, 1);
+			mvSet.visitTypeInsn(CHECKCAST, className);
+			mvSet.visitVarInsn(ALOAD, 3);
+			mvSet.visitTypeInsn(CHECKCAST, typeName);
+			mvSet.visitMethodInsn(INVOKEVIRTUAL, className, accessor.getName(), "(L" + typeName + ";)V");
+			mvSet.visitInsn(RETURN);
+
+			i++;
+		}
+
+		mvGet.visitLabel(defaultGet);
 		mvGet.visitInsn(ACONST_NULL);
-		mvGet.visitLabel(endGet);
 		mvGet.visitInsn(ARETURN);
 		mvGet.visitMaxs(0, 0);
 		mvGet.visitEnd();
 
-		mvSet.visitLabel(endSet);
+		mvSet.visitLabel(defaultSet);
 		mvSet.visitInsn(RETURN);
 		mvSet.visitMaxs(0, 0);
 		mvSet.visitEnd();
@@ -470,7 +504,12 @@ public class JsonSerializer {
 
 		byte[] code = cw.toByteArray();
 		try {
-			return (Serializer) ObjectMapper.defineClass(mapperName, code).newInstance();
+			AbstractBeanSerializer serializer = (AbstractBeanSerializer) ObjectMapper.defineClass(mapperName, code)
+					.newInstance();
+			for (Map.Entry<String, Object> name : names.entrySet()) {
+				serializer.setNameIndex(name.getKey(), (Integer) name.getValue());
+			}
+			return serializer;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw new NullPointerException();

@@ -25,8 +25,10 @@ public class JsonReader extends Reader {
 	 * @param in
 	 *          文本输入对象
 	 */
-	public JsonReader(Reader in) {
+	public void bind(Reader in) {
 		this.in = in;
+		nChars = 0;
+		nextChar = 0;
 	}
 
 	public void unread() {
@@ -52,6 +54,7 @@ public class JsonReader extends Reader {
 				//TODO 转义，回头再处理
 				throw new NullPointerException();
 			}
+			cb.append((char) ch);
 		}
 	}
 
