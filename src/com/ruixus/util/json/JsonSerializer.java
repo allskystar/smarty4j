@@ -6,12 +6,15 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
@@ -19,6 +22,7 @@ import org.objectweb.asm.MethodVisitor;
 
 import com.ruixus.util.SimpleCharBuffer;
 import com.ruixus.util.SimpleStack;
+import com.ruixus.util.json.JsonInclude.Include;
 import com.ruixus.util.json.ser.Generic;
 import com.ruixus.util.json.ser.Serializer;
 
@@ -81,6 +85,28 @@ public class JsonSerializer {
 		freeBuffer(cb);
 	}
 
+	public Object deserialize(Reader reader, Class<?> cc) throws IOException {
+		Serializer serializer = provider.getSerializer(cc);
+		JsonReader jsonReader = new JsonReader(reader);
+		int ch = jsonReader.read();
+		if (ch == '[') {
+			List<Object> list = new ArrayList<Object>();
+			while (true) {
+				list.add(serializer.deserialize(cc, jsonReader, provider));
+				ch = jsonReader.read();
+				if (ch == ']') {
+					break;
+				}
+				if (ch != ',') {
+					// TODO 出错
+				}
+			}
+			return list;
+		}
+		jsonReader.unread();
+		return serializer.deserialize(cc, jsonReader, provider);
+	}
+
 	private static final int OBJ = 0;
 	private static final int CB = OBJ + 1;
 	private static final int PROVIDER = CB + 1;
@@ -100,7 +126,11 @@ public class JsonSerializer {
 		String name = null;
 		for (Method method : clazz.getDeclaredMethods()) {
 			if (method.getName().charAt(0) == '$') {
-				name = org.objectweb.asm.Type.getDescriptor(method.getParameterTypes()[0]);
+				Class<?>[] params = method.getParameterTypes();
+				if ((generic != null && params.length == 3) || (generic == null && params.length == 4)) {
+					continue;
+				}
+				name = org.objectweb.asm.Type.getDescriptor(params[0]);
 				if (name.length() == 1) {
 					name = null;
 				} else {
@@ -110,8 +140,9 @@ public class JsonSerializer {
 		}
 		if (name == null) {
 			throw new RuntimeException(
-					"Please provide a static method '$serialize(E value, SimpleCharBuffer cb, Provider provider)' in Class "
-							+ serializer.getClass().getName() + " to serialize ‘value’");
+					"Please provide a static method '$serialize(E value, SimpleCharBuffer cb, Provider provider"
+							+ (generic != null ? ", Class cc" : "") + ")' in Class " + serializer.getClass().getName()
+							+ " to serialize ‘value’");
 		}
 		mv.visitVarInsn(ALOAD, CB);
 		mv.visitVarInsn(ALOAD, PROVIDER);
@@ -127,9 +158,13 @@ public class JsonSerializer {
 	}
 
 	public static Serializer createSerializer(Class<?> clazz, Provider provider) {
-		boolean first = true;
 		String className = clazz.getName().replace('.', '/');
 		String mapperName = Serializer.class.getName() + "$" + clazz.getName().replace('.', '$');
+		Include classJsonInclude;
+		{
+			JsonInclude anno = clazz.getAnnotation(JsonInclude.class);
+			classJsonInclude = anno != null ? anno.value() : null;
+		}
 
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
 		MethodVisitor mv;
@@ -166,8 +201,7 @@ public class JsonSerializer {
 
 		try {
 			// 序列化JavaBean可读属性
-			loop:
-			for (PropertyDescriptor prop : Introspector.getBeanInfo(clazz).getPropertyDescriptors()) {
+			loop: for (PropertyDescriptor prop : Introspector.getBeanInfo(clazz).getPropertyDescriptors()) {
 				Method accessor = prop.getReadMethod();
 				if (accessor == null) {
 					continue;
@@ -179,24 +213,25 @@ public class JsonSerializer {
 				}
 
 				Annotation[] annos = accessor.getDeclaredAnnotations();
+				Include jsonInclude = classJsonInclude;
 				for (Annotation anno : annos) {
 					Class<?> cc = anno.annotationType();
 					if (cc == JsonIgnore.class) {
 						continue loop;
 					} else if (cc == JsonProperty.class) {
 						name = ((JsonProperty) anno).value();
+					} else if (cc == JsonInclude.class) {
+						jsonInclude = ((JsonInclude) anno).value();
 					}
 				}
-					
-				mv.visitVarInsn(ALOAD, CB);
-				mv.visitLdcInsn((first ? "" : ",") + "\"" + name + "\":");
-				mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(Ljava/lang/String;)V");
-
-				first = false;
 
 				Class<?> type = accessor.getReturnType();
 				String typeName = org.objectweb.asm.Type.getDescriptor(type);
 				if (typeName.length() == 1) {
+					mv.visitVarInsn(ALOAD, CB);
+					mv.visitLdcInsn("\"" + name + "\":");
+					mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(Ljava/lang/String;)V");
+
 					boolean assign = false;
 
 					for (Annotation anno : annos) {
@@ -230,27 +265,29 @@ public class JsonSerializer {
 								typeName.equals("C") ? "appendString" : "append",
 								"(" + (typeName.equals("B") || typeName.equals("S") ? "I" : typeName) + ")V");
 					}
+
+					mv.visitVarInsn(ALOAD, CB);
+					mv.visitLdcInsn(',');
+					mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(C)V");
 				} else {
-					Label nonull = new Label();
+					Label isnull = new Label();
 					Label end = new Label();
 
 					mv.visitVarInsn(ALOAD, OBJ);
 					mv.visitMethodInsn(INVOKEVIRTUAL, className, accessor.getName(), "()" + typeName);
 					mv.visitVarInsn(ASTORE, VALUE);
 					mv.visitVarInsn(ALOAD, VALUE);
-					mv.visitJumpInsn(IFNONNULL, nonull);
-
-					mv.visitVarInsn(ALOAD, CB);
-					mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "appendNull", "()V");
-					mv.visitJumpInsn(GOTO, end);
-
-					mv.visitLabel(nonull);
+					mv.visitJumpInsn(IFNULL, isnull);
 
 					boolean assign = false;
 
 					for (Annotation anno : annos) {
 						Serializer serializer = provider.getSerializer(anno.getClass().getInterfaces()[0], false);
 						if (serializer != null) {
+							mv.visitVarInsn(ALOAD, CB);
+							mv.visitLdcInsn("\"" + name + "\":");
+							mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(Ljava/lang/String;)V");
+
 							mv.visitVarInsn(ALOAD, VALUE);
 							callStaticEncode(mv, provider, serializer, accessor.getGenericReturnType());
 							assign = true;
@@ -259,6 +296,16 @@ public class JsonSerializer {
 					}
 
 					if (!assign) {
+						if (jsonInclude == Include.NON_EMPTY) {
+							mv.visitVarInsn(ALOAD, VALUE);
+							mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "toString", "()Ljava/lang/String;");
+							mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "length", "()I");
+							mv.visitJumpInsn(IFEQ, end);
+						}
+						mv.visitVarInsn(ALOAD, CB);
+						mv.visitLdcInsn("\"" + name + "\":");
+						mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(Ljava/lang/String;)V");
+
 						Serializer serializer = provider.getSerializer(type, false);
 						if (serializer != null) {
 							mv.visitVarInsn(ALOAD, VALUE);
@@ -328,6 +375,28 @@ public class JsonSerializer {
 						}
 					}
 
+					mv.visitVarInsn(ALOAD, CB);
+					mv.visitLdcInsn(',');
+					mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(C)V");
+
+					if (jsonInclude != Include.NON_NULL && jsonInclude != Include.NON_EMPTY) {
+						mv.visitJumpInsn(GOTO, end);
+						mv.visitLabel(isnull);
+
+						mv.visitVarInsn(ALOAD, CB);
+						mv.visitLdcInsn("\"" + name + "\":");
+						mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(Ljava/lang/String;)V");
+
+						mv.visitVarInsn(ALOAD, CB);
+						mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "appendNull", "()V");
+
+						mv.visitVarInsn(ALOAD, CB);
+						mv.visitLdcInsn(',');
+						mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(C)V");
+					} else {
+						mv.visitLabel(isnull);
+					}
+
 					mv.visitLabel(end);
 				}
 			}
@@ -336,7 +405,7 @@ public class JsonSerializer {
 
 		mv.visitVarInsn(ALOAD, CB);
 		mv.visitLdcInsn('}');
-		mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(C)V");
+		mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "appendClose", "(C)V");
 
 		mv.visitLabel(ret);
 		mv.visitInsn(RETURN);

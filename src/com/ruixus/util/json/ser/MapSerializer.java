@@ -1,5 +1,6 @@
 package com.ruixus.util.json.ser;
 
+import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -7,6 +8,7 @@ import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
 import com.ruixus.util.SimpleCharBuffer;
+import com.ruixus.util.json.JsonReader;
 import com.ruixus.util.json.JsonSerializer;
 import com.ruixus.util.json.Provider;
 
@@ -51,6 +53,12 @@ public class MapSerializer implements Serializer, Generic {
 		if (type instanceof ParameterizedType) {
 			return ((ParameterizedType) type).getActualTypeArguments()[1];
 		}
+		return null;
+	}
+
+	@Override
+	public Object deserialize(Class<?> cc, JsonReader reader, Provider provider) throws IOException {
+		// TODO Auto-generated method stub
 		return null;
 	}
 }

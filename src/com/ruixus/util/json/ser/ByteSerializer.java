@@ -6,14 +6,14 @@ import com.ruixus.util.SimpleCharBuffer;
 import com.ruixus.util.json.JsonReader;
 import com.ruixus.util.json.Provider;
 
-public class IntegerSerializer implements Serializer {
-	public static void $serialize(Integer o, SimpleCharBuffer cb, Provider provider) {
+public class ByteSerializer implements Serializer {
+	public static void $serialize(Byte o, SimpleCharBuffer cb, Provider provider) {
 		cb.append(o.intValue());
 	}
 
 	@Override
 	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
-		IntegerSerializer.$serialize((Integer) o, cb, provider);
+		ByteSerializer.$serialize((Byte) o, cb, provider);
 	}
 
 	@Override
@@ -25,7 +25,7 @@ public class IntegerSerializer implements Serializer {
 				buf[i++] = (char) ch;
 			} else {
 				reader.unread();
-				return Integer.valueOf(new String(buf, 0, i));
+				return Byte.valueOf(new String(buf, 0, i));
 			}
 		}
 		return null;

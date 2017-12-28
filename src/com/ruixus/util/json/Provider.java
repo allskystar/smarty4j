@@ -10,20 +10,23 @@ import com.ruixus.util.json.ser.ArrayListSerializer;
 import com.ruixus.util.json.ser.BooleanArraySerializer;
 import com.ruixus.util.json.ser.BooleanSerializer;
 import com.ruixus.util.json.ser.ByteArraySerializer;
+import com.ruixus.util.json.ser.ByteSerializer;
 import com.ruixus.util.json.ser.CharArraySerializer;
 import com.ruixus.util.json.ser.CharacterSerializer;
 import com.ruixus.util.json.ser.DoubleArraySerializer;
+import com.ruixus.util.json.ser.DoubleSerializer;
 import com.ruixus.util.json.ser.FloatArraySerializer;
+import com.ruixus.util.json.ser.FloatSerializer;
 import com.ruixus.util.json.ser.IntArraySerializer;
 import com.ruixus.util.json.ser.IntegerSerializer;
 import com.ruixus.util.json.ser.ListSerializer;
 import com.ruixus.util.json.ser.LongArraySerializer;
 import com.ruixus.util.json.ser.LongSerializer;
 import com.ruixus.util.json.ser.MapSerializer;
-import com.ruixus.util.json.ser.NumberSerializer;
 import com.ruixus.util.json.ser.Serializer;
 import com.ruixus.util.json.ser.SetSerializer;
 import com.ruixus.util.json.ser.ShortArraySerializer;
+import com.ruixus.util.json.ser.ShortSerializer;
 import com.ruixus.util.json.ser.StringArraySerializer;
 import com.ruixus.util.json.ser.StringSerializer;
 
@@ -33,16 +36,17 @@ public class Provider {
 	private static final Class<?>[] defAssignables;
 
 	static {
-		defAssignables = new Class<?>[] { Number.class, Map.class, List.class, Set.class };
+		defAssignables = new Class<?>[] { Map.class, List.class, Set.class };
 		defBeanMapper.put(String.class, new StringSerializer());
 		defBeanMapper.put(Character.class, new CharacterSerializer());
 		defBeanMapper.put(Boolean.class, new BooleanSerializer());
-		defBeanMapper.put(Byte.class, new IntegerSerializer());
-		defBeanMapper.put(Short.class, new IntegerSerializer());
+		defBeanMapper.put(Byte.class, new ByteSerializer());
+		defBeanMapper.put(Short.class, new ShortSerializer());
 		defBeanMapper.put(Integer.class, new IntegerSerializer());
 		defBeanMapper.put(Long.class, new LongSerializer());
+		defBeanMapper.put(Float.class, new FloatSerializer());
+		defBeanMapper.put(Double.class, new DoubleSerializer());
 
-		defBeanMapper.put(Number.class, new NumberSerializer());
 		defBeanMapper.put(Map.class, new MapSerializer());
 		defBeanMapper.put(List.class, new ListSerializer());
 		defBeanMapper.put(Set.class, new SetSerializer());
