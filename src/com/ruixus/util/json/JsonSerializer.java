@@ -388,9 +388,15 @@ public class JsonSerializer {
 						mv.visitLdcInsn("\"" + name + "\":");
 						mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(Ljava/lang/String;)V");
 
-						mv.visitVarInsn(ALOAD, CB);
-						mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "appendNull", "()V");
-
+						Serializer serializer = provider.getSerializer(null, false);
+						if (serializer != null) {
+							mv.visitInsn(ACONST_NULL);
+							callStaticEncode(mv, provider, serializer, null);
+						} else {
+							mv.visitVarInsn(ALOAD, CB);
+							mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "appendNull", "()V");
+						}
+						
 						mv.visitVarInsn(ALOAD, CB);
 						mv.visitLdcInsn(',');
 						mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(C)V");
