@@ -23,6 +23,7 @@ import org.objectweb.asm.MethodVisitor;
 import com.ruixus.util.SimpleCharBuffer;
 import com.ruixus.util.SimpleStack;
 import com.ruixus.util.json.JsonInclude.Include;
+import com.ruixus.util.json.ser.AbstractBeanSerializer;
 import com.ruixus.util.json.ser.Generic;
 import com.ruixus.util.json.ser.Serializer;
 
@@ -85,7 +86,7 @@ public class JsonSerializer {
 		freeBuffer(cb);
 	}
 
-	public Object deserialize(Reader reader, Class<?> cc) throws IOException {
+	public Object deserialize(Reader reader, Class<?> cc) throws Exception {
 		Serializer serializer = provider.getSerializer(cc);
 		JsonReader jsonReader = new JsonReader(reader);
 		int ch = jsonReader.read();
@@ -165,16 +166,16 @@ public class JsonSerializer {
 			JsonInclude anno = clazz.getAnnotation(JsonInclude.class);
 			classJsonInclude = anno != null ? anno.value() : null;
 		}
+		int index = 0;
 
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
 		MethodVisitor mv;
-		cw.visit(V1_5, ACC_PUBLIC, mapperName.replace('.', '/'), null, "java/lang/Object",
-				new String[] { Serializer.NAME });
+		cw.visit(V1_5, ACC_PUBLIC, mapperName.replace('.', '/'), null, AbstractBeanSerializer.NAME, null);
 
 		// 定义类的构造方法
 		mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
 		mv.visitVarInsn(ALOAD, 0);
-		mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V");
+		mv.visitMethodInsn(INVOKESPECIAL, AbstractBeanSerializer.NAME, "<init>", "()V");
 		mv.visitInsn(RETURN);
 		mv.visitMaxs(0, 0);
 		mv.visitEnd();
@@ -191,7 +192,14 @@ public class JsonSerializer {
 		mv.visitMaxs(0, 0);
 		mv.visitEnd();
 
-		Label ret = new Label();
+		MethodVisitor mvGet = cw.visitMethod(ACC_PUBLIC, "getType",
+				"(Ljava/lang/String;)Ljava/lang/Class;", null, null);
+		Label endGet = new Label();
+
+		MethodVisitor mvSet = cw.visitMethod(ACC_PUBLIC, "setValue",
+				"(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;)V", null, null);
+		Label endSet = new Label();
+		
 		mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, "$serialize",
 				"(L" + className + ";L" + SimpleCharBuffer.NAME + ";L" + Provider.NAME + ";)V", null, null);
 
@@ -202,13 +210,42 @@ public class JsonSerializer {
 		try {
 			// 序列化JavaBean可读属性
 			loop: for (PropertyDescriptor prop : Introspector.getBeanInfo(clazz).getPropertyDescriptors()) {
-				Method accessor = prop.getReadMethod();
-				if (accessor == null) {
-					continue;
-				}
 				String name = prop.getName();
 				// class属性不需要序列化
 				if ("class".equals(name)) {
+					continue;
+				}
+
+				Method accessor = prop.getWriteMethod();
+				if (accessor != null) {
+					Class<?> type = accessor.getParameterTypes()[0];
+					String typeName = type.getName().replace('.', '/');
+					
+					Label ifeq = new Label();
+					mvGet.visitVarInsn(ALOAD, 1);
+					mvGet.visitLdcInsn(name);
+					mvGet.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z");
+					mvGet.visitJumpInsn(IFNE, ifeq);
+					mvGet.visitLdcInsn(org.objectweb.asm.Type.getType(type));
+					mvGet.visitJumpInsn(GOTO, endGet);
+					mvGet.visitLabel(ifeq);
+					
+					ifeq = new Label();
+					mvSet.visitVarInsn(ALOAD, 2);
+					mvSet.visitLdcInsn(name);
+					mvSet.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z");
+					mvSet.visitJumpInsn(IFNE, ifeq);
+					mvSet.visitVarInsn(ALOAD, 1);
+					mvSet.visitTypeInsn(CHECKCAST, className);
+					mvSet.visitVarInsn(ALOAD, 3);
+					mvSet.visitTypeInsn(CHECKCAST, typeName);
+					mvSet.visitMethodInsn(INVOKEVIRTUAL, className, accessor.getName(), "(L" + typeName + ";)V");
+					mvSet.visitJumpInsn(GOTO, endSet);
+					mvSet.visitLabel(ifeq);
+				}
+
+				accessor = prop.getReadMethod();
+				if (accessor == null) {
 					continue;
 				}
 
@@ -396,7 +433,7 @@ public class JsonSerializer {
 							mv.visitVarInsn(ALOAD, CB);
 							mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "appendNull", "()V");
 						}
-						
+
 						mv.visitVarInsn(ALOAD, CB);
 						mv.visitLdcInsn(',');
 						mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(C)V");
@@ -414,10 +451,21 @@ public class JsonSerializer {
 		mv.visitLdcInsn('}');
 		mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "appendClose", "(C)V");
 
-		mv.visitLabel(ret);
 		mv.visitInsn(RETURN);
 		mv.visitMaxs(0, 0);
 		mv.visitEnd();
+
+		mvGet.visitInsn(ACONST_NULL);
+		mvGet.visitLabel(endGet);
+		mvGet.visitInsn(ARETURN);
+		mvGet.visitMaxs(0, 0);
+		mvGet.visitEnd();
+
+		mvSet.visitLabel(endSet);
+		mvSet.visitInsn(RETURN);
+		mvSet.visitMaxs(0, 0);
+		mvSet.visitEnd();
+
 		cw.visitEnd();
 
 		byte[] code = cw.toByteArray();

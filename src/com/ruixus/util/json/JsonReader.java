@@ -3,6 +3,8 @@ package com.ruixus.util.json;
 import java.io.IOException;
 import java.io.Reader;
 
+import com.ruixus.util.SimpleCharBuffer;
+
 public class JsonReader extends Reader {
 
 	/** 文本输入流数据来源 */
@@ -29,6 +31,28 @@ public class JsonReader extends Reader {
 
 	public void unread() {
 		nextChar--;
+	}
+
+	public String readString() throws IOException {
+		SimpleCharBuffer cb = new SimpleCharBuffer(128);
+		if (read() != '"') {
+			//TODO 异常
+			throw new NullPointerException();
+		}
+		while (true) {
+			int ch = read();
+			if (ch == -1) {
+				//TODO 异常
+				throw new NullPointerException();
+			}
+			if (ch == '"') {
+				return cb.toString();
+			}
+			if (ch == '\\') {
+				//TODO 转义，回头再处理
+				throw new NullPointerException();
+			}
+		}
 	}
 
 	@Override
