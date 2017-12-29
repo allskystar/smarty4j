@@ -46,7 +46,7 @@ public class ArrayListSerializer implements Serializer, Generic {
 	}
 
 	@Override
-	public Object createObject(Object parent, Class<?> cc) {
+	public Object createObject(Object parent) {
 		return null;
 	}
 

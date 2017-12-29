@@ -1,6 +1,5 @@
 package com.ruixus.util.json.ser;
 
-import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,13 +17,6 @@ public abstract class AbstractBeanSerializer implements Serializer {
 
 	public void setNameIndex(String name, int index) {
 		idxNames.put(name, index);
-	}
-
-	@Override
-	public Object createObject(Object parent, Class<?> cc) throws Exception {
-		Constructor<?> constructor = cc.getConstructors()[0];
-		return constructor.getParameterTypes().length == 0 ? constructor.newInstance()
-				: constructor.newInstance(parent);
 	}
 
 	@Override
@@ -47,7 +39,7 @@ public abstract class AbstractBeanSerializer implements Serializer {
 			}
 
 			Serializer serializer = provider.getSerializer(type);
-			setValue(o, index, serializer.deserialize(serializer.createObject(o, type), reader, provider));
+			setValue(o, index, serializer.deserialize(serializer.createObject(o), reader, provider));
 			ch = reader.readIgnoreWhitespace();
 			if (ch == '}') {
 				return o;

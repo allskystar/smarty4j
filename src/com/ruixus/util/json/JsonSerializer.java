@@ -10,6 +10,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -102,7 +103,7 @@ public class JsonSerializer {
 		cb.flush();
 		freeBuffer(cb);
 	}
-	
+
 	public Object deserialize(Reader reader, Class<?> cc) throws Exception {
 		Serializer serializer = provider.getSerializer(cc);
 		JsonReader jsonReader = getReader();
@@ -210,6 +211,21 @@ public class JsonSerializer {
 		mv.visitMethodInsn(INVOKESTATIC, mapperName.replace('.', '/'), "$serialize",
 				"(L" + className + ";L" + SimpleCharBuffer.NAME + ";L" + Provider.NAME + ";)V");
 		mv.visitInsn(RETURN);
+		mv.visitMaxs(0, 0);
+		mv.visitEnd();
+
+		mv = cw.visitMethod(ACC_PUBLIC, "createObject", "(Ljava/lang/Object;)Ljava/lang/Object;", null, null);
+		mv.visitTypeInsn(NEW, className);
+		mv.visitInsn(DUP);
+		Constructor<?> constructor = clazz.getConstructors()[0];
+		if (constructor.getParameterTypes().length == 0) {
+			mv.visitMethodInsn(INVOKESPECIAL, className, "<init>", "()V");
+		} else {
+			mv.visitVarInsn(ALOAD, 1);
+			mv.visitTypeInsn(CHECKCAST, className.substring(0, className.lastIndexOf('$')));
+			mv.visitMethodInsn(INVOKESPECIAL, className, "<init>", "(L" + className.substring(0, className.lastIndexOf('$')) + ";)V");
+		}
+		mv.visitInsn(ARETURN);
 		mv.visitMaxs(0, 0);
 		mv.visitEnd();
 

@@ -17,7 +17,7 @@ public class FloatSerializer implements Serializer {
 	}
 
 	@Override
-	public Object createObject(Object parent, Class<?> cc) {
+	public Object createObject(Object parent) {
 		return null;
 	}
 
