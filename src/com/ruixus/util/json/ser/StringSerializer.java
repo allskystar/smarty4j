@@ -18,7 +18,6 @@ public class StringSerializer implements Serializer {
 
 	@Override
 	public Object deserialize(Class<?> cc, JsonReader reader, Provider provider) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return reader.readString();
 	}
 }

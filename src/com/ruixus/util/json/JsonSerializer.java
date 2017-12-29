@@ -456,37 +456,39 @@ public class JsonSerializer {
 		Label defaultSet = new Label();
 		Label[] switchSet = new Label[size];
 
-		for (int i = 0; i < size; i++) {
-			switchGet[i] = new Label();
-			switchSet[i] = new Label();
-		}
+		if (size > 0) {
+			for (int i = 0; i < size; i++) {
+				switchGet[i] = new Label();
+				switchSet[i] = new Label();
+			}
 
-		mvGet.visitVarInsn(ILOAD, 1);
-		mvGet.visitTableSwitchInsn(0, size - 1, defaultGet, switchGet);
-		mvSet.visitVarInsn(ILOAD, 2);
-		mvSet.visitTableSwitchInsn(0, size - 1, defaultSet, switchSet);
+			mvGet.visitVarInsn(ILOAD, 1);
+			mvGet.visitTableSwitchInsn(0, size - 1, defaultGet, switchGet);
+			mvSet.visitVarInsn(ILOAD, 2);
+			mvSet.visitTableSwitchInsn(0, size - 1, defaultSet, switchSet);
 
-		int i = 0;
-		for (Map.Entry<String, Object> name : names.entrySet()) {
-			Method accessor = (Method) name.getValue();
-			name.setValue(i);
+			int i = 0;
+			for (Map.Entry<String, Object> name : names.entrySet()) {
+				Method accessor = (Method) name.getValue();
+				name.setValue(i);
 
-			Class<?> type = accessor.getParameterTypes()[0];
-			String typeName = type.getName().replace('.', '/');
+				Class<?> type = accessor.getParameterTypes()[0];
+				String typeName = type.getName().replace('.', '/');
 
-			mvGet.visitLabel(switchGet[i]);
-			mvGet.visitLdcInsn(org.objectweb.asm.Type.getType(type));
-			mvGet.visitInsn(ARETURN);
+				mvGet.visitLabel(switchGet[i]);
+				mvGet.visitLdcInsn(org.objectweb.asm.Type.getType(type));
+				mvGet.visitInsn(ARETURN);
 
-			mvSet.visitLabel(switchSet[i]);
-			mvSet.visitVarInsn(ALOAD, 1);
-			mvSet.visitTypeInsn(CHECKCAST, className);
-			mvSet.visitVarInsn(ALOAD, 3);
-			mvSet.visitTypeInsn(CHECKCAST, typeName);
-			mvSet.visitMethodInsn(INVOKEVIRTUAL, className, accessor.getName(), "(L" + typeName + ";)V");
-			mvSet.visitInsn(RETURN);
+				mvSet.visitLabel(switchSet[i]);
+				mvSet.visitVarInsn(ALOAD, 1);
+				mvSet.visitTypeInsn(CHECKCAST, className);
+				mvSet.visitVarInsn(ALOAD, 3);
+				mvSet.visitTypeInsn(CHECKCAST, typeName);
+				mvSet.visitMethodInsn(INVOKEVIRTUAL, className, accessor.getName(), "(L" + typeName + ";)V");
+				mvSet.visitInsn(RETURN);
 
-			i++;
+				i++;
+			}
 		}
 
 		mvGet.visitLabel(defaultGet);

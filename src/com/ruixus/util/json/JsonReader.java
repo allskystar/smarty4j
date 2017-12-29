@@ -7,6 +7,39 @@ import com.ruixus.util.SimpleCharBuffer;
 
 public class JsonReader extends Reader {
 
+	private static final int WHITESPACE = 1;
+	private static final int NUMBER = 2;
+	private static int[] codeTypes = new int[128];
+	private static int[] escCodes = new int[128];
+	private static int[] codeValues = new int[128];
+
+	static {
+		for (int i = '0'; i <= '9'; i++) {
+			codeTypes[i] = NUMBER;
+
+			codeValues[i] = i - '0';
+		}
+		codeTypes['.'] = NUMBER;
+		codeTypes['-'] = NUMBER;
+		codeTypes['\t'] = WHITESPACE;
+		codeTypes['\n'] = WHITESPACE;
+		codeTypes['\r'] = WHITESPACE;
+		codeTypes[' '] = WHITESPACE;
+
+		escCodes['b'] = '\b';
+		escCodes['n'] = '\n';
+		escCodes['r'] = '\r';
+		escCodes['t'] = '\t';
+		escCodes['f'] = '\f';
+
+		codeValues['a'] = codeValues['A'] = 10;
+		codeValues['b'] = codeValues['B'] = 11;
+		codeValues['c'] = codeValues['C'] = 12;
+		codeValues['d'] = codeValues['D'] = 13;
+		codeValues['e'] = codeValues['E'] = 14;
+		codeValues['f'] = codeValues['F'] = 15;
+	}
+
 	private SimpleCharBuffer buf = new SimpleCharBuffer(128);
 
 	/** 文本输入流数据来源 */
@@ -25,7 +58,7 @@ public class JsonReader extends Reader {
 	 * 建立缓冲文本输入对象。
 	 * 
 	 * @param in
-	 *          文本输入对象
+	 *            文本输入对象
 	 */
 	public void bind(Reader in) {
 		this.in = in;
@@ -37,39 +70,65 @@ public class JsonReader extends Reader {
 		nextChar--;
 	}
 
+	public int readIgnoreWhitespace() throws IOException {
+		while (true) {
+			int ch = read();
+			if (ch < 128 && codeTypes[ch] != WHITESPACE) {
+				return ch;
+			}
+		}
+	}
+
 	public String readNumber() throws IOException {
-		int ch = read();
-		int i = nextChar - 1;
+		readIgnoreWhitespace();
+		unread();
 		if (nextChar > 8000) {
 			fill();
 		}
+		int i = nextChar;
 		while (true) {
-			ch = cb[nextChar++];
-			if ((ch < '0' || ch > '9') && ch != '.') {
-				nextChar--;
-				return new String(cb, i, nextChar - i);
+			if (i >= nChars) {
+				i = nChars - nextChar + 1;
+				fill();
+				if (i >= nChars) {
+					// TODO json格式错误
+					throw new NullPointerException();
+				}
 			}
+			int c = cb[i];
+			if (c < 128 && codeTypes[c] != NUMBER) {
+				String ret = new String(cb, nextChar, i - nextChar);
+				nextChar = i;
+				return ret;
+			}
+			i++;
 		}
 	}
 
 	public String readString() throws IOException {
 		buf.setLength(0);
-		if (read() != '"') {
-			//TODO 异常
+		if (readIgnoreWhitespace() != '"') {
+			// TODO 异常
 			throw new NullPointerException();
 		}
+		int i = nextChar;
 		while (true) {
 			int ch = read();
-			if (ch == -1) {
-				//TODO 异常
-				throw new NullPointerException();
-			}
 			if (ch == '"') {
 				return buf.toString();
 			}
 			if (ch == '\\') {
-				//TODO 转义，回头再处理
-				throw new NullPointerException();
+				ch = read();
+				if (ch == 'u') {
+					ch = codeValues[read()] * 16 * 16 * 16 + codeValues[read()] * 16 * 16 + codeValues[read()] * 16
+							+ codeValues[read()];
+				} else {
+					ch = escCodes[ch];
+					if (ch == 0) {
+						// TODO json格式错误
+						throw new NullPointerException();
+					}
+				}
 			}
 			buf.append((char) ch);
 		}
@@ -77,18 +136,14 @@ public class JsonReader extends Reader {
 
 	@Override
 	public int read() throws IOException {
-		while (true) {
+		if (nextChar >= nChars) {
+			fill();
 			if (nextChar >= nChars) {
-				fill();
-				if (nextChar >= nChars) {
-					return -1;
-				}
-			}
-			int ch = cb[nextChar++];
-			if (!Character.isWhitespace(ch)) {
-				return ch;
+				// TODO 异常
+				throw new NullPointerException();
 			}
 		}
+		return cb[nextChar++];
 	}
 
 	@Override
@@ -152,12 +207,12 @@ public class JsonReader extends Reader {
 	 * 向文本缓冲区内填充数据。
 	 * 
 	 * @throws IOException
-	 *           数据读取产生异常
+	 *             数据读取产生异常
 	 */
 	private void fill() throws IOException {
 		int len = nChars - nextChar + 1;
 		if (nextChar > 0) {
-			System.arraycopy(cb, nextChar - 1, cb, 0, len + 1);
+			System.arraycopy(cb, nextChar - 1, cb, 0, len);
 		}
 		int n;
 		do {

@@ -34,13 +34,13 @@ public abstract class AbstractBeanSerializer implements Serializer {
 		while (true) {
 			int index = idxNames.get(reader.readString()).intValue();
 			Class<?> type = getType(index);
-			if (reader.read() != ':') {
+			if (reader.readIgnoreWhitespace() != ':') {
 				//TODO 异常
 				throw new NullPointerException();
 			}
 			Object value = provider.getSerializer(type).deserialize(type, reader, provider);
 			setValue(o, index, value);
-			ch = reader.read();
+			ch = reader.readIgnoreWhitespace();
 			if (ch == '}') {
 				return o;
 			}
