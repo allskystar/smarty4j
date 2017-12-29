@@ -102,7 +102,7 @@ public class JsonSerializer {
 		cb.flush();
 		freeBuffer(cb);
 	}
-
+	
 	public Object deserialize(Reader reader, Class<?> cc) throws Exception {
 		Serializer serializer = provider.getSerializer(cc);
 		JsonReader jsonReader = getReader();
@@ -111,7 +111,7 @@ public class JsonSerializer {
 		if (ch == '[') {
 			List<Object> list = new ArrayList<Object>();
 			while (true) {
-				list.add(serializer.deserialize(cc, jsonReader, provider));
+				list.add(serializer.deserialize(cc.newInstance(), jsonReader, provider));
 				ch = jsonReader.read();
 				if (ch == ']') {
 					break;
@@ -124,7 +124,7 @@ public class JsonSerializer {
 			return list;
 		}
 		jsonReader.unread();
-		Object value = serializer.deserialize(cc, jsonReader, provider);
+		Object value = serializer.deserialize(cc.newInstance(), jsonReader, provider);
 		freeReader(jsonReader);
 		return value;
 	}

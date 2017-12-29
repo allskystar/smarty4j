@@ -9,5 +9,7 @@ public interface Serializer {
 
 	public void serialize(Object o, SimpleCharBuffer cb, Provider provider);
 
-	public Object deserialize(Class<?> cc, JsonReader reader, Provider provider) throws Exception;
+	public Object createObject(Object parent, Class<?> cc) throws Exception;
+
+	public Object deserialize(Object o, JsonReader reader, Provider provider) throws Exception;
 }

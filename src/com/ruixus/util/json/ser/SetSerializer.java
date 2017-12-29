@@ -46,7 +46,12 @@ public class SetSerializer implements Serializer, Generic {
 	}
 
 	@Override
-	public Object deserialize(Class<?> cc, JsonReader reader, Provider provider) throws IOException {
+	public Object createObject(Object parent, Class<?> cc) {
+		return null;
+	}
+
+	@Override
+	public Object deserialize(Object o, JsonReader reader, Provider provider) throws IOException {
 		// TODO Auto-generated method stub
 		return null;
 	}

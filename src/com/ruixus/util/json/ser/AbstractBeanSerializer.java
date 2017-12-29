@@ -1,5 +1,6 @@
 package com.ruixus.util.json.ser;
 
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,7 +11,7 @@ public abstract class AbstractBeanSerializer implements Serializer {
 	public static final String NAME = AbstractBeanSerializer.class.getName().replace('.', '/');
 
 	private Map<String, Integer> idxNames = new HashMap<String, Integer>();
-	
+
 	public abstract Class<?> getType(int index);
 
 	public abstract void setValue(Object o, int index, Object value);
@@ -18,12 +19,18 @@ public abstract class AbstractBeanSerializer implements Serializer {
 	public void setNameIndex(String name, int index) {
 		idxNames.put(name, index);
 	}
-	
+
 	@Override
-	public Object deserialize(Class<?> cc, JsonReader reader, Provider provider) throws Exception {
-		Object o = cc.newInstance();
+	public Object createObject(Object parent, Class<?> cc) throws Exception {
+		Constructor<?> constructor = cc.getConstructors()[0];
+		return constructor.getParameterTypes().length == 0 ? constructor.newInstance()
+				: constructor.newInstance(parent);
+	}
+
+	@Override
+	public Object deserialize(Object o, JsonReader reader, Provider provider) throws Exception {
 		if (reader.read() != '{') {
-			//TODO 异常
+			// TODO 异常
 			throw new NullPointerException();
 		}
 		int ch = reader.read();
@@ -35,17 +42,18 @@ public abstract class AbstractBeanSerializer implements Serializer {
 			int index = idxNames.get(reader.readString()).intValue();
 			Class<?> type = getType(index);
 			if (reader.readIgnoreWhitespace() != ':') {
-				//TODO 异常
+				// TODO 异常
 				throw new NullPointerException();
 			}
-			Object value = provider.getSerializer(type).deserialize(type, reader, provider);
-			setValue(o, index, value);
+
+			Serializer serializer = provider.getSerializer(type);
+			setValue(o, index, serializer.deserialize(serializer.createObject(o, type), reader, provider));
 			ch = reader.readIgnoreWhitespace();
 			if (ch == '}') {
 				return o;
 			}
 			if (ch != ',') {
-				//TODO
+				// TODO
 				throw new NullPointerException();
 			}
 		}
