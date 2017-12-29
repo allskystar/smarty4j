@@ -141,6 +141,10 @@ public class SimpleCharBuffer {
 	}
 
 	public void append(int i) {
+		if (i == Integer.MIN_VALUE) {
+			append("-2147483648");
+			return;
+		}
 		int capacity = off + ((i < 0) ? stringSize(-i) + 1 : stringSize(i));
 		ensureCapacityInternal(capacity);
 		off = capacity;
@@ -148,6 +152,10 @@ public class SimpleCharBuffer {
 	}
 
 	public void append(long l) {
+		if (l == Long.MIN_VALUE) {
+			append("-9223372036854775808");
+			return;
+		}
 		int capacity = off + ((l < 0) ? stringSize(-l) + 1 : stringSize(l));
 		ensureCapacityInternal(capacity);
 		off = capacity;
