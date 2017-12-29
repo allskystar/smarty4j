@@ -93,7 +93,7 @@ public class JsonReader extends Reader {
 			ch -= '0';
 			if (value > 0) {
 				long test = Long.MAX_VALUE / value;
-				if (test < 10 || (test == 10 && Long.MAX_VALUE % value < ch)) {
+				if (test < 10 || (test == 10 && Long.MAX_VALUE % value < ch - (sign ? 1 : 0))) {
 					// 数值超出范围
 					throw new NullPointerException();
 				}
@@ -117,7 +117,7 @@ public class JsonReader extends Reader {
 			ch -= '0';
 			if (value > 0) {
 				int test = Integer.MAX_VALUE / value;
-				if (test < 10 || (test == 10 && Integer.MAX_VALUE % value < ch)) {
+				if (test < 10 || (test == 10 && Integer.MAX_VALUE % value < ch - (sign ? 1 : 0))) {
 					// 数值超出范围
 					throw new NullPointerException();
 				}

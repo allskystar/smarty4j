@@ -30,19 +30,17 @@ import com.ruixus.util.json.ser.Generic;
 import com.ruixus.util.json.ser.Serializer;
 
 public class JsonSerializer {
-	private static class ObjectMapper extends ClassLoader {
-		private static final ObjectMapper loader = new ObjectMapper();
+	private static final String NAME = JsonSerializer.class.getName().replace('.', '/');
+	private static Method defineClass;
 
-		private ObjectMapper() {
-			super(ObjectMapper.class.getClassLoader());
-		}
-
-		static Class<?> defineClass(String name, byte[] code) {
-			return loader.defineClass(name, code, 0, code.length);
+	static {
+		try {
+			defineClass = ClassLoader.class.getDeclaredMethod("defineClass", String.class, byte[].class, int.class,
+					int.class);
+			defineClass.setAccessible(true);
+		} catch (Exception ex) {
 		}
 	}
-
-	private static final String NAME = JsonSerializer.class.getName().replace('.', '/');
 
 	private SimpleStack cbRecycler = new SimpleStack();
 	private SimpleStack jrRecycler = new SimpleStack();
@@ -183,7 +181,7 @@ public class JsonSerializer {
 
 	public static Serializer createSerializer(Class<?> clazz, Provider provider) {
 		String className = clazz.getName().replace('.', '/');
-		String mapperName = Serializer.class.getName() + "$" + clazz.getName().replace('.', '$');
+		String mapperName = className + "$" + clazz.getName().replace('.', '$');
 		Include classJsonInclude;
 		{
 			JsonInclude anno = clazz.getAnnotation(JsonInclude.class);
@@ -507,8 +505,8 @@ public class JsonSerializer {
 
 		byte[] code = cw.toByteArray();
 		try {
-			AbstractBeanSerializer serializer = (AbstractBeanSerializer) ObjectMapper.defineClass(mapperName, code)
-					.newInstance();
+			AbstractBeanSerializer serializer = (AbstractBeanSerializer) ((Class<?>) defineClass
+					.invoke(clazz.getClassLoader(), mapperName, code, 0, code.length)).newInstance();
 			for (Map.Entry<String, Object> name : names.entrySet()) {
 				serializer.setNameIndex(name.getKey(), (Integer) name.getValue());
 			}
