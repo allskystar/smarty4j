@@ -18,6 +18,6 @@ public class ShortSerializer implements Serializer {
 
 	@Override
 	public Object deserialize(Class<?> cc, JsonReader reader, Provider provider) throws IOException {
-		return Short.valueOf(reader.readNumber());
+		return Short.valueOf((short) reader.readInteger());
 	}
 }

@@ -26,6 +26,8 @@ public class JsonReader extends Reader {
 		codeTypes['\r'] = WHITESPACE;
 		codeTypes[' '] = WHITESPACE;
 
+		escCodes['\\'] = '\\';
+		escCodes['"'] = '"';
 		escCodes['b'] = '\b';
 		escCodes['n'] = '\n';
 		escCodes['r'] = '\r';
@@ -79,6 +81,54 @@ public class JsonReader extends Reader {
 		}
 	}
 
+	public long readLong() throws IOException {
+		long value = 0;
+		boolean sign = false;
+		int ch = readIgnoreWhitespace();
+		if (ch == '-') {
+			sign = true;
+			ch = read();
+		}
+		while (ch >= '0' && ch <= '9') {
+			ch -= '0';
+			if (value > 0) {
+				long test = Long.MAX_VALUE / value;
+				if (test < 10 || (test == 10 && Long.MAX_VALUE % value < ch)) {
+					// 数值超出范围
+					throw new NullPointerException();
+				}
+			}
+			value = value * 10 + ch;
+			ch = read();
+		}
+		unread();
+		return sign ? -value : value;
+	}
+
+	public int readInteger() throws IOException {
+		int value = 0;
+		boolean sign = false;
+		int ch = readIgnoreWhitespace();
+		if (ch == '-') {
+			sign = true;
+			ch = read();
+		}
+		while (ch >= '0' && ch <= '9') {
+			ch -= '0';
+			if (value > 0) {
+				int test = Integer.MAX_VALUE / value;
+				if (test < 10 || (test == 10 && Integer.MAX_VALUE % value < ch)) {
+					// 数值超出范围
+					throw new NullPointerException();
+				}
+			}
+			value = value * 10 + ch;
+			ch = read();
+		}
+		unread();
+		return sign ? -value : value;
+	}
+
 	public String readNumber() throws IOException {
 		readIgnoreWhitespace();
 		unread();
@@ -111,7 +161,6 @@ public class JsonReader extends Reader {
 			// TODO 异常
 			throw new NullPointerException();
 		}
-		int i = nextChar;
 		while (true) {
 			int ch = read();
 			if (ch == '"') {

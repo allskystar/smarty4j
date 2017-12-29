@@ -122,6 +122,7 @@ public class JsonSerializer {
 					// TODO 出错
 				}
 			}
+			freeReader(jsonReader);
 			return list;
 		}
 		jsonReader.unread();

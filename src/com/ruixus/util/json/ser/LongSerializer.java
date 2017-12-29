@@ -18,6 +18,6 @@ public class LongSerializer implements Serializer {
 
 	@Override
 	public Object deserialize(Class<?> cc, JsonReader reader, Provider provider) throws IOException {
-		return Long.valueOf(reader.readNumber());
+		return Long.valueOf(reader.readLong());
 	}
 }

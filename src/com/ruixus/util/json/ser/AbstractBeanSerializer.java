@@ -50,16 +50,4 @@ public abstract class AbstractBeanSerializer implements Serializer {
 			}
 		}
 	}
-	
-	public Object test() {
-		int c = 5;
-		switch (c) {
-		case 0:
-			return new Integer(10);
-		case 1:
-			return new Integer(8);
-		default:
-			return null;
-		}
-	}
 }

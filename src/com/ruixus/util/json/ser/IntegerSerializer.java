@@ -18,6 +18,6 @@ public class IntegerSerializer implements Serializer {
 
 	@Override
 	public Object deserialize(Class<?> cc, JsonReader reader, Provider provider) throws IOException {
-		return Integer.valueOf(reader.readNumber());
+		return Integer.valueOf(reader.readInteger());
 	}
 }
