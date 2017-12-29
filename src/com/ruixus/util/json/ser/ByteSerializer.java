@@ -23,6 +23,11 @@ public class ByteSerializer implements Serializer {
 
 	@Override
 	public Object deserialize(Object o, JsonReader reader, Provider provider) throws IOException {
-		return Byte.valueOf(reader.readNumber());
+		int value = reader.readInteger();
+		if (value > Byte.MAX_VALUE || value < Byte.MIN_VALUE) {
+			// TODO json数据错误
+			throw new NullPointerException();
+		}
+		return Byte.valueOf((byte) value);
 	}
 }

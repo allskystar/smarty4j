@@ -23,6 +23,11 @@ public class ShortSerializer implements Serializer {
 
 	@Override
 	public Object deserialize(Object o, JsonReader reader, Provider provider) throws IOException {
-		return Short.valueOf((short) reader.readInteger());
+		int value = reader.readInteger();
+		if (value > Short.MAX_VALUE || value < Short.MIN_VALUE) {
+			// TODO json数据错误
+			throw new NullPointerException();
+		}
+		return Short.valueOf((short) value);
 	}
 }

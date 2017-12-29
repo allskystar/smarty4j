@@ -221,9 +221,10 @@ public class JsonSerializer {
 		if (constructor.getParameterTypes().length == 0) {
 			mv.visitMethodInsn(INVOKESPECIAL, className, "<init>", "()V");
 		} else {
+			String name = constructor.getParameterTypes()[0].getName().replace('.', '/');
 			mv.visitVarInsn(ALOAD, 1);
-			mv.visitTypeInsn(CHECKCAST, className.substring(0, className.lastIndexOf('$')));
-			mv.visitMethodInsn(INVOKESPECIAL, className, "<init>", "(L" + className.substring(0, className.lastIndexOf('$')) + ";)V");
+			mv.visitTypeInsn(CHECKCAST, name);
+			mv.visitMethodInsn(INVOKESPECIAL, className, "<init>", "(L" + name + ";)V");
 		}
 		mv.visitInsn(ARETURN);
 		mv.visitMaxs(0, 0);

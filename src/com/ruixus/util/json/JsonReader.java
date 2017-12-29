@@ -90,15 +90,18 @@ public class JsonReader extends Reader {
 			ch = read();
 		}
 		while (ch >= '0' && ch <= '9') {
-			ch -= '0';
-			if (value > 0) {
-				long test = Long.MAX_VALUE / value;
-				if (test < 10 || (test == 10 && Long.MAX_VALUE % value < ch - (sign ? 1 : 0))) {
-					// 数值超出范围
+			if (value > 922337203685477580L) {
+				// TODO 数值超出范围
+				throw new NullPointerException();
+			} else if (value == 922337203685477580L) {
+				if (sign && ch == '8') {
+					return Long.MIN_VALUE;
+				} else if (ch > '7') {
+					// TODO 数值超出范围
 					throw new NullPointerException();
 				}
 			}
-			value = value * 10 + ch;
+			value = value * 10 + ch - '0';
 			ch = read();
 		}
 		unread();
@@ -114,15 +117,18 @@ public class JsonReader extends Reader {
 			ch = read();
 		}
 		while (ch >= '0' && ch <= '9') {
-			ch -= '0';
-			if (value > 0) {
-				int test = Integer.MAX_VALUE / value;
-				if (test < 10 || (test == 10 && Integer.MAX_VALUE % value < ch - (sign ? 1 : 0))) {
-					// 数值超出范围
+			if (value > 214748364) {
+				// TODO 数值超出范围
+				throw new NullPointerException();
+			} else if (value == 214748364) {
+				if (sign && ch == '8') {
+					return Integer.MIN_VALUE;
+				} else if (ch > '7') {
+					// TODO 数值超出范围
 					throw new NullPointerException();
 				}
 			}
-			value = value * 10 + ch;
+			value = value * 10 + ch - '0';
 			ch = read();
 		}
 		unread();
