@@ -62,6 +62,10 @@ public class ListSerializer implements Serializer, Generic {
 			throw new NullPointerException();
 		}
 		List<Object> list = new ArrayList<Object>();
+		if (reader.readIgnoreWhitespace() == ']') {
+			return list;
+		}
+		reader.unread();
 		while (true) {
 			if (generic instanceof Class) {
 				Serializer serializer = provider.getSerializer((Class<?>) generic);
@@ -80,10 +84,9 @@ public class ListSerializer implements Serializer, Generic {
 				if (ch == '{') {
 					list.add(mapSerializer.deserialize(mapSerializer.createObject(o), reader, provider));
 				} else if (ch == '[') {
-					list.add(this.deserialize(this.createObject(o), reader, provider));
+					list.add(deserialize(createObject(o), reader, provider));
 				} else {
-					// TODO 出错
-					throw new NullPointerException();
+					list.add(reader.readObject());
 				}
 			}
 			int ch = reader.readIgnoreWhitespace();

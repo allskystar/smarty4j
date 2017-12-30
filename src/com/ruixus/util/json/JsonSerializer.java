@@ -89,6 +89,10 @@ public class JsonSerializer {
 		jsonReader.bind(reader);
 		if (jsonReader.readIgnoreWhitespace() == '[') {
 			List<Object> list = new ArrayList<Object>();
+			if (jsonReader.readIgnoreWhitespace() == ']') {
+				return list;
+			}
+			jsonReader.unread();
 			while (true) {
 				list.add(serializer.deserialize(serializer.createObject(null), jsonReader, provider));
 				int ch = jsonReader.readIgnoreWhitespace();

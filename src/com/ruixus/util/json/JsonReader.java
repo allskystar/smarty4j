@@ -15,6 +15,9 @@ public class JsonReader extends Reader {
 	private static int[] codeValues = new int[128];
 
 	static {
+		for (int i = 0; i < 128; i++) {
+			codeValues[i] = -1;
+		}
 		for (int i = '0'; i <= '9'; i++) {
 			codeTypes[i] = NUMBER;
 
@@ -102,6 +105,12 @@ public class JsonReader extends Reader {
 				throw new NullPointerException();
 			} else if (value == 922337203685477580L) {
 				if (sign && ch == '8') {
+					ch = read();
+					if (ch >= '0' && ch <= '9') {
+						// TODO 数字格式不合法
+						throw new NullPointerException();
+					}
+					unread();
 					return Long.MIN_VALUE;
 				} else if (ch > '7') {
 					// TODO 数值超出范围
@@ -129,6 +138,12 @@ public class JsonReader extends Reader {
 				throw new NullPointerException();
 			} else if (value == 214748364) {
 				if (sign && ch == '8') {
+					ch = read();
+					if (ch >= '0' && ch <= '9') {
+						// TODO 数字格式不合法
+						throw new NullPointerException();
+					}
+					unread();
 					return Integer.MIN_VALUE;
 				} else if (ch > '7') {
 					// TODO 数值超出范围
@@ -183,9 +198,20 @@ public class JsonReader extends Reader {
 			if (ch == '\\') {
 				ch = read();
 				if (ch == 'u') {
-					ch = codeValues[read()] * 16 * 16 * 16 + codeValues[read()] * 16 * 16 + codeValues[read()] * 16
-							+ codeValues[read()];
+					ch = 0;
+					for (int i = 0; i < 4; i++) {
+						int c = read();
+						if (c >= 128 || codeValues[c] < 0) {
+							// TODO 格式错误
+							throw new NullPointerException();
+						}
+						ch = ch * 16 + c;
+					}
 				} else {
+					if (ch >= 128) {
+						// TODO 格式错误
+						throw new NullPointerException();
+					}
 					ch = escCodes[ch];
 					if (ch == 0) {
 						// TODO json格式错误
@@ -195,6 +221,37 @@ public class JsonReader extends Reader {
 			}
 			buf.append((char) ch);
 		}
+	}
+
+	public Object readObject() throws IOException {
+		int ch = readIgnoreWhitespace();
+		if (ch >= 128) {
+			// TODO json格式错误
+			throw new NullPointerException();
+		}
+		unread();
+		if (ch == '"') {
+			return readString();
+		}
+		ch = codeTypes[ch];
+		if (ch == NUMBER) {
+			String s = readConst(true);
+			int index = s.indexOf('.');
+			if (index < 0) {
+				long v = Long.parseLong(s);
+				if (v <= Integer.MAX_VALUE && v >= Integer.MIN_VALUE) {
+					return (int) v;
+				}
+				return v;
+			}
+			if (index == s.lastIndexOf('.')) {
+				return Double.valueOf(s);
+			}
+		} else if (ch == LETTER) {
+			return Boolean.valueOf(readConst(false));
+		}
+		// TODO 格式错误
+		throw new NullPointerException();
 	}
 
 	@Override

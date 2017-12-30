@@ -1,6 +1,5 @@
 package com.ruixus.util.json.ser;
 
-import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -12,6 +11,8 @@ import com.ruixus.util.json.JsonSerializer;
 import com.ruixus.util.json.Provider;
 
 public class MapSerializer implements Serializer, Generic {
+	private static final ListSerializer listSerializer = new ListSerializer();
+	
 	public static void $serialize(Map<?, ?> o, SimpleCharBuffer cb, Provider provider,
 			Class<?> generic) {
 		Serializer serializer = provider.getSerializer(generic);
@@ -49,12 +50,12 @@ public class MapSerializer implements Serializer, Generic {
 
 	@Override
 	public Object createObject(Object parent) {
-		return new HashMap<Object, Object>();
+		return parent;
 	}
 
 	@Override
-	public Object deserialize(Object o, JsonReader reader, Provider provider) throws IOException {
-		return null;
+	public Object deserialize(Object o, JsonReader reader, Provider provider) throws Exception {
+		return deserialize(o, reader, provider, null);
 	}
 
 	@Override
@@ -66,8 +67,53 @@ public class MapSerializer implements Serializer, Generic {
 	}
 
 	@Override
-	public Object deserialize(Object o, JsonReader reader, Provider provider, Type generic) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+	public Object deserialize(Object o, JsonReader reader, Provider provider, Type generic) throws Exception {
+		if (reader.readIgnoreWhitespace() != '{') {
+			// TODO 出错
+			throw new NullPointerException();
+		}
+		Map<String, Object> map = new HashMap<String, Object>();
+		if (reader.readIgnoreWhitespace() == '}') {
+			return map;
+		}
+		reader.unread();
+		while (true) {
+			String name = reader.readString();
+			if (reader.readIgnoreWhitespace() != ':') {
+				// TODO 异常
+				throw new NullPointerException();
+			}
+			if (generic instanceof Class) {
+				Serializer serializer = provider.getSerializer((Class<?>) generic);
+				map.put(name, serializer.deserialize(serializer.createObject(o), reader, provider));
+			} else if (generic instanceof ParameterizedType) {
+				Serializer serializer = provider.getSerializer((Class<?>) ((ParameterizedType) generic).getRawType());
+				if (serializer instanceof Generic) {
+					map.put(name, ((Generic) serializer).deserialize(serializer.createObject(o), reader, provider,
+							((Generic) serializer).getGeneric(generic)));
+				} else {
+					map.put(name, serializer.deserialize(serializer.createObject(o), reader, provider));
+				}
+			} else {
+				int ch = reader.readIgnoreWhitespace();
+				reader.unread();
+				if (ch == '{') {
+					map.put(name, deserialize(createObject(o), reader, provider));
+				} else if (ch == '[') {
+					map.put(name, listSerializer.deserialize(listSerializer.createObject(o), reader, provider));
+				} else {
+					map.put(name, reader.readObject());
+				}
+			}
+			int ch = reader.readIgnoreWhitespace();
+			if (ch == '}') {
+				break;
+			}
+			if (ch != ',') {
+				// TODO 出错
+				throw new NullPointerException();
+			}
+		}
+		return map;
 	}
 }
