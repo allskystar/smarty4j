@@ -24,15 +24,20 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
 import com.ruixus.util.SimpleCharBuffer;
-import com.ruixus.util.SimpleStack;
 import com.ruixus.util.json.JsonInclude.Include;
 import com.ruixus.util.json.ser.AbstractBeanSerializer;
 import com.ruixus.util.json.ser.Generic;
 import com.ruixus.util.json.ser.Serializer;
 
 public class JsonSerializer {
+	private static class Recycler {
+		private SimpleCharBuffer cb = new SimpleCharBuffer(4000);
+		private JsonReader jr = new JsonReader();
+	}
+
 	private static final String NAME = JsonSerializer.class.getName().replace('.', '/');
 	private static Method defineClass;
+	private static final ThreadLocal<Recycler> threadLocal = new ThreadLocal<Recycler>();
 
 	static {
 		try {
@@ -43,8 +48,6 @@ public class JsonSerializer {
 		}
 	}
 
-	private SimpleStack cbRecycler = new SimpleStack();
-	private SimpleStack jrRecycler = new SimpleStack();
 	private Provider provider;
 
 	public JsonSerializer() {
@@ -55,58 +58,33 @@ public class JsonSerializer {
 		this.provider = provider;
 	}
 
-	private SimpleCharBuffer getBuffer() {
-		synchronized (cbRecycler) {
-			if (cbRecycler.size() > 0) {
-				return (SimpleCharBuffer) cbRecycler.pop();
-			} else {
-				return new SimpleCharBuffer(4000);
-			}
+	private Recycler getRecycler() {
+		Recycler recycler = threadLocal.get();
+		if (recycler == null) {
+			recycler = new Recycler();
+			threadLocal.set(recycler);
 		}
-	}
-
-	private void freeBuffer(SimpleCharBuffer cb) {
-		synchronized (cbRecycler) {
-			cbRecycler.push(cb);
-		}
-	}
-
-	private JsonReader getReader() {
-		synchronized (jrRecycler) {
-			if (jrRecycler.size() > 0) {
-				return (JsonReader) jrRecycler.pop();
-			} else {
-				return new JsonReader();
-			}
-		}
-	}
-
-	private void freeReader(JsonReader cb) {
-		synchronized (jrRecycler) {
-			jrRecycler.push(cb);
-		}
+		return recycler;
 	}
 
 	public String serialize(Object o) {
-		SimpleCharBuffer cb = getBuffer();
+		SimpleCharBuffer cb = getRecycler().cb;
 		serializeValue(o, cb, provider);
 		String ret = cb.toString();
 		cb.setLength(0);
-		freeBuffer(cb);
 		return ret;
 	}
 
 	public void serialize(Writer writer, Object o) throws IOException {
-		SimpleCharBuffer cb = getBuffer();
+		SimpleCharBuffer cb = getRecycler().cb;
 		cb.setWriter(writer);
 		serializeValue(o, cb, provider);
 		cb.flush();
-		freeBuffer(cb);
 	}
 
 	public Object deserialize(Reader reader, Class<?> cc) throws Exception {
 		Serializer serializer = provider.getSerializer(cc);
-		JsonReader jsonReader = getReader();
+		JsonReader jsonReader = getRecycler().jr;
 		jsonReader.bind(reader);
 		int ch = jsonReader.read();
 		if (ch == '[') {
@@ -121,12 +99,10 @@ public class JsonSerializer {
 					// TODO 出错
 				}
 			}
-			freeReader(jsonReader);
 			return list;
 		}
 		jsonReader.unread();
 		Object value = serializer.deserialize(cc.newInstance(), jsonReader, provider);
-		freeReader(jsonReader);
 		return value;
 	}
 
