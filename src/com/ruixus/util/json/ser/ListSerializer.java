@@ -11,6 +11,8 @@ import com.ruixus.util.json.JsonSerializer;
 import com.ruixus.util.json.Provider;
 
 public class ListSerializer implements Serializer, Generic {
+	private static final MapSerializer mapSerializer = new MapSerializer();
+	
 	public static void $serialize(List<?> o, SimpleCharBuffer cb, Provider provider, Class<?> generic) {
 		Serializer serializer = provider.getSerializer(generic);
 		cb.append('[');
@@ -61,12 +63,30 @@ public class ListSerializer implements Serializer, Generic {
 		}
 		List<Object> list = new ArrayList<Object>();
 		while (true) {
-			Serializer serializer = null;
 			if (generic instanceof Class) {
-				serializer = provider.getSerializer((Class<?>) generic);
+				Serializer serializer = provider.getSerializer((Class<?>) generic);
+				list.add(serializer.deserialize(serializer.createObject(o), reader, provider));
+			} else if (generic instanceof ParameterizedType) {
+				Serializer serializer = provider.getSerializer((Class<?>) ((ParameterizedType) generic).getRawType());
+				if (serializer instanceof Generic) {
+					list.add(((Generic) serializer).deserialize(serializer.createObject(o), reader, provider,
+							((Generic) serializer).getGeneric(generic)));
+				} else {
+					list.add(serializer.deserialize(serializer.createObject(o), reader, provider));
+				}
+			} else {
+				int ch = reader.readIgnoreWhitespace();
+				reader.unread();
+				if (ch == '{') {
+					list.add(mapSerializer.deserialize(mapSerializer.createObject(o), reader, provider));
+				} else if (ch == '[') {
+					list.add(this.deserialize(this.createObject(o), reader, provider));
+				} else {
+					// TODO 出错
+					throw new NullPointerException();
+				}
 			}
-			list.add(serializer.deserialize(serializer.createObject(o), reader, provider));
-			int ch = reader.read();
+			int ch = reader.readIgnoreWhitespace();
 			if (ch == ']') {
 				break;
 			}
