@@ -26,6 +26,7 @@ import org.objectweb.asm.MethodVisitor;
 import com.ruixus.util.SimpleCharBuffer;
 import com.ruixus.util.json.JsonInclude.Include;
 import com.ruixus.util.json.ser.AbstractBeanSerializer;
+import com.ruixus.util.json.ser.AbstractBeanSerializer.BeanItem;
 import com.ruixus.util.json.ser.Generic;
 import com.ruixus.util.json.ser.Serializer;
 
@@ -439,60 +440,43 @@ public class JsonSerializer {
 		mv.visitEnd();
 
 		int size = names.size();
-		MethodVisitor mvGet = cw.visitMethod(ACC_PUBLIC, "getType", "(I)Ljava/lang/Class;", null, null);
-		Label defaultGet = new Label();
-		Label[] switchGet = new Label[size];
-
-		MethodVisitor mvSet = cw.visitMethod(ACC_PUBLIC, "setValue", "(Ljava/lang/Object;ILjava/lang/Object;)V", null,
+		mv = cw.visitMethod(ACC_PUBLIC, "setValue", "(Ljava/lang/Object;ILjava/lang/Object;)V", null,
 				null);
 		Label defaultSet = new Label();
 		Label[] switchSet = new Label[size];
 
 		if (size > 0) {
 			for (int i = 0; i < size; i++) {
-				switchGet[i] = new Label();
 				switchSet[i] = new Label();
 			}
 
-			mvGet.visitVarInsn(ILOAD, 1);
-			mvGet.visitTableSwitchInsn(0, size - 1, defaultGet, switchGet);
-			mvSet.visitVarInsn(ILOAD, 2);
-			mvSet.visitTableSwitchInsn(0, size - 1, defaultSet, switchSet);
+			mv.visitVarInsn(ALOAD, 1);
+			mv.visitTypeInsn(CHECKCAST, className);
+			mv.visitVarInsn(ALOAD, 3);
+			mv.visitVarInsn(ILOAD, 2);
+			mv.visitTableSwitchInsn(0, size - 1, defaultSet, switchSet);
 
 			int i = 0;
 			for (Map.Entry<String, Object> name : names.entrySet()) {
 				Method accessor = (Method) name.getValue();
-				name.setValue(i);
-
+				
 				Class<?> type = accessor.getParameterTypes()[0];
 				String typeName = type.getName().replace('.', '/');
+				name.setValue(new BeanItem(i, provider.getSerializer(type)));
 
-				mvGet.visitLabel(switchGet[i]);
-				mvGet.visitLdcInsn(org.objectweb.asm.Type.getType(type));
-				mvGet.visitInsn(ARETURN);
-
-				mvSet.visitLabel(switchSet[i]);
-				mvSet.visitVarInsn(ALOAD, 1);
-				mvSet.visitTypeInsn(CHECKCAST, className);
-				mvSet.visitVarInsn(ALOAD, 3);
-				mvSet.visitTypeInsn(CHECKCAST, typeName);
-				mvSet.visitMethodInsn(INVOKEVIRTUAL, className, accessor.getName(), "(L" + typeName + ";)V");
-				mvSet.visitInsn(RETURN);
+				mv.visitLabel(switchSet[i]);
+				mv.visitTypeInsn(CHECKCAST, typeName);
+				mv.visitMethodInsn(INVOKEVIRTUAL, className, accessor.getName(), "(L" + typeName + ";)V");
+				mv.visitInsn(RETURN);
 
 				i++;
 			}
 		}
 
-		mvGet.visitLabel(defaultGet);
-		mvGet.visitInsn(ACONST_NULL);
-		mvGet.visitInsn(ARETURN);
-		mvGet.visitMaxs(0, 0);
-		mvGet.visitEnd();
-
-		mvSet.visitLabel(defaultSet);
-		mvSet.visitInsn(RETURN);
-		mvSet.visitMaxs(0, 0);
-		mvSet.visitEnd();
+		mv.visitLabel(defaultSet);
+		mv.visitInsn(RETURN);
+		mv.visitMaxs(0, 0);
+		mv.visitEnd();
 
 		cw.visitEnd();
 
@@ -501,7 +485,7 @@ public class JsonSerializer {
 			AbstractBeanSerializer serializer = (AbstractBeanSerializer) ((Class<?>) defineClass
 					.invoke(clazz.getClassLoader(), mapperName, code, 0, code.length)).newInstance();
 			for (Map.Entry<String, Object> name : names.entrySet()) {
-				serializer.setNameIndex(name.getKey(), (Integer) name.getValue());
+				serializer.setNameIndex(name.getKey(), (BeanItem) name.getValue());
 			}
 			return serializer;
 		} catch (Exception ex) {

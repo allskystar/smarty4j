@@ -7,16 +7,24 @@ import com.ruixus.util.json.JsonReader;
 import com.ruixus.util.json.Provider;
 
 public abstract class AbstractBeanSerializer implements Serializer {
+	public static class BeanItem {
+		private int index;
+		private Serializer serializer;
+		
+		public BeanItem(int index, Serializer serializer) {
+			this.index = index;
+			this.serializer = serializer;
+		}
+	}
+
 	public static final String NAME = AbstractBeanSerializer.class.getName().replace('.', '/');
 
-	private Map<String, Integer> idxNames = new HashMap<String, Integer>();
-
-	public abstract Class<?> getType(int index);
+	private Map<String, BeanItem> items = new HashMap<String, BeanItem>();
 
 	public abstract void setValue(Object o, int index, Object value);
 
-	public void setNameIndex(String name, int index) {
-		idxNames.put(name, index);
+	public void setNameIndex(String name, BeanItem item) {
+		items.put(name, item);
 	}
 
 	@Override
@@ -31,15 +39,13 @@ public abstract class AbstractBeanSerializer implements Serializer {
 		}
 		reader.unread();
 		while (true) {
-			int index = idxNames.get(reader.readString()).intValue();
-			Class<?> type = getType(index);
+			BeanItem item = items.get(reader.readString());
 			if (reader.readIgnoreWhitespace() != ':') {
 				// TODO 异常
 				throw new NullPointerException();
 			}
 
-			Serializer serializer = provider.getSerializer(type);
-			setValue(o, index, serializer.deserialize(serializer.createObject(o), reader, provider));
+			setValue(o, item.index, item.serializer.deserialize(item.serializer.createObject(o), reader, provider));
 			ch = reader.readIgnoreWhitespace();
 			if (ch == '}') {
 				return o;
