@@ -87,12 +87,11 @@ public class JsonSerializer {
 		Serializer serializer = provider.getSerializer(cc);
 		JsonReader jsonReader = getRecycler().jr;
 		jsonReader.bind(reader);
-		int ch = jsonReader.read();
-		if (ch == '[') {
+		if (jsonReader.readIgnoreWhitespace() == '[') {
 			List<Object> list = new ArrayList<Object>();
 			while (true) {
 				list.add(serializer.deserialize(cc.newInstance(), jsonReader, provider));
-				ch = jsonReader.read();
+				int ch = jsonReader.read();
 				if (ch == ']') {
 					break;
 				}
@@ -115,7 +114,7 @@ public class JsonSerializer {
 	private static void callStaticEncode(MethodVisitor mv, Provider provider, Serializer serializer, Type type) {
 		Class<?> generic = null;
 		if (serializer instanceof Generic) {
-			type = ((Generic) serializer).getGeneric(mv, type);
+			type = ((Generic) serializer).getGeneric(type);
 			if (type instanceof Class) {
 				if (Modifier.isFinal(((Class<?>) type).getModifiers())) {
 					generic = (Class<?>) type;
@@ -461,7 +460,7 @@ public class JsonSerializer {
 
 				Class<?> type = accessor.getParameterTypes()[0];
 				String typeName = org.objectweb.asm.Type.getDescriptor(type);
-				name.setValue(new BeanItem(i, provider.getSerializer(type)));
+				name.setValue(new BeanItem(i, provider.getSerializer(type), accessor.getGenericParameterTypes()[0]));
 
 				mv.visitLabel(switchSet[i]);
 				if (typeName.length() > 1) {

@@ -5,8 +5,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Set;
 
-import org.objectweb.asm.MethodVisitor;
-
 import com.ruixus.util.SimpleCharBuffer;
 import com.ruixus.util.json.JsonReader;
 import com.ruixus.util.json.JsonSerializer;
@@ -38,7 +36,17 @@ public class SetSerializer implements Serializer, Generic {
 	}
 
 	@Override
-	public Type getGeneric(MethodVisitor mv, Type type) {
+	public Object createObject(Object parent) {
+		return null;
+	}
+
+	@Override
+	public Object deserialize(Object o, JsonReader reader, Provider provider) throws IOException {
+		return null;
+	}
+
+	@Override
+	public Type getGeneric(Type type) {
 		if (type instanceof ParameterizedType) {
 			return ((ParameterizedType) type).getActualTypeArguments()[0];
 		}
@@ -46,13 +54,7 @@ public class SetSerializer implements Serializer, Generic {
 	}
 
 	@Override
-	public Object createObject(Object parent) {
-		return null;
-	}
-
-	@Override
-	public Object deserialize(Object o, JsonReader reader, Provider provider) throws IOException {
-		// TODO Auto-generated method stub
+	public Object deserialize(Object o, JsonReader reader, Provider provider, Type generic) throws IOException {
 		return null;
 	}
 }

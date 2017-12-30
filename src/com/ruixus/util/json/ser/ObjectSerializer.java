@@ -1,5 +1,6 @@
 package com.ruixus.util.json.ser;
 
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,10 +11,14 @@ public abstract class ObjectSerializer implements Serializer {
 	public static class BeanItem {
 		private int index;
 		private Serializer serializer;
+		private Type generic;
 		
-		public BeanItem(int index, Serializer serializer) {
+		public BeanItem(int index, Serializer serializer, Type generic) {
 			this.index = index;
 			this.serializer = serializer;
+			if (serializer instanceof Generic) {
+				this.generic = ((Generic) serializer).getGeneric(generic);
+			}
 		}
 	}
 
@@ -45,7 +50,13 @@ public abstract class ObjectSerializer implements Serializer {
 				throw new NullPointerException();
 			}
 
-			setValue(o, item.index, item.serializer.deserialize(item.serializer.createObject(o), reader, provider));
+			Object value;
+			if (item.generic != null) {
+				value = ((Generic) item.serializer).deserialize(item.serializer.createObject(o), reader, provider, item.generic);
+			} else {
+				value = item.serializer.deserialize(item.serializer.createObject(o), reader, provider);
+			}
+			setValue(o, item.index, value);
 			ch = reader.readIgnoreWhitespace();
 			if (ch == '}') {
 				return o;

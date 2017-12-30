@@ -3,9 +3,8 @@ package com.ruixus.util.json.ser;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.Map;
-
-import org.objectweb.asm.MethodVisitor;
 
 import com.ruixus.util.SimpleCharBuffer;
 import com.ruixus.util.json.JsonReader;
@@ -49,7 +48,17 @@ public class MapSerializer implements Serializer, Generic {
 	}
 
 	@Override
-	public Type getGeneric(MethodVisitor mv, Type type) {
+	public Object createObject(Object parent) {
+		return new HashMap<Object, Object>();
+	}
+
+	@Override
+	public Object deserialize(Object o, JsonReader reader, Provider provider) throws IOException {
+		return null;
+	}
+
+	@Override
+	public Type getGeneric(Type type) {
 		if (type instanceof ParameterizedType) {
 			return ((ParameterizedType) type).getActualTypeArguments()[1];
 		}
@@ -57,12 +66,7 @@ public class MapSerializer implements Serializer, Generic {
 	}
 
 	@Override
-	public Object createObject(Object parent) {
-		return null;
-	}
-
-	@Override
-	public Object deserialize(Object o, JsonReader reader, Provider provider) throws IOException {
+	public Object deserialize(Object o, JsonReader reader, Provider provider, Type generic) throws IOException {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -1,11 +1,9 @@
 package com.ruixus.util.json.ser;
 
-import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
-
-import org.objectweb.asm.MethodVisitor;
 
 import com.ruixus.util.SimpleCharBuffer;
 import com.ruixus.util.json.JsonReader;
@@ -38,7 +36,17 @@ public class ListSerializer implements Serializer, Generic {
 	}
 
 	@Override
-	public Type getGeneric(MethodVisitor mv, Type type) {
+	public Object createObject(Object parent) {
+		return parent;
+	}
+
+	@Override
+	public Object deserialize(Object o, JsonReader reader, Provider provider) throws Exception {
+		return deserialize(o, reader, provider, null);
+	}
+
+	@Override
+	public Type getGeneric(Type type) {
 		if (type instanceof ParameterizedType) {
 			return ((ParameterizedType) type).getActualTypeArguments()[0];
 		}
@@ -46,12 +54,27 @@ public class ListSerializer implements Serializer, Generic {
 	}
 
 	@Override
-	public Object createObject(Object parent) {
-		return null;
-	}
-
-	@Override
-	public Object deserialize(Object o, JsonReader reader, Provider provider) throws IOException {
-		return null;
+	public Object deserialize(Object o, JsonReader reader, Provider provider, Type generic) throws Exception {
+		if (reader.readIgnoreWhitespace() != '[') {
+			// TODO 出错
+			throw new NullPointerException();
+		}
+		List<Object> list = new ArrayList<Object>();
+		while (true) {
+			Serializer serializer = null;
+			if (generic instanceof Class) {
+				serializer = provider.getSerializer((Class<?>) generic);
+			}
+			list.add(serializer.deserialize(serializer.createObject(o), reader, provider));
+			int ch = reader.read();
+			if (ch == ']') {
+				break;
+			}
+			if (ch != ',') {
+				// TODO 出错
+				throw new NullPointerException();
+			}
+		}
+		return list;
 	}
 }
