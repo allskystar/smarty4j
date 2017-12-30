@@ -6,7 +6,7 @@ import java.util.Map;
 import com.ruixus.util.json.JsonReader;
 import com.ruixus.util.json.Provider;
 
-public abstract class AbstractBeanSerializer implements Serializer {
+public abstract class ObjectSerializer implements Serializer {
 	public static class BeanItem {
 		private int index;
 		private Serializer serializer;
@@ -17,7 +17,7 @@ public abstract class AbstractBeanSerializer implements Serializer {
 		}
 	}
 
-	public static final String NAME = AbstractBeanSerializer.class.getName().replace('.', '/');
+	public static final String NAME = ObjectSerializer.class.getName().replace('.', '/');
 
 	private Map<String, BeanItem> items = new HashMap<String, BeanItem>();
 

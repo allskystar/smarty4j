@@ -25,8 +25,8 @@ import org.objectweb.asm.MethodVisitor;
 
 import com.ruixus.util.SimpleCharBuffer;
 import com.ruixus.util.json.JsonInclude.Include;
-import com.ruixus.util.json.ser.AbstractBeanSerializer;
-import com.ruixus.util.json.ser.AbstractBeanSerializer.BeanItem;
+import com.ruixus.util.json.ser.ObjectSerializer;
+import com.ruixus.util.json.ser.ObjectSerializer.BeanItem;
 import com.ruixus.util.json.ser.Generic;
 import com.ruixus.util.json.ser.Serializer;
 
@@ -169,12 +169,12 @@ public class JsonSerializer {
 
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
 		MethodVisitor mv;
-		cw.visit(V1_5, ACC_PUBLIC, mapperName.replace('.', '/'), null, AbstractBeanSerializer.NAME, null);
+		cw.visit(V1_5, ACC_PUBLIC, mapperName.replace('.', '/'), null, ObjectSerializer.NAME, null);
 
 		// 定义类的构造方法
 		mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
 		mv.visitVarInsn(ALOAD, 0);
-		mv.visitMethodInsn(INVOKESPECIAL, AbstractBeanSerializer.NAME, "<init>", "()V");
+		mv.visitMethodInsn(INVOKESPECIAL, ObjectSerializer.NAME, "<init>", "()V");
 		mv.visitInsn(RETURN);
 		mv.visitMaxs(0, 0);
 		mv.visitEnd();
@@ -482,7 +482,7 @@ public class JsonSerializer {
 
 		byte[] code = cw.toByteArray();
 		try {
-			AbstractBeanSerializer serializer = (AbstractBeanSerializer) ((Class<?>) defineClass
+			ObjectSerializer serializer = (ObjectSerializer) ((Class<?>) defineClass
 					.invoke(clazz.getClassLoader(), mapperName, code, 0, code.length)).newInstance();
 			for (Map.Entry<String, Object> name : names.entrySet()) {
 				serializer.setNameIndex(name.getKey(), (BeanItem) name.getValue());
