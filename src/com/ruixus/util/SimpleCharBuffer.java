@@ -21,22 +21,6 @@ public class SimpleCharBuffer {
 	private static final int[] intTable = { 9, 99, 999, 9999, 99999, 999999, 9999999, 99999999, 999999999,
 			Integer.MAX_VALUE };
 
-	private static int stringSize(int x) {
-		for (int i = 0;; i++)
-			if (x <= intTable[i])
-				return i + 1;
-	}
-
-	private static final long[] longTable = { 9, 99, 999, 9999, 99999, 999999, 9999999, 99999999, 999999999,
-			9999999999L, 99999999999L, 999999999999L, 9999999999999L, 99999999999999L, 999999999999999L,
-			9999999999999999L, 99999999999999999L, 999999999999999999L, Long.MAX_VALUE };
-
-	private static int stringSize(long x) {
-		for (int i = 0;; i++)
-			if (x <= longTable[i])
-				return i + 1;
-	}
-
 	private static final char[] digitOnes = new char[100];
 	private static final char[] digitTens = new char[100];
 	private static final int[] escCodes = new int[128];
@@ -80,62 +64,6 @@ public class SimpleCharBuffer {
 		}
 	}
 
-	private static void getChars(int i, int index, char[] buf) {
-		char sign = 0;
-
-		if (i < 0) {
-			sign = '-';
-			i = -i;
-		}
-
-		while (i >= 100) {
-			int r = i % 100;
-			i = i / 100;
-			buf[--index] = digitOnes[r];
-			buf[--index] = digitTens[r];
-		}
-
-		buf[--index] = digitOnes[i];
-		if (i >= 10) {
-			buf[--index] = digitTens[i];
-		}
-		if (sign != 0) {
-			buf[--index] = sign;
-		}
-	}
-
-	private static void getChars(long l, int index, char[] buf) {
-		char sign = 0;
-
-		if (l < 0) {
-			sign = '-';
-			l = -l;
-		}
-
-		while (l > Integer.MAX_VALUE) {
-			int r = (int) (l % 100);
-			l = l / 100;
-			buf[--index] = digitOnes[r];
-			buf[--index] = digitTens[r];
-		}
-
-		int i = (int) l;
-		while (i >= 100) {
-			int r = i % 100;
-			i = i / 100;
-			buf[--index] = digitOnes[r];
-			buf[--index] = digitTens[r];
-		}
-
-		buf[--index] = digitOnes[i];
-		if (i >= 10) {
-			buf[--index] = digitTens[i];
-		}
-		if (sign != 0) {
-			buf[--index] = sign;
-		}
-	}
-
 	public void setWriter(Writer writer) {
 		this.writer = writer;
 	}
@@ -145,10 +73,33 @@ public class SimpleCharBuffer {
 			append("-2147483648");
 			return;
 		}
-		int capacity = off + ((i < 0) ? stringSize(-i) + 1 : stringSize(i));
+		
+		if (i < 0) {
+			i = -i;
+			buf[off++] = '-';
+		}
+		
+		int capacity;
+		for (int j = 0;; j++) {
+			if (i <= intTable[j]) {
+				capacity = off + j + 1;
+				break;
+			}
+		}
 		ensureCapacityInternal(capacity);
 		off = capacity;
-		getChars(i, off, buf);
+
+		while (i >= 100) {
+			int r = i % 100;
+			i = i / 100;
+			buf[--capacity] = digitOnes[r];
+			buf[--capacity] = digitTens[r];
+		}
+
+		buf[--capacity] = digitOnes[i];
+		if (i >= 10) {
+			buf[--capacity] = digitTens[i];
+		}
 	}
 
 	public void append(long l) {
@@ -156,10 +107,49 @@ public class SimpleCharBuffer {
 			append("-9223372036854775808");
 			return;
 		}
-		int capacity = off + ((l < 0) ? stringSize(-l) + 1 : stringSize(l));
+		if (l < 0) {
+			l = -l;
+			buf[off++] = '-';
+		}
+		
+		int capacity;
+		int i;
+		if (l < 1000000000) {
+			i = (int) l;
+			capacity = off;
+		} else {
+			i = (int) (l / 10000000000L);
+			capacity = off + 10;
+		}
+		if (i > 0) {
+			for (int j = 0;; j++) {
+				if (i <= intTable[j]) {
+					capacity += j + 1;
+					break;
+				}
+			}
+		}
 		ensureCapacityInternal(capacity);
 		off = capacity;
-		getChars(l, off, buf);
+		while (l > 100) {
+			int r = (int) (l % 100);
+			l = l / 100;
+			buf[--capacity] = digitOnes[r];
+			buf[--capacity] = digitTens[r];
+		}
+
+		i = (int) l;
+		while (i >= 100) {
+			int r = i % 100;
+			i = i / 100;
+			buf[--capacity] = digitOnes[r];
+			buf[--capacity] = digitTens[r];
+		}
+
+		buf[--capacity] = digitOnes[i];
+		if (i >= 10) {
+			buf[--capacity] = digitTens[i];
+		}
 	}
 
 	public void append(boolean b) {
