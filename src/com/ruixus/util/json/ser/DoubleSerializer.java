@@ -23,6 +23,6 @@ public class DoubleSerializer implements Serializer {
 
 	@Override
 	public Object deserialize(Object o, JsonReader reader, Provider provider) throws IOException {
-		return Double.valueOf(reader.readNumber());
+		return Double.valueOf(reader.readConst(true));
 	}
 }

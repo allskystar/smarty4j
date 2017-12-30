@@ -23,7 +23,11 @@ public class CharacterSerializer implements Serializer {
 
 	@Override
 	public Object deserialize(Object o, JsonReader reader, Provider provider) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		String s = reader.readString();
+		if (s.length() != 1) {
+			// TODO 错误
+			throw new NullPointerException();
+		}
+		return Character.valueOf(s.charAt(0));
 	}
 }

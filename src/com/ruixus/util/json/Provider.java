@@ -37,7 +37,16 @@ public class Provider {
 
 	static {
 		defAssignables = new Class<?>[] { Map.class, List.class, Set.class };
-		defBeanMapper.put(String.class, new StringSerializer());
+
+		defBeanMapper.put(char.class, new CharacterSerializer());
+		defBeanMapper.put(boolean.class, new BooleanSerializer());
+		defBeanMapper.put(byte.class, new ByteSerializer());
+		defBeanMapper.put(short.class, new ShortSerializer());
+		defBeanMapper.put(int.class, new IntegerSerializer());
+		defBeanMapper.put(long.class, new LongSerializer());
+		defBeanMapper.put(float.class, new FloatSerializer());
+		defBeanMapper.put(double.class, new DoubleSerializer());
+
 		defBeanMapper.put(Character.class, new CharacterSerializer());
 		defBeanMapper.put(Boolean.class, new BooleanSerializer());
 		defBeanMapper.put(Byte.class, new ByteSerializer());
@@ -46,6 +55,8 @@ public class Provider {
 		defBeanMapper.put(Long.class, new LongSerializer());
 		defBeanMapper.put(Float.class, new FloatSerializer());
 		defBeanMapper.put(Double.class, new DoubleSerializer());
+
+		defBeanMapper.put(String.class, new StringSerializer());
 
 		defBeanMapper.put(Map.class, new MapSerializer());
 		defBeanMapper.put(List.class, new ListSerializer());

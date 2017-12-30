@@ -9,6 +9,7 @@ public class JsonReader extends Reader {
 
 	private static final int WHITESPACE = 1;
 	private static final int NUMBER = 2;
+	private static final int LETTER = 3;
 	private static int[] codeTypes = new int[128];
 	private static int[] escCodes = new int[128];
 	private static int[] codeValues = new int[128];
@@ -18,6 +19,12 @@ public class JsonReader extends Reader {
 			codeTypes[i] = NUMBER;
 
 			codeValues[i] = i - '0';
+		}
+		for (int i = 'A'; i <= 'Z'; i++) {
+			codeTypes[i] = LETTER;
+		}
+		for (int i = 'a'; i <= 'z'; i++) {
+			codeTypes[i] = LETTER;
 		}
 		codeTypes['.'] = NUMBER;
 		codeTypes['-'] = NUMBER;
@@ -135,13 +142,14 @@ public class JsonReader extends Reader {
 		return sign ? -value : value;
 	}
 
-	public String readNumber() throws IOException {
+	public String readConst(boolean isNumber) throws IOException {
 		readIgnoreWhitespace();
 		unread();
 		if (nextChar > 8000) {
 			fill();
 		}
 		int i = nextChar;
+		int type = isNumber ? NUMBER : LETTER;
 		while (true) {
 			if (i >= nChars) {
 				i = nChars - nextChar + 1;
@@ -152,7 +160,7 @@ public class JsonReader extends Reader {
 				}
 			}
 			int c = cb[i];
-			if (c < 128 && codeTypes[c] != NUMBER) {
+			if (c < 128 && codeTypes[c] != type) {
 				String ret = new String(cb, nextChar, i - nextChar);
 				nextChar = i;
 				return ret;

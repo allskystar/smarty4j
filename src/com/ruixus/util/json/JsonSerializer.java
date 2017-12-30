@@ -440,8 +440,7 @@ public class JsonSerializer {
 		mv.visitEnd();
 
 		int size = names.size();
-		mv = cw.visitMethod(ACC_PUBLIC, "setValue", "(Ljava/lang/Object;ILjava/lang/Object;)V", null,
-				null);
+		mv = cw.visitMethod(ACC_PUBLIC, "setValue", "(Ljava/lang/Object;ILjava/lang/Object;)V", null, null);
 		Label defaultSet = new Label();
 		Label[] switchSet = new Label[size];
 
@@ -459,14 +458,51 @@ public class JsonSerializer {
 			int i = 0;
 			for (Map.Entry<String, Object> name : names.entrySet()) {
 				Method accessor = (Method) name.getValue();
-				
+
 				Class<?> type = accessor.getParameterTypes()[0];
-				String typeName = type.getName().replace('.', '/');
+				String typeName = org.objectweb.asm.Type.getDescriptor(type);
 				name.setValue(new BeanItem(i, provider.getSerializer(type)));
 
 				mv.visitLabel(switchSet[i]);
-				mv.visitTypeInsn(CHECKCAST, typeName);
-				mv.visitMethodInsn(INVOKEVIRTUAL, className, accessor.getName(), "(L" + typeName + ";)V");
+				if (typeName.length() > 1) {
+					mv.visitTypeInsn(CHECKCAST, type.getName().replace('.', '/'));
+				} else {
+					switch (typeName.charAt(0)) {
+					case 'I':
+						mv.visitTypeInsn(CHECKCAST, "java/lang/Integer");
+						mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Integer", "intValue", "()I");
+						break;
+					case 'B':
+						mv.visitTypeInsn(CHECKCAST, "java/lang/Byte");
+						mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Byte", "byteValue", "()B");
+						break;
+					case 'C':
+						mv.visitTypeInsn(CHECKCAST, "java/lang/Character");
+						mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Character", "byteValue", "()C");
+						break;
+					case 'S':
+						mv.visitTypeInsn(CHECKCAST, "java/lang/Short");
+						mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Short", "shortValue", "()C");
+						break;
+					case 'J':
+						mv.visitTypeInsn(CHECKCAST, "java/lang/Long");
+						mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Long", "longValue", "()J");
+						break;
+					case 'Z':
+						mv.visitTypeInsn(CHECKCAST, "java/lang/Boolean");
+						mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z");
+						break;
+					case 'F':
+						mv.visitTypeInsn(CHECKCAST, "java/lang/Float");
+						mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Float", "floatValue", "()F");
+						break;
+					case 'D':
+						mv.visitTypeInsn(CHECKCAST, "java/lang/Double");
+						mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Double", "doubleValue", "()D");
+						break;
+					}
+				}
+				mv.visitMethodInsn(INVOKEVIRTUAL, className, accessor.getName(), "(" + typeName + ")V");
 				mv.visitInsn(RETURN);
 
 				i++;
@@ -482,8 +518,8 @@ public class JsonSerializer {
 
 		byte[] code = cw.toByteArray();
 		try {
-			ObjectSerializer serializer = (ObjectSerializer) ((Class<?>) defineClass
-					.invoke(clazz.getClassLoader(), mapperName, code, 0, code.length)).newInstance();
+			ObjectSerializer serializer = (ObjectSerializer) ((Class<?>) defineClass.invoke(clazz.getClassLoader(),
+					mapperName, code, 0, code.length)).newInstance();
 			for (Map.Entry<String, Object> name : names.entrySet()) {
 				serializer.setNameIndex(name.getKey(), (BeanItem) name.getValue());
 			}

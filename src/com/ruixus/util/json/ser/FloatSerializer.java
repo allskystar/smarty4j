@@ -23,6 +23,6 @@ public class FloatSerializer implements Serializer {
 
 	@Override
 	public Object deserialize(Object o, JsonReader reader, Provider provider) throws IOException {
-		return Float.valueOf(reader.readNumber());
+		return Float.valueOf(reader.readConst(true));
 	}
 }
