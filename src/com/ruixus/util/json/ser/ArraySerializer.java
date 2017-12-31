@@ -2,9 +2,9 @@ package com.ruixus.util.json.ser;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.ruixus.util.SimpleCharBuffer;
@@ -22,10 +22,11 @@ public class ArraySerializer implements Serializer, Generic {
 	}
 
 	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
+		Object[] array = (Object[]) o;
 		cb.append('[');
-		int len = Array.getLength(o);
+		int len = array.length;
 		for (int i = 0; i < len; i++) {
-			serializer.serialize(Array.get(o, i), cb, provider);
+			serializer.serialize(array[i], cb, provider);
 			cb.append(',');
 		}
 		cb.appendClose(']');
@@ -55,11 +56,15 @@ public class ArraySerializer implements Serializer, Generic {
 			// TODO json数据错误
 			throw new NullPointerException();
 		}
-		List<Object> list = new ArrayList<Object>();
+		Object[] list = (Object[]) Array.newInstance(type, 16);
+		int size = 0;
 		if (reader.readIgnoreWhitespace() != ']') {
 			reader.unread();
 			while (true) {
-				list.add(serializer.deserialize(o, reader, provider));
+				if (size == list.length) {
+					list = Arrays.copyOf(list, size * 2);
+				}
+				list[size++] = serializer.deserialize(o, reader, provider);
 				int ch = reader.readIgnoreWhitespace();
 				if (ch == ']') {
 					break;
@@ -69,11 +74,6 @@ public class ArraySerializer implements Serializer, Generic {
 				}
 			}
 		}
-		int len = list.size();
-		Object ret = Array.newInstance(type, len);
-		for (int i = 0; i < len; i++) {
-			Array.set(ret, i, list.get(i));
-		}
-		return ret;
+		return Arrays.copyOf(list, size);
 	}
 }
