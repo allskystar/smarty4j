@@ -46,7 +46,6 @@ import com.ruixus.util.json.ser.Serializer;
 import com.ruixus.util.json.ser.SetSerializer;
 import com.ruixus.util.json.ser.ShortArraySerializer;
 import com.ruixus.util.json.ser.ShortSerializer;
-import com.ruixus.util.json.ser.StringArraySerializer;
 import com.ruixus.util.json.ser.StringSerializer;
 import com.ruixus.util.json.ser.ObjectSerializer.BeanItem;
 
@@ -91,7 +90,6 @@ public class Provider {
 		defBeanMapper.put(Set.class, SetSerializer.instance);
 
 		defBeanMapper.put(ArrayList.class, ArrayListSerializer.instance);
-		defBeanMapper.put(String[].class, StringArraySerializer.instance);
 		defBeanMapper.put(char[].class, CharArraySerializer.instance);
 		defBeanMapper.put(boolean[].class, BooleanArraySerializer.instance);
 		defBeanMapper.put(byte[].class, ByteArraySerializer.instance);
