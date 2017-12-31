@@ -3,7 +3,6 @@ package com.ruixus.util.json;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,23 +80,7 @@ public class JsonSerializer {
 	}
 
 	public static void serializeObject(Object o, SimpleCharBuffer cb, Provider provider) {
-		Class<?> clazz = o.getClass();
-		if (clazz.isArray()) {
-			Serializer serializer = provider.getSerializer(clazz, false);
-			if (serializer != null) {
-				serializer.serialize(o, cb, provider);
-			} else {
-				cb.append('[');
-				int len = Array.getLength(o);
-				for (int i = 0; i < len; i++) {
-					serializeValue(Array.get(o, i), cb, provider);
-					cb.append(',');
-				}
-				cb.appendClose(']');
-			}
-		} else {
-			provider.getSerializer(clazz).serialize(o, cb, provider);
-		}
+		provider.getSerializer(o.getClass()).serialize(o, cb, provider);
 	}
 
 	public static void serializeValue(Object o, SimpleCharBuffer cb, Provider provider) {

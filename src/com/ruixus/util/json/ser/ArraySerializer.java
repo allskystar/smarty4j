@@ -1,6 +1,9 @@
 package com.ruixus.util.json.ser;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +11,7 @@ import com.ruixus.util.SimpleCharBuffer;
 import com.ruixus.util.json.JsonReader;
 import com.ruixus.util.json.Provider;
 
-public class ArraySerializer implements Serializer {
+public class ArraySerializer implements Serializer, Generic {
 
 	private Class<?> type;
 	private Serializer serializer;
@@ -35,6 +38,19 @@ public class ArraySerializer implements Serializer {
 
 	@Override
 	public Object deserialize(Object o, JsonReader reader, Provider provider) throws Exception {
+		return deserialize(o, reader, provider, null);
+	}
+
+	@Override
+	public Type getGeneric(Type type) {
+		if (type instanceof GenericArrayType) {
+			return ((GenericArrayType) type).getGenericComponentType();
+		}
+		return null;
+	}
+
+	@Override
+	public Object deserialize(Object o, JsonReader reader, Provider provider, Type generic) throws Exception {
 		if (reader.readIgnoreWhitespace() != '[') {
 			// TODO json数据错误
 			throw new NullPointerException();

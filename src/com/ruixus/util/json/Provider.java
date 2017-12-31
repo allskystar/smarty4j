@@ -167,8 +167,23 @@ public class Provider {
 	private static final int CB = OBJ + 1;
 	private static final int PROVIDER = CB + 1;
 	private static final int VALUE = PROVIDER + 1;
+	private static final int INDEX = VALUE + 1;
+	private static final int LENGTH = INDEX + 1;
 
-	private void callStaticEncode(MethodVisitor mv, Serializer serializer, Type type) {
+	private void dynamicCall(MethodVisitor mv) {
+		mv.visitInsn(DUP);
+		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;");
+		mv.visitVarInsn(ALOAD, PROVIDER);
+		mv.visitInsn(SWAP);
+		mv.visitMethodInsn(INVOKEVIRTUAL, Provider.NAME, "getSerializer", "(Ljava/lang/Class;)L" + Serializer.NAME + ";");
+		mv.visitInsn(SWAP);
+		mv.visitVarInsn(ALOAD, CB);
+		mv.visitVarInsn(ALOAD, PROVIDER);
+		mv.visitMethodInsn(INVOKEINTERFACE, Serializer.NAME, "serialize",
+				"(Ljava/lang/Object;L" + SimpleCharBuffer.NAME + ";L" + Provider.NAME + ";)V");
+	}
+
+	private void staticCall(MethodVisitor mv, Serializer serializer, Type type) {
 		Class<?> generic = null;
 		if (serializer instanceof Generic) {
 			type = ((Generic) serializer).getGeneric(type);
@@ -374,7 +389,7 @@ public class Provider {
 							mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(Ljava/lang/String;)V");
 
 							mv.visitVarInsn(ALOAD, VALUE);
-							callStaticEncode(mv, serializer, accessor.getGenericReturnType());
+							staticCall(mv, serializer, accessor.getGenericReturnType());
 							assign = true;
 							break;
 						}
@@ -388,7 +403,7 @@ public class Provider {
 						Serializer serializer = getSerializer(type, false);
 						if (serializer != null) {
 							mv.visitVarInsn(ALOAD, VALUE);
-							callStaticEncode(mv, serializer, accessor.getGenericReturnType());
+							staticCall(mv, serializer, accessor.getGenericReturnType());
 						} else {
 							if (type.isArray()) {
 								clazz = type.getComponentType();
@@ -404,35 +419,31 @@ public class Provider {
 
 								mv.visitVarInsn(ALOAD, VALUE);
 								mv.visitInsn(ARRAYLENGTH);
-								mv.visitVarInsn(ISTORE, VALUE + 2);
+								mv.visitVarInsn(ISTORE, LENGTH);
 								mv.visitInsn(ICONST_0);
-								mv.visitVarInsn(ISTORE, VALUE + 1);
+								mv.visitVarInsn(ISTORE, INDEX);
 								mv.visitJumpInsn(GOTO, condition);
 
 								mv.visitLabel(loop);
 								if (isFinal) {
 									mv.visitVarInsn(ALOAD, VALUE);
-									mv.visitVarInsn(ILOAD, VALUE + 1);
+									mv.visitVarInsn(ILOAD, INDEX);
 									mv.visitInsn(AALOAD);
-									callStaticEncode(mv, serializer, accessor.getGenericReturnType());
+									staticCall(mv, serializer, accessor.getGenericReturnType());
 								} else {
 									mv.visitVarInsn(ALOAD, VALUE);
-									mv.visitVarInsn(ILOAD, VALUE + 1);
+									mv.visitVarInsn(ILOAD, INDEX);
 									mv.visitInsn(AALOAD);
-									mv.visitVarInsn(ALOAD, CB);
-									mv.visitVarInsn(ALOAD, PROVIDER);
-									mv.visitMethodInsn(INVOKESTATIC, JsonSerializer.NAME, "serializeObject",
-											"(Ljava/lang/Object;L" + SimpleCharBuffer.NAME + ";L" + Provider.NAME
-													+ ";)V");
+									dynamicCall(mv);
 								}
 								mv.visitVarInsn(ALOAD, CB);
 								mv.visitLdcInsn(',');
 								mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(C)V");
-								mv.visitIincInsn(VALUE + 1, 1);
+								mv.visitIincInsn(INDEX, 1);
 
 								mv.visitLabel(condition);
-								mv.visitVarInsn(ILOAD, VALUE + 1);
-								mv.visitVarInsn(ILOAD, VALUE + 2);
+								mv.visitVarInsn(ILOAD, INDEX);
+								mv.visitVarInsn(ILOAD, LENGTH);
 								mv.visitJumpInsn(IF_ICMPLT, loop);
 
 								mv.visitVarInsn(ALOAD, CB);
@@ -443,14 +454,10 @@ public class Provider {
 
 								if (Modifier.isFinal(type.getModifiers())) {
 									mv.visitVarInsn(ALOAD, VALUE);
-									callStaticEncode(mv, serializer, accessor.getGenericReturnType());
+									staticCall(mv, serializer, accessor.getGenericReturnType());
 								} else {
 									mv.visitVarInsn(ALOAD, VALUE);
-									mv.visitVarInsn(ALOAD, CB);
-									mv.visitVarInsn(ALOAD, PROVIDER);
-									mv.visitMethodInsn(INVOKESTATIC, JsonSerializer.NAME, "serializeObject",
-											"(Ljava/lang/Object;L" + SimpleCharBuffer.NAME + ";L" + Provider.NAME
-													+ ";)V");
+									dynamicCall(mv);
 								}
 							}
 						}
@@ -471,7 +478,7 @@ public class Provider {
 						Serializer serializer = getSerializer(null, false);
 						if (serializer != null) {
 							mv.visitInsn(ACONST_NULL);
-							callStaticEncode(mv, serializer, null);
+							staticCall(mv, serializer, null);
 						} else {
 							mv.visitVarInsn(ALOAD, CB);
 							mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "appendNull", "()V");
@@ -520,26 +527,10 @@ public class Provider {
 
 				Class<?> type = accessor.getParameterTypes()[0];
 				String typeName = org.objectweb.asm.Type.getDescriptor(type);
-				Serializer serializer;
 				Type generic = null;
-				if (type.isArray()) {
-					serializer = getSerializer(type, false);
-					if (serializer == null) {
-						serializer = ListSerializer.instance;
-						generic = accessor.getGenericParameterTypes()[0];
-						if (generic instanceof Class) {
-							generic = ((Class<?>) generic).getComponentType();
-						}
-					} else {
-						if (serializer instanceof Generic) {
-							generic = ((Generic) serializer).getGeneric(accessor.getGenericParameterTypes()[0]);
-						}
-					}
-				} else {
-					serializer = getSerializer(type);
-					if (serializer instanceof Generic) {
-						generic = ((Generic) serializer).getGeneric(accessor.getGenericParameterTypes()[0]);
-					}
+				Serializer serializer = getSerializer(type);
+				if (serializer instanceof Generic) {
+					generic = ((Generic) serializer).getGeneric(accessor.getGenericParameterTypes()[0]);
 				}
 				name.setValue(new BeanItem(i, serializer, generic));
 
