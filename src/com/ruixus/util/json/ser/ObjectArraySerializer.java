@@ -2,32 +2,41 @@ package com.ruixus.util.json.ser;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import com.ruixus.util.SimpleCharBuffer;
 import com.ruixus.util.json.JsonReader;
+import com.ruixus.util.json.JsonSerializer;
 import com.ruixus.util.json.Provider;
 
-public class ArraySerializer implements Serializer, Generic {
+public class ObjectArraySerializer implements Serializer, Generic {
 
 	private Class<?> type;
 	private Serializer serializer;
+	private boolean isFinal;
 	
-	public ArraySerializer(Class<?> type, Serializer serializer) {
+	public ObjectArraySerializer(Class<?> type, Serializer serializer) {
 		this.type = type;
 		this.serializer = serializer;
+		isFinal = Modifier.isFinal(type.getModifiers());
 	}
 
 	public void serialize(Object o, SimpleCharBuffer cb, Provider provider) {
 		Object[] array = (Object[]) o;
 		cb.append('[');
 		int len = array.length;
-		for (int i = 0; i < len; i++) {
-			serializer.serialize(array[i], cb, provider);
-			cb.append(',');
+		if (isFinal) {
+			for (int i = 0; i < len; i++) {
+				serializer.serialize(array[i], cb, provider);
+				cb.append(',');
+			}
+		} else {
+			for (int i = 0; i < len; i++) {
+				JsonSerializer.serializeValue(array[i], cb, provider);
+				cb.append(',');
+			}
 		}
 		cb.appendClose(']');
 	}

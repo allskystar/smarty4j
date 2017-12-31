@@ -23,7 +23,7 @@ import org.objectweb.asm.MethodVisitor;
 import com.ruixus.util.SimpleCharBuffer;
 import com.ruixus.util.json.JsonInclude.Include;
 import com.ruixus.util.json.ser.ArrayListSerializer;
-import com.ruixus.util.json.ser.ArraySerializer;
+import com.ruixus.util.json.ser.ObjectArraySerializer;
 import com.ruixus.util.json.ser.BooleanArraySerializer;
 import com.ruixus.util.json.ser.BooleanSerializer;
 import com.ruixus.util.json.ser.ByteArraySerializer;
@@ -149,7 +149,7 @@ public class Provider {
 				synchronized (beanMapper) {
 					if (cc.isArray()) {
 						Class<?> type = cc.getComponentType();
-						serializer = new ArraySerializer(type, getSerializer(type));
+						serializer = new ObjectArraySerializer(type, getSerializer(type));
 					} else {
 						serializer = beanMapper.get(cc);
 					}
