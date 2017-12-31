@@ -17,9 +17,7 @@ public abstract class ObjectSerializer implements Serializer {
 		public BeanItem(int index, Serializer serializer, Type generic) {
 			this.index = index;
 			this.serializer = serializer;
-			if (serializer instanceof Generic) {
-				this.generic = ((Generic) serializer).getGeneric(generic);
-			}
+			this.generic = generic;
 		}
 	}
 
