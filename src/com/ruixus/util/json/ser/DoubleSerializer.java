@@ -7,6 +7,12 @@ import com.ruixus.util.json.JsonReader;
 import com.ruixus.util.json.Provider;
 
 public class DoubleSerializer implements Serializer {
+
+	public static final DoubleSerializer instance = new DoubleSerializer();
+	
+	private DoubleSerializer() {		
+	}
+
 	public static void $serialize(Double o, SimpleCharBuffer cb, Provider provider) {
 		cb.append(o.toString());
 	}

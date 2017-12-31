@@ -1,12 +1,19 @@
 package com.ruixus.util.json.ser;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import com.ruixus.util.SimpleCharBuffer;
 import com.ruixus.util.json.JsonReader;
 import com.ruixus.util.json.Provider;
 
 public class BooleanArraySerializer implements Serializer {
+
+	public static final BooleanArraySerializer instance = new BooleanArraySerializer();
+	
+	private BooleanArraySerializer() {		
+	}
+
 	public static void $serialize(boolean[] o, SimpleCharBuffer cb, Provider provider) {
 		cb.append('[');
 		for (boolean item : o) {
@@ -28,6 +35,28 @@ public class BooleanArraySerializer implements Serializer {
 
 	@Override
 	public Object deserialize(Object o, JsonReader reader, Provider provider) throws IOException {
-		return null;
+		if (reader.readIgnoreWhitespace() != '[') {
+			// TODO json数据错误
+			throw new NullPointerException();
+		}
+		boolean[] list = new boolean[16];
+		int size = 0;
+		if (reader.readIgnoreWhitespace() != ']') {
+			reader.unread();
+			while (true) {
+				if (size == list.length) {
+					list = Arrays.copyOf(list, size * 2);
+				}
+				list[size++] = Boolean.parseBoolean(reader.readConst(false));
+				int ch = reader.readIgnoreWhitespace();
+				if (ch == ']') {
+					break;
+				}
+				if (ch != ',') {
+					// TODO 出错
+				}
+			}
+		}
+		return Arrays.copyOf(list, size);
 	}
 }

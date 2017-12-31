@@ -7,6 +7,12 @@ import com.ruixus.util.json.JsonReader;
 import com.ruixus.util.json.Provider;
 
 public class IntegerSerializer implements Serializer {
+
+	public static final IntegerSerializer instance = new IntegerSerializer();
+	
+	private IntegerSerializer() {		
+	}
+
 	public static void $serialize(Integer o, SimpleCharBuffer cb, Provider provider) {
 		cb.append(o.intValue());
 	}

@@ -106,7 +106,7 @@ public class JsonSerializer {
 			return list;
 		}
 		jsonReader.unread();
-		Object value = serializer.deserialize(cc.newInstance(), jsonReader, provider);
+		Object value = serializer.deserialize(serializer.createObject(null), jsonReader, provider);
 		return value;
 	}
 

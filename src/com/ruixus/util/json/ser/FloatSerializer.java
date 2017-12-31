@@ -7,6 +7,12 @@ import com.ruixus.util.json.JsonReader;
 import com.ruixus.util.json.Provider;
 
 public class FloatSerializer implements Serializer {
+
+	public static final FloatSerializer instance = new FloatSerializer();
+	
+	private FloatSerializer() {		
+	}
+
 	public static void $serialize(Float o, SimpleCharBuffer cb, Provider provider) {
 		cb.append(o.toString());
 	}

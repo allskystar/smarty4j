@@ -7,6 +7,12 @@ import com.ruixus.util.json.JsonReader;
 import com.ruixus.util.json.Provider;
 
 public class LongSerializer implements Serializer {
+
+	public static final LongSerializer instance = new LongSerializer();
+	
+	private LongSerializer() {		
+	}
+
 	public static void $serialize(Long o, SimpleCharBuffer cb, Provider provider) {
 		cb.append(o.longValue());
 	}

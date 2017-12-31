@@ -1,12 +1,19 @@
 package com.ruixus.util.json.ser;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import com.ruixus.util.SimpleCharBuffer;
 import com.ruixus.util.json.JsonReader;
 import com.ruixus.util.json.Provider;
 
 public class DoubleArraySerializer implements Serializer {
+
+	public static final DoubleArraySerializer instance = new DoubleArraySerializer();
+	
+	private DoubleArraySerializer() {		
+	}
+
 	public static void $serialize(double[] o, SimpleCharBuffer cb, Provider provider) {
 		cb.append('[');
 		for (double item : o) {
@@ -28,7 +35,28 @@ public class DoubleArraySerializer implements Serializer {
 
 	@Override
 	public Object deserialize(Object o, JsonReader reader, Provider provider) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		if (reader.readIgnoreWhitespace() != '[') {
+			// TODO json数据错误
+			throw new NullPointerException();
+		}
+		double[] list = new double[16];
+		int size = 0;
+		if (reader.readIgnoreWhitespace() != ']') {
+			reader.unread();
+			while (true) {
+				if (size == list.length) {
+					list = Arrays.copyOf(list, size * 2);
+				}
+				list[size++] = Double.parseDouble(reader.readConst(true));
+				int ch = reader.readIgnoreWhitespace();
+				if (ch == ']') {
+					break;
+				}
+				if (ch != ',') {
+					// TODO 出错
+				}
+			}
+		}
+		return Arrays.copyOf(list, size);
 	}
 }

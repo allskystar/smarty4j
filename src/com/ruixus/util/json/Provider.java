@@ -38,40 +38,40 @@ public class Provider {
 	static {
 		defAssignables = new Class<?>[] { Map.class, List.class, Set.class };
 
-		defBeanMapper.put(char.class, new CharacterSerializer());
-		defBeanMapper.put(boolean.class, new BooleanSerializer());
-		defBeanMapper.put(byte.class, new ByteSerializer());
-		defBeanMapper.put(short.class, new ShortSerializer());
-		defBeanMapper.put(int.class, new IntegerSerializer());
-		defBeanMapper.put(long.class, new LongSerializer());
-		defBeanMapper.put(float.class, new FloatSerializer());
-		defBeanMapper.put(double.class, new DoubleSerializer());
+		defBeanMapper.put(char.class, CharacterSerializer.instance);
+		defBeanMapper.put(boolean.class, BooleanSerializer.instance);
+		defBeanMapper.put(byte.class, ByteSerializer.instance);
+		defBeanMapper.put(short.class,  ShortSerializer.instance);
+		defBeanMapper.put(int.class,  IntegerSerializer.instance);
+		defBeanMapper.put(long.class,  LongSerializer.instance);
+		defBeanMapper.put(float.class,  FloatSerializer.instance);
+		defBeanMapper.put(double.class,  DoubleSerializer.instance);
 
-		defBeanMapper.put(Character.class, new CharacterSerializer());
-		defBeanMapper.put(Boolean.class, new BooleanSerializer());
-		defBeanMapper.put(Byte.class, new ByteSerializer());
-		defBeanMapper.put(Short.class, new ShortSerializer());
-		defBeanMapper.put(Integer.class, new IntegerSerializer());
-		defBeanMapper.put(Long.class, new LongSerializer());
-		defBeanMapper.put(Float.class, new FloatSerializer());
-		defBeanMapper.put(Double.class, new DoubleSerializer());
+		defBeanMapper.put(Character.class,  CharacterSerializer.instance);
+		defBeanMapper.put(Boolean.class,  BooleanSerializer.instance);
+		defBeanMapper.put(Byte.class,  ByteSerializer.instance);
+		defBeanMapper.put(Short.class,  ShortSerializer.instance);
+		defBeanMapper.put(Integer.class,  IntegerSerializer.instance);
+		defBeanMapper.put(Long.class,  LongSerializer.instance);
+		defBeanMapper.put(Float.class,  FloatSerializer.instance);
+		defBeanMapper.put(Double.class,  DoubleSerializer.instance);
 
-		defBeanMapper.put(String.class, new StringSerializer());
+		defBeanMapper.put(String.class,  StringSerializer.instance);
 
-		defBeanMapper.put(Map.class, new MapSerializer());
-		defBeanMapper.put(List.class, new ListSerializer());
-		defBeanMapper.put(Set.class, new SetSerializer());
+		defBeanMapper.put(Map.class,  MapSerializer.instance);
+		defBeanMapper.put(List.class,  ListSerializer.instance);
+		defBeanMapper.put(Set.class,  SetSerializer.instance);
 
-		defBeanMapper.put(ArrayList.class, new ArrayListSerializer());
-		defBeanMapper.put(String[].class, new StringArraySerializer());
-		defBeanMapper.put(char[].class, new CharArraySerializer());
-		defBeanMapper.put(boolean[].class, new BooleanArraySerializer());
-		defBeanMapper.put(byte[].class, new ByteArraySerializer());
-		defBeanMapper.put(short[].class, new ShortArraySerializer());
-		defBeanMapper.put(int[].class, new IntArraySerializer());
-		defBeanMapper.put(long[].class, new LongArraySerializer());
-		defBeanMapper.put(float[].class, new FloatArraySerializer());
-		defBeanMapper.put(double[].class, new DoubleArraySerializer());
+		defBeanMapper.put(ArrayList.class,  ArrayListSerializer.instance);
+		defBeanMapper.put(String[].class,  StringArraySerializer.instance);
+		defBeanMapper.put(char[].class,  CharArraySerializer.instance);
+		defBeanMapper.put(boolean[].class,  BooleanArraySerializer.instance);
+		defBeanMapper.put(byte[].class,  ByteArraySerializer.instance);
+		defBeanMapper.put(short[].class,  ShortArraySerializer.instance);
+		defBeanMapper.put(int[].class,  IntArraySerializer.instance);
+		defBeanMapper.put(long[].class,  LongArraySerializer.instance);
+		defBeanMapper.put(float[].class,  FloatArraySerializer.instance);
+		defBeanMapper.put(double[].class,  DoubleArraySerializer.instance);
 	}
 
 	private Map<Class<?>, Serializer> beanMapper;

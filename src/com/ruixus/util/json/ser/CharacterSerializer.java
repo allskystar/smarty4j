@@ -7,6 +7,12 @@ import com.ruixus.util.json.JsonReader;
 import com.ruixus.util.json.Provider;
 
 public class CharacterSerializer implements Serializer {
+
+	public static final CharacterSerializer instance = new CharacterSerializer();
+	
+	private CharacterSerializer() {		
+	}
+
 	public static void $serialize(Character o, SimpleCharBuffer cb, Provider provider) {
 		cb.appendString(o.charValue());
 	}

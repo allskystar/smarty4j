@@ -11,9 +11,12 @@ import com.ruixus.util.json.JsonSerializer;
 import com.ruixus.util.json.Provider;
 
 public class SetSerializer extends ListSerializer implements Serializer, Generic {
-	private static final ListSerializer listSerializer = new ListSerializer();
-	private static final MapSerializer mapSerializer = new MapSerializer();
+
+	public static final SetSerializer instance = new SetSerializer();
 	
+	private SetSerializer() {		
+	}
+
 	public static void $serialize(Set<?> o, SimpleCharBuffer cb, Provider provider, Class<?> generic) {
 		Serializer serializer = provider.getSerializer(generic);
 		cb.append('[');
@@ -45,40 +48,40 @@ public class SetSerializer extends ListSerializer implements Serializer, Generic
 			throw new NullPointerException();
 		}
 		Set<Object> set = new HashSet<Object>();
-		if (reader.readIgnoreWhitespace() == ']') {
-			return set;
-		}
-		reader.unread();
-		while (true) {
-			if (generic instanceof Class) {
-				Serializer serializer = provider.getSerializer((Class<?>) generic);
-				set.add(serializer.deserialize(serializer.createObject(o), reader, provider));
-			} else if (generic instanceof ParameterizedType) {
-				Serializer serializer = provider.getSerializer((Class<?>) ((ParameterizedType) generic).getRawType());
-				if (serializer instanceof Generic) {
-					set.add(((Generic) serializer).deserialize(serializer.createObject(o), reader, provider,
-							((Generic) serializer).getGeneric(generic)));
-				} else {
+		if (reader.readIgnoreWhitespace() != ']') {
+			reader.unread();
+			while (true) {
+				if (generic instanceof Class) {
+					Serializer serializer = provider.getSerializer((Class<?>) generic);
 					set.add(serializer.deserialize(serializer.createObject(o), reader, provider));
-				}
-			} else {
-				int ch = reader.readIgnoreWhitespace();
-				reader.unread();
-				if (ch == '{') {
-					set.add(mapSerializer.deserialize(mapSerializer.createObject(o), reader, provider));
-				} else if (ch == '[') {
-					set.add(listSerializer.deserialize(listSerializer.createObject(o), reader, provider));
+				} else if (generic instanceof ParameterizedType) {
+					Serializer serializer = provider
+							.getSerializer((Class<?>) ((ParameterizedType) generic).getRawType());
+					if (serializer instanceof Generic) {
+						set.add(((Generic) serializer).deserialize(serializer.createObject(o), reader, provider,
+								((Generic) serializer).getGeneric(generic)));
+					} else {
+						set.add(serializer.deserialize(serializer.createObject(o), reader, provider));
+					}
 				} else {
-					set.add(reader.readObject());
+					int ch = reader.readIgnoreWhitespace();
+					reader.unread();
+					if (ch == '{') {
+						set.add(MapSerializer.instance.deserialize(MapSerializer.instance.createObject(o), reader, provider));
+					} else if (ch == '[') {
+						set.add(ListSerializer.instance.deserialize(ListSerializer.instance.createObject(o), reader, provider));
+					} else {
+						set.add(reader.readObject());
+					}
 				}
-			}
-			int ch = reader.readIgnoreWhitespace();
-			if (ch == ']') {
-				break;
-			}
-			if (ch != ',') {
-				// TODO 出错
-				throw new NullPointerException();
+				int ch = reader.readIgnoreWhitespace();
+				if (ch == ']') {
+					break;
+				}
+				if (ch != ',') {
+					// TODO 出错
+					throw new NullPointerException();
+				}
 			}
 		}
 		return set;

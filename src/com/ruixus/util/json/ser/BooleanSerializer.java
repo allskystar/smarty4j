@@ -7,6 +7,12 @@ import com.ruixus.util.json.JsonReader;
 import com.ruixus.util.json.Provider;
 
 public class BooleanSerializer implements Serializer {
+
+	public static final BooleanSerializer instance = new BooleanSerializer();
+	
+	private BooleanSerializer() {		
+	}
+
 	public static void $serialize(Boolean o, SimpleCharBuffer cb, Provider provider) {
 		cb.append(o.booleanValue());
 	}

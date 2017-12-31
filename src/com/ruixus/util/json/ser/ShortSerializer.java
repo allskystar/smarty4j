@@ -7,6 +7,12 @@ import com.ruixus.util.json.JsonReader;
 import com.ruixus.util.json.Provider;
 
 public class ShortSerializer implements Serializer {
+
+	public static final ShortSerializer instance = new ShortSerializer();
+	
+	private ShortSerializer() {		
+	}
+
 	public static void $serialize(Short o, SimpleCharBuffer cb, Provider provider) {
 		cb.append(o.intValue());
 	}

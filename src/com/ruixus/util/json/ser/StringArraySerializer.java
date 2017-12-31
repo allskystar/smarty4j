@@ -7,6 +7,12 @@ import com.ruixus.util.json.JsonReader;
 import com.ruixus.util.json.Provider;
 
 public class StringArraySerializer implements Serializer {
+
+	public static final StringArraySerializer instance = new StringArraySerializer();
+	
+	private StringArraySerializer() {		
+	}
+
 	public static void $serialize(String[] o, SimpleCharBuffer cb, Provider provider) {
 		cb.append('[');
 		for (String item : o) {

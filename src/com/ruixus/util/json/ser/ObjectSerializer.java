@@ -8,6 +8,7 @@ import com.ruixus.util.json.JsonReader;
 import com.ruixus.util.json.Provider;
 
 public abstract class ObjectSerializer implements Serializer {
+
 	public static class BeanItem {
 		private int index;
 		private Serializer serializer;
@@ -45,6 +46,10 @@ public abstract class ObjectSerializer implements Serializer {
 		reader.unread();
 		while (true) {
 			BeanItem item = items.get(reader.readString());
+			if (item == null) {
+				// TODO 不存在的属性名
+				throw new NullPointerException();
+			}
 			if (reader.readIgnoreWhitespace() != ':') {
 				// TODO 异常
 				throw new NullPointerException();

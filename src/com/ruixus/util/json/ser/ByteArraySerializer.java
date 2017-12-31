@@ -1,12 +1,19 @@
 package com.ruixus.util.json.ser;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import com.ruixus.util.SimpleCharBuffer;
 import com.ruixus.util.json.JsonReader;
 import com.ruixus.util.json.Provider;
 
 public class ByteArraySerializer implements Serializer {
+
+	public static final ByteArraySerializer instance = new ByteArraySerializer();
+	
+	private ByteArraySerializer() {		
+	}
+
 	public static void $serialize(byte[] o, SimpleCharBuffer cb, Provider provider) {
 		cb.append('[');
 		for (byte item : o) {
@@ -28,7 +35,33 @@ public class ByteArraySerializer implements Serializer {
 
 	@Override
 	public Object deserialize(Object o, JsonReader reader, Provider provider) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		if (reader.readIgnoreWhitespace() != '[') {
+			// TODO json数据错误
+			throw new NullPointerException();
+		}
+		byte[] list = new byte[16];
+		int size = 0;
+		if (reader.readIgnoreWhitespace() != ']') {
+			reader.unread();
+			while (true) {
+				if (size == list.length) {
+					list = Arrays.copyOf(list, size * 2);
+				}
+				int value = reader.readInteger();
+				if (value > Byte.MAX_VALUE || value < Byte.MIN_VALUE) {
+					// TODO json数据错误
+					throw new NullPointerException();
+				}
+				list[size++] = (byte) value;
+				int ch = reader.readIgnoreWhitespace();
+				if (ch == ']') {
+					break;
+				}
+				if (ch != ',') {
+					// TODO 出错
+				}
+			}
+		}
+		return Arrays.copyOf(list, size);
 	}
 }

@@ -7,6 +7,12 @@ import com.ruixus.util.json.JsonSerializer;
 import com.ruixus.util.json.Provider;
 
 public class ArrayListSerializer extends ListSerializer implements Serializer, Generic {
+
+	public static final ArrayListSerializer instance = new ArrayListSerializer();
+	
+	private ArrayListSerializer() {		
+	}
+	
 	public static void $serialize(ArrayList<?> o, SimpleCharBuffer cb, Provider provider, Class<?> generic) {
 		Serializer serializer = provider.getSerializer(generic);
 		cb.append('[');
