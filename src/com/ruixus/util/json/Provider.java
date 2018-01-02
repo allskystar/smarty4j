@@ -231,8 +231,8 @@ public class Provider {
 		String className = clazz.getName().replace('.', '/');
 		String mapperName;
 		if (className.startsWith("java/")) {
-			loader = Thread.currentThread().getContextClassLoader();
-			mapperName = Provider.class.getName() + '$' + className.replace('/', '$');
+			loader = Provider.class.getClassLoader();
+			mapperName = Provider.NAME + '$' + className.replace('/', '$');
 		} else {
 			mapperName = className + "$RUIXUS_JSON";
 		}
