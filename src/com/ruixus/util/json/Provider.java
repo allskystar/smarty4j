@@ -232,9 +232,9 @@ public class Provider {
 		String mapperName;
 		if (className.startsWith("java/")) {
 			loader = Provider.class.getClassLoader();
-			mapperName = Provider.class.getName() + '$' + className.replace('/', '$');
+			mapperName = Provider.NAME + '$' + className.replace('/', '$');
 		} else {
-			mapperName = clazz.getName() + "$RUIXUS_JSON";
+			mapperName = className + "$RUIXUS_JSON";
 		}
 	
 		Include classJsonInclude;
@@ -246,7 +246,7 @@ public class Provider {
 
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
 		MethodVisitor mv;
-		cw.visit(V1_5, ACC_PUBLIC, mapperName.replace('.', '/'), null, ObjectSerializer.NAME, null);
+		cw.visit(V1_5, ACC_PUBLIC, mapperName, null, ObjectSerializer.NAME, null);
 
 		// 定义类的构造方法
 		mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
@@ -262,7 +262,7 @@ public class Provider {
 		mv.visitTypeInsn(CHECKCAST, className);
 		mv.visitVarInsn(ALOAD, 2);
 		mv.visitVarInsn(ALOAD, 3);
-		mv.visitMethodInsn(INVOKESTATIC, mapperName.replace('.', '/'), "$serialize",
+		mv.visitMethodInsn(INVOKESTATIC, mapperName, "$serialize",
 				"(L" + className + ";L" + SimpleCharBuffer.NAME + ";L" + Provider.NAME + ";)V");
 		mv.visitInsn(RETURN);
 		mv.visitMaxs(0, 0);
@@ -594,7 +594,7 @@ public class Provider {
 
 		byte[] code = cw.toByteArray();
 		try {
-			ObjectSerializer serializer = (ObjectSerializer) ((Class<?>) defineClass.invoke(loader, mapperName, code, 0,
+			ObjectSerializer serializer = (ObjectSerializer) ((Class<?>) defineClass.invoke(loader, mapperName.replace('/', '.'), code, 0,
 					code.length)).newInstance();
 			for (Map.Entry<String, Object> name : names.entrySet()) {
 				serializer.setNameIndex(name.getKey(), (BeanItem) name.getValue());
