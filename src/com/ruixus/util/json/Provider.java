@@ -230,7 +230,7 @@ public class Provider {
 		ClassLoader loader = clazz.getClassLoader();
 		String className = clazz.getName().replace('.', '/');
 		String mapperName;
-		if (className.startsWith("java/")) {
+		if (className.startsWith("java/lang/")) {
 			loader = Provider.class.getClassLoader();
 			mapperName = Provider.class.getName() + '$' + className.replace('/', '$');
 		} else {
