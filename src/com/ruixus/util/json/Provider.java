@@ -232,9 +232,9 @@ public class Provider {
 		String mapperName;
 		if (className.startsWith("java/")) {
 			loader = Provider.class.getClassLoader();
-			mapperName = Provider.NAME + '$' + className.replace('/', '$');
+			mapperName = Provider.class.getName() + '$' + className.replace('/', '$');
 		} else {
-			mapperName = className + "$RUIXUS_JSON";
+			mapperName = clazz.getName() + "$RUIXUS_JSON";
 		}
 	
 		Include classJsonInclude;
