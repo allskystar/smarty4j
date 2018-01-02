@@ -229,7 +229,14 @@ public class Provider {
 	public Serializer createSerializer(Class<?> clazz) {
 		ClassLoader loader = clazz.getClassLoader();
 		String className = clazz.getName().replace('.', '/');
-		String mapperName = className + "$RUIXUS_JSON";
+		String mapperName;
+		if (className.startsWith("java/")) {
+			loader = Provider.class.getClassLoader();
+			mapperName = Provider.class.getName() + '$' + className.replace('/', '$');
+		} else {
+			mapperName = className + "$RUIXUS_JSON";
+		}
+	
 		Include classJsonInclude;
 		{
 			JsonInclude anno = clazz.getAnnotation(JsonInclude.class);
