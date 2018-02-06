@@ -173,7 +173,8 @@ public class Provider {
 		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;");
 		mv.visitVarInsn(ALOAD, PROVIDER);
 		mv.visitInsn(SWAP);
-		mv.visitMethodInsn(INVOKEVIRTUAL, Provider.NAME, "getSerializer", "(Ljava/lang/Class;)L" + Serializer.NAME + ";");
+		mv.visitMethodInsn(INVOKEVIRTUAL, Provider.NAME, "getSerializer",
+				"(Ljava/lang/Class;)L" + Serializer.NAME + ";");
 		mv.visitInsn(SWAP);
 		mv.visitVarInsn(ALOAD, CB);
 		mv.visitVarInsn(ALOAD, PROVIDER);
@@ -236,7 +237,7 @@ public class Provider {
 		} else {
 			mapperName = className + "$RUIXUS_JSON";
 		}
-	
+
 		Include classJsonInclude;
 		{
 			JsonInclude anno = clazz.getAnnotation(JsonInclude.class);
@@ -312,6 +313,7 @@ public class Provider {
 
 				Annotation[] annos = accessor.getDeclaredAnnotations();
 				Include jsonInclude = classJsonInclude;
+				boolean directOutput = false;
 				for (Annotation anno : annos) {
 					Class<?> cc = anno.annotationType();
 					if (cc == JsonIgnore.class) {
@@ -320,6 +322,8 @@ public class Provider {
 						name = ((JsonProperty) anno).value();
 					} else if (cc == JsonInclude.class) {
 						jsonInclude = ((JsonInclude) anno).value();
+					} else if (cc == JsonDirectOutput.class) {
+						directOutput = true;
 					}
 				}
 
@@ -384,19 +388,37 @@ public class Provider {
 						mv.visitJumpInsn(IFEQ, end);
 					}
 
-					boolean assign = false;
+					boolean assign;
 
-					for (Annotation anno : annos) {
-						Serializer serializer = getSerializer(anno.getClass().getInterfaces()[0], false);
-						if (serializer != null) {
-							mv.visitVarInsn(ALOAD, CB);
-							mv.visitLdcInsn("\"" + name + "\":");
-							mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(Ljava/lang/String;)V");
+					if (directOutput) {
+						assign = true;
 
-							mv.visitVarInsn(ALOAD, VALUE);
-							staticCall(mv, serializer, accessor.getGenericReturnType());
-							assign = true;
-							break;
+						mv.visitVarInsn(ALOAD, CB);
+						mv.visitLdcInsn("\"" + name + "\":");
+						mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(Ljava/lang/String;)V");
+
+						mv.visitVarInsn(ALOAD, CB);
+						mv.visitVarInsn(ALOAD, VALUE);
+						if (type != String.class) {
+							mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "toString", "()Ljava/lang/String;");
+						}
+						mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append", "(Ljava/lang/String;)V");
+					} else {
+						assign = false;
+
+						for (Annotation anno : annos) {
+							Serializer serializer = getSerializer(anno.getClass().getInterfaces()[0], false);
+							if (serializer != null) {
+								mv.visitVarInsn(ALOAD, CB);
+								mv.visitLdcInsn("\"" + name + "\":");
+								mv.visitMethodInsn(INVOKEVIRTUAL, SimpleCharBuffer.NAME, "append",
+										"(Ljava/lang/String;)V");
+
+								mv.visitVarInsn(ALOAD, VALUE);
+								staticCall(mv, serializer, accessor.getGenericReturnType());
+								assign = true;
+								break;
+							}
 						}
 					}
 
@@ -594,8 +616,8 @@ public class Provider {
 
 		byte[] code = cw.toByteArray();
 		try {
-			ObjectSerializer serializer = (ObjectSerializer) ((Class<?>) defineClass.invoke(loader, mapperName.replace('/', '.'), code, 0,
-					code.length)).newInstance();
+			ObjectSerializer serializer = (ObjectSerializer) ((Class<?>) defineClass.invoke(loader,
+					mapperName.replace('/', '.'), code, 0, code.length)).newInstance();
 			for (Map.Entry<String, Object> name : names.entrySet()) {
 				serializer.setNameIndex(name.getKey(), (BeanItem) name.getValue());
 			}
